@@ -1,0 +1,15 @@
+out_prefix: '' # Leave as empty string for current working directory
+log_prefix: logs/
+temp_prefix: /srv/scratch/atwang/encode_scatac_
+
+max_threads: 8
+seed: 8757647
+
+### ARCHR TEST DATASET ###
+
+atac_samples: 
+  - scATAC_BMMC_R1
+  - scATAC_CD34_BMMC_R1
+  - scATAC_PBMC_R1
+
+fragments_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test/HemeFragments/

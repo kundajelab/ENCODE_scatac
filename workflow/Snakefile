@@ -1,0 +1,45 @@
+configfile: "config/config.yaml"
+
+out_prefix = config["out_prefix"]
+log_prefix = config["log_prefix"]
+temp_prefix = config["temp_prefix"]
+
+max_threads = config["threads"]
+seed = config["seed"]
+
+atac_samples = config["atac_samples"]
+
+# temporary
+fragments_prefix = config["fragments_prefix"] 
+
+"""
+Preliminary ArchR analyses
+"""
+rule build_archr_project:
+    input:
+        expand(fragments_prefix + "{sample}.fragments.tsv.gz", sample=atac_samples)
+    output:
+        arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
+        qc_dir=directory(out_prefix + "/archr_build/qc"),
+        project_dir=directory(out_prefix + "/archr_build/project")
+    params:
+        seed=seed
+    log:
+        log_dir=(log_prefix + "/archr_build")
+        arrow_create=(log_prefix + "/archr_build/arrow_create.log"),
+        doublets=(log_prefix + "/archr_build/doublets.log"),
+        lsi=(log_prefix + "/archr_build/lsi.log"),
+        cluster=(log_prefix + "/archr_build/cluster.log"),
+        marker_genes=(log_prefix + "/archr_build/marker_genes.log"),
+        pseudobulk_rep=(log_prefix + "/archr_build/pseudobulk_rep.log"),
+        peak_call=(log_prefix + "/archr_build/peak_call.log"),
+        peak_matrix=(log_prefix + "/archr_build/peak_matrix.log"),
+        marker_peaks=(log_prefix + "/archr_build/marker_peaks.log"),
+        enr_motif=(log_prefix + "/archr_build/enr_motif.log"),
+        fetch_tf=(log_prefix + "/archr_build/fetch_tf.log"),
+        enr_tf=(log_prefix + "/archr_build/enr_tf.log"),
+        save=(log_prefix + "/archr_build/save.log"),
+    threads:
+        max_threads
+    script:
+        "build_archr_project.R"
