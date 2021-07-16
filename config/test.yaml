@@ -1,4 +1,4 @@
-out_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test
+out_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test/
 log_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test/logs/
 temp_prefix: /srv/scratch/atwang/encode_scatac_
 

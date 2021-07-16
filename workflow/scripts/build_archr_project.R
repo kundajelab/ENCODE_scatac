@@ -49,14 +49,6 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         ArchRProj = proj,
         useMatrix = "TileMatrix", 
         name = "IterativeLSI", 
-        iterations = 2, 
-        clusterParams = list( 
-            resolution = c(0.2), 
-            sampleCells = 10000, 
-            n.start = 10
-        ), 
-        varFeatures = 25000, 
-        dimsToUse = 1:30,
         logFile = log_paths[["lsi"]]
     )
 
