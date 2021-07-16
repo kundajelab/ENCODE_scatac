@@ -6,7 +6,7 @@ build_archr_project <- function(input_paths, output_paths, threads, log_paths, s
     addArchRThreads(threads = threads)
     addArchRGenome("hg38")
 
-    arrow_sample_names = names(input_paths)
+    arrow_sample_names = names(unlist(input_paths, use.names=FALSE))
     arrow_output_names = paste0(output_paths[["arrows_temp_dir"]], arrow_sample_names)
     print(arrow_output_names) ####
     arrows <- createArrowFiles(
