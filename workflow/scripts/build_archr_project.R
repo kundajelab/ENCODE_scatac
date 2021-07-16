@@ -1,5 +1,6 @@
 library(ArchR)
 
+# Disable HDF5 file locking
 # Workaround for HDF5 I/O issues on shared filesystems
 # https://github.com/GreenleafLab/ArchR/issues/248#issuecomment-789453997
 Sys.setenv("HDF5_USE_FILE_LOCKING" = "FALSE")
@@ -12,22 +13,21 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
     addArchRGenome("hg38")
 
     input_paths = unlist(input_paths)
-    # dir.create(output_paths[["arrows_temp_dir"]])
     arrow_output_names = paste0(output_paths[["arrows_temp_dir"]], arrow_sample_names)
-    # print(arrow_output_names) ####
     arrows <- createArrowFiles(
         inputFiles = input_paths,
         sampleNames = arrow_sample_names,
         outputNames = arrow_output_names,
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
-        subThreading = FALSE, # required
+        force = TRUE,
+        subThreading = FALSE, # required or else file locking gets turned back on
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
     )
 
     proj <- ArchRProject(
-        ArrowFiles = ArrowFiles, 
+        ArrowFiles = arrows, 
         outputDirectory = output_paths[["project_dir"]],
         copyArrows = FALSE 
     )
