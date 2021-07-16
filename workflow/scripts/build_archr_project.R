@@ -14,20 +14,22 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
 
     input_paths = unlist(input_paths)
     arrow_output_names = paste0(output_paths[["arrows_temp_dir"]], arrow_sample_names)
-    print(input_paths) ####
-    print(arrow_output_names) ####
+    # print(input_paths) ####
+    # print(arrow_output_names) ####
     arrows <- createArrowFiles(
         inputFiles = input_paths,
         sampleNames = arrow_sample_names,
         outputNames = arrow_output_names,
+        minTSS = 0, ####
+        minFrags = 0, ####
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
-        # force = TRUE,
+        force = TRUE,
         subThreading = FALSE, # required or else file locking gets turned back on
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
     )
-    print(arrows) ####
+    # print(arrows) ####
 
     proj <- ArchRProject(
         ArrowFiles = arrows, 
