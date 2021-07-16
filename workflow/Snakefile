@@ -25,7 +25,7 @@ rule build_archr_project:
     params:
         seed=seed
     log:
-        log_dir=(log_prefix + "/archr_build")
+        log_dir=(log_prefix + "/archr_build"),
         arrow_create=(log_prefix + "/archr_build/arrow_create.log"),
         doublets=(log_prefix + "/archr_build/doublets.log"),
         lsi=(log_prefix + "/archr_build/lsi.log"),
