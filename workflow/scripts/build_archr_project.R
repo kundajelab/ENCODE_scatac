@@ -34,7 +34,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         outputDirectory = output_paths[["project_dir"]],
         copyArrows = FALSE 
     )
-    print(nCells(input = proj))
+    print(nCells(input = proj)) ####
 
     # Calculate doublet scores
     doub_scores <- addDoubletScores(
