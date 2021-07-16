@@ -20,7 +20,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         outputNames = arrow_output_names,
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
-        force = TRUE,
+        # force = TRUE,
         subThreading = FALSE, # required or else file locking gets turned back on
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
@@ -34,7 +34,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
 
     # Calculate doublet scores
     doub_scores <- addDoubletScores(
-        input = arrows,
+        input = proj,
         k = 10, 
         knnMethod = "UMAP", 
         LSIMethod = 1,
