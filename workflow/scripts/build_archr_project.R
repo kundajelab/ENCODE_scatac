@@ -1,6 +1,6 @@
 library(ArchR)
 
-build_archr_project <- function(input_paths, output_paths, qc_dir, threads, log_paths, seed) {
+build_archr_project <- function(input_paths, output_paths, threads, log_paths, seed) {
     set.seed(seed)
 
     addArchRThreads(threads = threads)
