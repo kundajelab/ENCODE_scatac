@@ -78,7 +78,6 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         nNeighbors = 30, 
         minDist = 0.5, 
         metric = "cosine",
-        logFile = log_paths[["umap"]]
     )
 
     # Get marker genes
