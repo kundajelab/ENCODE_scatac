@@ -25,6 +25,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
     )
+    print(arrows) ####
 
     proj <- ArchRProject(
         ArrowFiles = arrows, 
