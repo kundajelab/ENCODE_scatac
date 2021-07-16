@@ -8,6 +8,7 @@ build_archr_project <- function(input_paths, output_paths, threads, log_paths, s
 
     arrow_sample_names = names(input_paths)
     arrow_output_names = paste0(output_paths[["arrows_temp_dir"]], arrow_sample_names)
+    print(arrow_output_names) ####
     arrows <- createArrowFiles(
         inputFiles = input_paths,
         sampleNames = arrow_sample_names,
