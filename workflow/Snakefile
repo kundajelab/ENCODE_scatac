@@ -35,6 +35,7 @@ rule build_archr_project:
         doublets=(log_prefix + "archr_build/doublets.log"),
         lsi=(log_prefix + "archr_build/lsi.log"),
         cluster=(log_prefix + "archr_build/cluster.log"),
+        umap=(log_prefix + "archr_build/umap.log"),
         marker_genes=(log_prefix + "archr_build/marker_genes.log"),
         pseudobulk_rep=(log_prefix + "archr_build/pseudobulk_rep.log"),
         peak_call=(log_prefix + "archr_build/peak_call.log"),
