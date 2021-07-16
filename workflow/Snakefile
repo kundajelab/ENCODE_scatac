@@ -4,7 +4,7 @@ out_prefix = config["out_prefix"]
 log_prefix = config["log_prefix"]
 temp_prefix = config["temp_prefix"]
 
-max_threads = config["threads"]
+max_threads = config["max_threads"]
 seed = config["seed"]
 
 atac_samples = config["atac_samples"]
