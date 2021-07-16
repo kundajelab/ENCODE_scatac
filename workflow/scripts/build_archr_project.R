@@ -1,6 +1,6 @@
 library(ArchR)
 
-build_archr_project <- function(sample_names, input_paths, output_paths, threads, log_paths, seed) {
+build_archr_project <- function(arrow_sample_names, input_paths, output_paths, threads, log_paths, seed) {
     set.seed(seed)
 
     addArchRThreads(threads = threads)
@@ -8,7 +8,6 @@ build_archr_project <- function(sample_names, input_paths, output_paths, threads
 
     print(input_paths) ####
     input_paths = unlist(input_paths)
-    arrow_sample_names = names(input_paths)
     arrow_output_names = paste0(output_paths[["arrows_temp_dir"]], arrow_sample_names)
     print(input_paths) ####
     print(arrow_output_names) ####
