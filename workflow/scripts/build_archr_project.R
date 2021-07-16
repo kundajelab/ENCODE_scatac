@@ -20,11 +20,11 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         inputFiles = input_paths,
         sampleNames = arrow_sample_names,
         outputNames = arrow_output_names,
-        minTSS = 0, ####
-        minFrags = 0, ####
+        minTSS = 1, ####
+        minFrags = 1, ####
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
-        # force = TRUE,
+        force = TRUE,
         subThreading = FALSE, # required or else file locking gets turned back on
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
