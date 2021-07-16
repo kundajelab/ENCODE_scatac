@@ -21,13 +21,13 @@ Preliminary ArchR analyses
 """
 rule build_archr_project:
     input:
-        sample_names=atac_samples,
-        fragment_paths=expand(fragments_prefix + "{sample}.fragments.tsv.gz", sample=atac_samples)
+        expand(fragments_prefix + "{sample}.fragments.tsv.gz", sample=atac_samples)
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
         qc_dir=directory(out_prefix + "archr_build/qc"),
         project_dir=directory(out_prefix + "archr_build/project")
     params:
+        sample_names=atac_samples,
         seed=seed
     log:
         log_dir=(log_prefix + "archr_build"),
