@@ -1,4 +1,4 @@
-configfile: "config/config.yaml"
+configfile: config/test.yaml # test
 
 out_prefix = config["out_prefix"]
 log_prefix = config["log_prefix"]
@@ -9,7 +9,7 @@ seed = config["seed"]
 
 atac_samples = config["atac_samples"]
 
-# temporary
+# test
 fragments_prefix = config["fragments_prefix"] 
 
 """
