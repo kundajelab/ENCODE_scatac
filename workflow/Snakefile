@@ -12,6 +12,10 @@ atac_samples = config["atac_samples"]
 # test
 fragments_prefix = config["fragments_prefix"] 
 
+rule all:
+    input:
+        directory(out_prefix + "archr_build/project")
+
 """
 Preliminary ArchR analyses
 """
