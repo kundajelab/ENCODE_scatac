@@ -1,4 +1,4 @@
-configfile: config/test.yaml # test
+configfile: "config/test.yaml" # test
 
 out_prefix = config["out_prefix"]
 log_prefix = config["log_prefix"]
