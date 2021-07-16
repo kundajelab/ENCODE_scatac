@@ -1,5 +1,10 @@
 library(ArchR)
 
+# Workaround for HDF5 I/O issues on shared filesystems
+# https://github.com/GreenleafLab/ArchR/issues/248#issuecomment-789453997
+Sys.setenv("HDF5_USE_FILE_LOCKING" = "FALSE")
+Sys.setenv("RHDF5_USE_FILE_LOCKING" = "FALSE")
+
 build_archr_project <- function(arrow_sample_names, input_paths, output_paths, threads, log_paths, seed) {
     set.seed(seed)
 
@@ -16,6 +21,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         outputNames = arrow_output_names,
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
+        subThreading = FALSE, # required
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
     )
