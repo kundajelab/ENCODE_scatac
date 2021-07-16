@@ -3,8 +3,6 @@ library(ArchR)
 build_archr_project <- function(input_paths, output_paths, qc_dir, threads, log_paths, seed) {
     set.seed(seed)
 
-    dir.create(dirname(log_path), showWarnings = FALSE)
-
     addArchRThreads(threads = threads)
     addArchRGenome("hg38")
 
