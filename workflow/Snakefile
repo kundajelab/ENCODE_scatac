@@ -46,4 +46,4 @@ rule build_archr_project:
     threads:
         max_threads
     script:
-        "build_archr_project.R"
+        "scripts/build_archr_project.R"
