@@ -6,18 +6,13 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
     addArchRThreads(threads = threads)
     addArchRGenome("hg38")
 
-    print(input_paths) ####
     input_paths = unlist(input_paths)
-    arrow_output_names = paste0(output_paths[["arrows_temp_dir"]], arrow_sample_names)
-    print(input_paths) ####
-    print(arrow_sample_names) ####
-    print(arrow_output_names) ####
+    arrow_output_names = paste33330(output_paths[["arrows_temp_dir"]], arrow_sample_names)
+    print(arrow_output_names) 
     arrows <- createArrowFiles(
         inputFiles = input_paths,
         sampleNames = arrow_sample_names,
         outputNames = arrow_output_names,
-        filterTSS = 4, 
-        filterFrags = 1000, 
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
         logFile = log_paths[["arrow_create"]],
