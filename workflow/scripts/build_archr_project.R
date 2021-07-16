@@ -24,7 +24,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         minFrags = 0, ####
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
-        force = TRUE,
+        # force = TRUE,
         subThreading = FALSE, # required or else file locking gets turned back on
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
@@ -46,6 +46,8 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         LSIMethod = 1,
         logFile = log_paths[["doublets"]],
     )
+    print(nCells(input = proj)) ####
+
     
     # Filter doublets
     proj <- filterDoublets(proj)
