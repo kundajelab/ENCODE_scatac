@@ -17,7 +17,7 @@ fragments_suffix: .fragments.tsv.gz
 
 
 atac_samples: 
-  - atac_v1_pbmc_10k_fragments
+  - atac_v1_pbmc_10k
 
 fragments_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test/PBMC/
 fragments_suffix: _fragments.tsv.gz
