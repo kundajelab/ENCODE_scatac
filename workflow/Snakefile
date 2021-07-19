@@ -11,6 +11,7 @@ atac_samples = config["atac_samples"]
 
 # test
 fragments_prefix = config["fragments_prefix"] 
+fragments_suffix = config["fragments_suffix"] 
 
 rule all:
     input:
@@ -21,7 +22,7 @@ Preliminary ArchR analyses
 """
 rule build_archr_project:
     input:
-        expand(fragments_prefix + "{sample}.fragments.tsv.gz", sample=atac_samples)
+        expand(fragments_prefix + sample + fragments_suffix, sample=atac_samples)
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
         qc_dir=directory(out_prefix + "archr_build/qc"),

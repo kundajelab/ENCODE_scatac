@@ -13,8 +13,11 @@ seed: 8757647
 #   - scATAC_PBMC_R1
 
 # fragments_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test/HemeFragments/
+fragments_suffix: .fragments.tsv.gz
+
 
 atac_samples: 
   - atac_v1_pbmc_10k_fragments
 
 fragments_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test/PBMC/
+fragments_suffix: _fragments.tsv.gz
