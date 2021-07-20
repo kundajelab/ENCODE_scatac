@@ -24,7 +24,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         # minFrags = 1, ####
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
-        force = TRUE,
+        # force = TRUE,
         subThreading = FALSE, # required or else file locking gets turned back on
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
@@ -120,8 +120,15 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         testMethod = "wilcoxon",
         logFile = log_paths[["marker_peaks"]]
     )
+    marker_peaks_list <- getMarkers(marker_peaks, cutOff = "FDR <= 0.01 & Log2FC >= 1")
 
     # Calculate motif enrichment
+    proj <- addMotifAnnotations(
+        ArchRProj = proj, 
+        motifSet = "cisbp", 
+        name = "Motif"
+        logFile = log_paths[["fetch_motif"]]
+    )
     enrichMotifs <- peakAnnoEnrichment(
         seMarker = marker_peaks,
         ArchRProj = proj,
