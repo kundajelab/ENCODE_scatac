@@ -7,6 +7,8 @@ temp_prefix = config["temp_prefix"]
 max_threads = config["max_threads"]
 seed = config["seed"]
 
+genome = config["genome"]
+
 atac_samples = config["atac_samples"]
 
 # test
@@ -29,7 +31,8 @@ rule build_archr_project:
         project_dir=directory(out_prefix + "archr_build/project")
     params:
         sample_names=atac_samples,
-        seed=seed
+        seed=seed,
+        genome=genome
     log:
         log_dir=(log_prefix + "archr_build"),
         arrow_create=(log_prefix + "archr_build/arrow_create.log"),

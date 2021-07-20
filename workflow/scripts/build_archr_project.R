@@ -6,11 +6,11 @@ library(ArchR)
 Sys.setenv("HDF5_USE_FILE_LOCKING" = "FALSE")
 Sys.setenv("RHDF5_USE_FILE_LOCKING" = "FALSE")
 
-build_archr_project <- function(arrow_sample_names, input_paths, output_paths, threads, log_paths, seed) {
+build_archr_project <- function(arrow_sample_names, input_paths, output_paths, threads, log_paths, seed, genome) {
     set.seed(seed)
 
     addArchRThreads(threads = threads)
-    addArchRGenome("hg38")
+    addArchRGenome(genome)
 
     input_paths = unlist(input_paths)
     arrow_output_names = paste0(output_paths[["arrows_temp_dir"]], arrow_sample_names)
@@ -20,11 +20,11 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         inputFiles = input_paths,
         sampleNames = arrow_sample_names,
         outputNames = arrow_output_names,
-        minTSS = 1, ####
-        minFrags = 1, ####
+        # minTSS = 1, ####
+        # minFrags = 1, ####
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
-        # force = TRUE,
+        force = TRUE,
         subThreading = FALSE, # required or else file locking gets turned back on
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
@@ -155,4 +155,4 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
 
 }
 
-build_archr_project(snakemake@params[["sample_names"]], snakemake@input, snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["seed"]])
+build_archr_project(snakemake@params[["sample_names"]], snakemake@input, snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["seed"]], snakemake@params[["genome"]])
