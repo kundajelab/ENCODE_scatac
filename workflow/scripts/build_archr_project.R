@@ -1,4 +1,5 @@
 library(ArchR)
+library(chromVARmotifs)
 
 # Disable HDF5 file locking
 # Workaround for HDF5 I/O issues on shared filesystems
