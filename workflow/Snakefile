@@ -44,6 +44,7 @@ rule build_archr_project:
         peak_call=(log_prefix + "archr_build/peak_call.log"),
         peak_matrix=(log_prefix + "archr_build/peak_matrix.log"),
         marker_peaks=(log_prefix + "archr_build/marker_peaks.log"),
+        fetch_motif=(log_prefix + "archr_build/fetch_motif.log"),
         enr_motif=(log_prefix + "archr_build/enr_motif.log"),
         fetch_tf=(log_prefix + "archr_build/fetch_tf.log"),
         enr_tf=(log_prefix + "archr_build/enr_tf.log"),
