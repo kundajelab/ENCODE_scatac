@@ -37,6 +37,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         k = 10, 
         knnMethod = "UMAP", 
         LSIMethod = 1,
+        outDir = output_paths[["qc_dir"]],
         logFile = log_paths[["doublets"]],
     )
 
@@ -87,6 +88,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         testMethod = "wilcoxon",
         logFile = log_paths[["marker_genes"]]
     )
+    marker_genes_list <- getMarkers(marker_genes, cutOff = "FDR <= 0.01 & Log2FC >= 1.25")
 
     # Generate pseudo-bulk replicates
     proj <- addGroupCoverages(
