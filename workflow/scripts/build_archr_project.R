@@ -126,7 +126,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
     proj <- addMotifAnnotations(
         ArchRProj = proj, 
         motifSet = "cisbp", 
-        name = "Motif"
+        name = "Motif",
         logFile = log_paths[["fetch_motif"]]
     )
     enrichMotifs <- peakAnnoEnrichment(
