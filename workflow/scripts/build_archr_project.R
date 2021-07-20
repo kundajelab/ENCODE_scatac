@@ -31,23 +31,21 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
     )
     # print(arrows) ####
 
-    proj <- ArchRProject(
-        ArrowFiles = arrows, 
-        outputDirectory = output_paths[["project_dir"]],
-        copyArrows = FALSE 
-    )
-    print(nCells(input = proj)) ####
-
     # Calculate doublet scores
     doub_scores <- addDoubletScores(
-        input = proj,
+        input = arrows,
         k = 10, 
         knnMethod = "UMAP", 
         LSIMethod = 1,
         logFile = log_paths[["doublets"]],
     )
-    print(nCells(input = proj)) ####
 
+    # Create project
+    proj <- ArchRProject(
+        ArrowFiles = arrows, 
+        outputDirectory = output_paths[["project_dir"]],
+        copyArrows = FALSE 
+    )
     
     # Filter doublets
     proj <- filterDoublets(proj)
