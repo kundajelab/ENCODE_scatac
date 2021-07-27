@@ -15,9 +15,65 @@ atac_samples = config["atac_samples"]
 fragments_prefix = config["fragments_prefix"] 
 fragments_suffix = config["fragments_suffix"] 
 
+def get_input_fastq_r1(wildcards):
+    return config["fastq"][wildcards.sample]["R1"]
+
+def get_input_fastq_r2(wildcards):
+    return config["fastq"][wildcards.sample]["R2"]
+
 rule all:
     input:
         directory(out_prefix + "archr_build/project")
+
+"""
+Read alignment (Bowtie2 aligner)
+"""
+rule align_bowtie2:
+    input:
+        fastq1=get_input_fastq_r1,
+        fastq2=get_input_fastq_r2,
+        bwt2_idx=config["bwt2"]["index"] #TODO: Add to config
+    output:
+        bam_raw=(out_prefix + "align/raw.bam"),
+        bam_no_mito=(out_prefix + "align/non_mito.bam"),
+        flagstat_qc=(out_prefix + "align/flagstat_raw.qc")
+    params:
+        multimapping=config["bwt2"]["multimapping"] #TODO: Add to config
+    log:
+        log_prefix + "align/bwt2.log",
+    threads:
+        max_threads
+    shell:
+        "./scripts/align.sh {input.fastq1} {input.fastq2} {input.bwt2_idx}" 
+        "{params.multimapping}" 
+        "{output.bam_raw} {output.bam_no_mito} {output.flagstat_qc}"
+        "{log} {threads}"
+
+"""
+Compute fraction of mitochondrial reads
+"""
+rule frac_mito:
+    #TODO
+
+"""
+Post-alignment filtering
+"""
+rule dedup_bam:
+    input:
+        out_prefix + "raw.bam"
+    output:
+        bam=(out_prefix + "align/final.bam"),
+        ind=(out_prefix + "align/final.bam.bai"),
+        flagstat=(out_prefix + "align/flagstat_final.qc"),
+        dup=(out_prefix + "align/dup.qc"),
+        pbc=(out_prefix + "align/pbc.qc"),
+        filter_temp_prefix=temp(directory(temp_prefix + "align/filter/"))
+    threads:
+        max_threads
+    shell:
+        f"scripts_sh/dedup_bam_{'pe' if is_paired_end else 'se'}.sh"
+        " {input} {output.bam} {output.ind} {output.flagstat} {output.dup} {output.pbc} {output.filter_temp_prefix} {threads}"
+
 
 """
 Preliminary ArchR analyses
