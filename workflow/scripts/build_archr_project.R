@@ -49,6 +49,8 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         outputDirectory = output_paths[["project_dir"]],
         copyArrows = FALSE 
     )
+    markers_dir = file.path(output_paths[["project_dir"]], "Markers")
+    dir.create(markers_dir)
     
     # Filter doublets
     proj <- filterDoublets(proj)
@@ -91,6 +93,8 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         logFile = log_paths[["marker_genes"]]
     )
     marker_genes_list <- getMarkers(marker_genes, cutOff = "FDR <= 0.01 & Log2FC >= 1.25")
+    marker_genes_path <= file.path(markers_dir, "marker_genes.rds")
+    saveRDS(marker_genes_list, marker_genes_path)
 
     # Generate pseudo-bulk replicates
     proj <- addGroupCoverages(
@@ -123,6 +127,8 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         logFile = log_paths[["marker_peaks"]]
     )
     marker_peaks_list <- getMarkers(marker_peaks, cutOff = "FDR <= 0.01 & Log2FC >= 1")
+    marker_peaks_path <= file.path(markers_dir, "marker_peaks.rds")
+    saveRDS(marker_peaks_list, marker_peaks_path)
 
     # Calculate motif enrichment
     proj <- addMotifAnnotations(
