@@ -92,16 +92,6 @@ def chunk_writer_gzip(filename, what):
                 out_write.writelines(what)
     return(filename)            
 
-def prove_barcode_simple(bc, valid_set):
-    '''
-    Function that takes a putative barcode and returns the nearest valid one
-    '''
-        
-    if(bc in valid_set):
-        return(bc)
-    else:
-        return("NA")
-
             
 def formatRead(raw_barcode, corrected_barcode, title, sequence, quality):
     """
