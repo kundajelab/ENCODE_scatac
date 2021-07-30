@@ -8,11 +8,12 @@ MULTIMAPPING = $4
 
 BAM_RAW_PATH = $5
 BAM_NO_MITO_PATH = $6
-FLAGSTAT_QC_PATH = $7
+BAM_MITO_PATH = $7
+FLAGSTAT_QC_PATH = $8
 
-LOG_BWT_PATH = $8
+LOG_BWT_PATH = $9
 
-THREADS = $9
+THREADS = ${10}
 
 if [ $MULTIMAPPING == 0 ]
 then
@@ -30,4 +31,5 @@ fi
 samtools sort -n --@ $THREADS $BAM_RAW_PATH -O SAM | SAMstats --sorted_sam_file - --outf $FLAGSTAT_QC_PATH
 
 samtools idxstats $BAM_RAW_PATH | cut -f 1 | grep -v -P "^chrM$" | xargs samtools view $BAM_RAW_PATH -@ $THREADS -b> $BAM_NO_MITO_PATH
+samtools idxstats $BAM_RAW_PATH | cut -f 1 | grep -P "^chrM$" | xargs samtools view $BAM_RAW_PATH -@ $THREADS -b> $BAM_MITO_PATH
 

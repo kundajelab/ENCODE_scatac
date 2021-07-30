@@ -21,66 +21,121 @@ def get_input_fastq_r1(wildcards):
 def get_input_fastq_r2(wildcards):
     return config["fastq"][wildcards.sample]["R2"]
 
+def get_input_fastq_bc(wildcards):
+    return config["fastq"][wildcards.sample]["BC"]
+
+
 rule all:
     input:
         directory(out_prefix + "archr_build/project")
+
+"""
+Barcode Correction and Filtering
+"""
+rule barcode_corr:
+    input:
+        fastq1=get_input_fastq_r1,
+        fastq2=get_input_fastq_r2,
+        fastq_bc=get_input_fastq_bc,
+        bc_whitelist=config["barcode_correction"]["whitelist"] #TODO: Add to config
+    output:
+        fastq1_bc=(out_prefix + "barcode/{sample}_R1_bc.fastq"),
+        fastq2_bc=(out_prefix + "barcode/{sample}_R2_bc.fastq"),
+        qc_barcode_corr=(out_prefix + "barcode/{sample}_barcode_corr.qc")
+    params:
+        max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] #TODO: Add to config
+    threads:
+        max_threads
+    script:
+        "scripts/process_10x_barcodes.py"
 
 """
 Read alignment (Bowtie2 aligner)
 """
 rule align_bowtie2:
     input:
-        fastq1=get_input_fastq_r1,
-        fastq2=get_input_fastq_r2,
+        fastq1=(out_prefix + "barcode/{sample}_R1_bc.fastq"),
+        fastq2=(out_prefix + "barcode/{sample}_R2_bc.fastq"),
         bwt2_idx=config["bwt2"]["index"] #TODO: Add to config
     output:
-        bam_raw=(out_prefix + "align/raw.bam"),
-        bam_no_mito=(out_prefix + "align/non_mito.bam"),
-        flagstat_qc=(out_prefix + "align/flagstat_raw.qc")
+        bam_raw=(out_prefix + "align/{sample}/raw.bam"),
+        bam_no_mito=(out_prefix + "align/{sample}/non_mito.bam"),
+        bam_mito=(out_prefix + "align/{sample}/mito.bam"),
+        flagstat_qc=(out_prefix + "align/{sample}/flagstat_raw.qc")
     params:
         multimapping=config["bwt2"]["multimapping"] #TODO: Add to config
     log:
-        log_prefix + "align/bwt2.log",
+        log_prefix + "align/{sample}/bwt2.log",
     threads:
         max_threads
     shell:
-        "./scripts/align.sh {input.fastq1} {input.fastq2} {input.bwt2_idx}" 
-        "{params.multimapping}" 
-        "{output.bam_raw} {output.bam_no_mito} {output.flagstat_qc}"
-        "{log} {threads}"
+        "scripts/align.sh {input.fastq1} {input.fastq2} {input.bwt2_idx}" 
+        " {params.multimapping}" 
+        " {output.bam_raw} {output.bam_no_mito} {output.bam_mito} {output.flagstat_qc}"
+        " {log} {threads}"
 
 """
 Compute fraction of mitochondrial reads
 """
 rule frac_mito:
-    #TODO
+    input:
+        bam_raw=(out_prefix + "align/{sample}/raw.bam"),
+        bam_mito=(out_prefix + "align/{sample}/mito.bam"),
+        bam_no_mito=(out_prefix + "align/{sample}/non_mito.bam"),
+        tmp_sort_mito=temp(temp_prefix + "align/{sample}/sort_mito.tmp"),
+        tmp_sort_no_mito=temp(temp_prefix + "align/{sample}/sort_no_mito.tmp")
+    output:
+        mito_samstats_qc_path=(out_prefix + "align/mito_samstats.qc"),
+        no_mito_samstats_qc_path=(out_prefix + "align/{sample}/non_mito_samstats.qc"),
+        qc_frac_mito=(out_prefix + "align/{sample}/frac_mito.qc")
+    log:
+        log_prefix + "align/{sample}/frac_mito.log"
+    threads:
+        max_threads
+    script:
+        "scripts/frac_mito.py"
 
 """
 Post-alignment filtering
 """
 rule dedup_bam:
     input:
-        out_prefix + "raw.bam"
+        out_prefix + "align/{sample}/raw.bam"
     output:
-        bam=(out_prefix + "align/final.bam"),
-        ind=(out_prefix + "align/final.bam.bai"),
-        flagstat=(out_prefix + "align/flagstat_final.qc"),
-        dup=(out_prefix + "align/dup.qc"),
-        pbc=(out_prefix + "align/pbc.qc"),
-        filter_temp_prefix=temp(directory(temp_prefix + "align/filter/"))
+        bam=(out_prefix + "filter/{sample}/final.bam"),
+        ind=(out_prefix + "filter/{sample}/final.bam.bai"),
+        flagstat=(out_prefix + "filter/{sample}/flagstat_final.qc"),
+        dup=(out_prefix + "filter/{sample}/dup.qc"),
+        pbc=(out_prefix + "filter/{sample}/pbc.qc"),
+        filter_temp_prefix=temp(directory(temp_prefix + "filter/tmp_{sample}/"))
     threads:
         max_threads
     shell:
-        f"scripts_sh/dedup_bam_{'pe' if is_paired_end else 'se'}.sh"
+        "scripts/dedup_bam_pe.sh"
         " {input} {output.bam} {output.ind} {output.flagstat} {output.dup} {output.pbc} {output.filter_temp_prefix} {threads}"
 
+"""
+Convert BAM to fragment file
+"""
+rule bam_to_frag: 
+    input:
+        bam=(out_prefix + "filter/{sample}/final.bam"),
+        bam_ind=(out_prefix + "filter/{sample}/final.bam.bai"),
+    output:
+        frag=(out_prefix + "fragment/{sample}_fragments.tsv.gz"),
+        frag_ind=(out_prefix + "filter/{sample}_fragments.tsv.gz.tbi"),
+        tmp_frag=temp(temp_prefix + "fragment/{sample}/bam_to_frag.tmp"),
+    threads:
+        max_threads
+    shell:
+        "scripts/bam_to_frag.sh {input.bam} {output.frag} {output.tmp_frag}"
 
 """
 Preliminary ArchR analyses
 """
-rule build_archr_project:
+rule run_archr:
     input:
-        expand(fragments_prefix + "{sample}" + fragments_suffix, sample=atac_samples)
+        expand(out_prefix + "fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]) 
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
         qc_dir=directory(out_prefix + "archr_build/qc"),
