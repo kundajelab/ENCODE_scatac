@@ -6,6 +6,19 @@ import tqdm
 
 import matcha
 
+# Processes 10x ATAC-seq fastqs
+# Inputs: 10x fastq files R1,R2,R3, and barcode whitelist
+# Outputs: 
+#   - R1.fastq.gz: Input R1 filtered for matching barcodes, with corrected barcode
+#     appended to the read name
+#   - R2.fastq.gz: Input R3 (NOT R2) filtered for matching barcodes, with corrected barcode
+#     appended to the read name
+#
+# Limitations:
+#  - Current QC output is just printing a few lines to stdout at the end of the run
+#  - Currently doesn't have arguments for the output filenames
+#  - Only outputs corrected barcode, skipping the uncorrected barcode.
+
 def main():
     parser = argparse.ArgumentParser(description='Process raw fastq reads to append cell barcodes')
     parser.add_argument('fastq1', type=str, help='R1 fastq file')
