@@ -12,8 +12,8 @@ genome = config["genome"]
 atac_samples = config["atac_samples"]
 
 # test
-fragments_prefix = config["fragments_prefix"] 
-fragments_suffix = config["fragments_suffix"] 
+# fragments_prefix = config["fragments_prefix"] 
+# fragments_suffix = config["fragments_suffix"] 
 
 def get_input_fastq_r1(wildcards):
     return config["fastq"][wildcards.sample]["R1"]
@@ -37,13 +37,13 @@ rule barcode_corr:
         fastq1=get_input_fastq_r1,
         fastq2=get_input_fastq_r2,
         fastq_bc=get_input_fastq_bc,
-        bc_whitelist=config["barcode_correction"]["whitelist"] #TODO: Add to config
+        bc_whitelist=config["barcode_correction"]["whitelist"] 
     output:
         fastq1_bc=(out_prefix + "barcode/{sample}_R1_bc.fastq"),
         fastq2_bc=(out_prefix + "barcode/{sample}_R2_bc.fastq"),
         qc_barcode_corr=(out_prefix + "barcode/{sample}_barcode_corr.qc")
     params:
-        max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] #TODO: Add to config
+        max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] 
     threads:
         max_threads
     script:
@@ -56,14 +56,14 @@ rule align_bowtie2:
     input:
         fastq1=(out_prefix + "barcode/{sample}_R1_bc.fastq"),
         fastq2=(out_prefix + "barcode/{sample}_R2_bc.fastq"),
-        bwt2_idx=config["bwt2"]["index"] #TODO: Add to config
+        bwt2_idx=config["bwt2"]["index"] 
     output:
         bam_raw=(out_prefix + "align/{sample}/raw.bam"),
         bam_no_mito=(out_prefix + "align/{sample}/non_mito.bam"),
         bam_mito=(out_prefix + "align/{sample}/mito.bam"),
         flagstat_qc=(out_prefix + "align/{sample}/flagstat_raw.qc")
     params:
-        multimapping=config["bwt2"]["multimapping"] #TODO: Add to config
+        multimapping=config["bwt2"]["multimapping"] 
     log:
         log_prefix + "align/{sample}/bwt2.log",
     threads:
