@@ -9,7 +9,7 @@ seed = config["seed"]
 
 genome = config["genome"]
 
-atac_samples = config["atac_samples"]
+atac_samples = config["fastq"]
 
 # test
 # fragments_prefix = config["fragments_prefix"] 
