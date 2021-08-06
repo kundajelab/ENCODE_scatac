@@ -1,16 +1,16 @@
 #!/bin/bash
 
-RAW_BAM_FILE = $1
+RAW_BAM_FILE=$1
 
-FINAL_BAM_FILE = $2
-FINAL_BAM_INDEX_FILE = $3
-FINAL_BAM_FILE_MAPSTATS = $4
-DUP_FILE_QC = $5
-PBC_FILE_QC = $6
+FINAL_BAM_FILE=$2
+FINAL_BAM_INDEX_FILE=$3
+FINAL_BAM_FILE_MAPSTATS=$4
+DUP_FILE_QC=$5
+PBC_FILE_QC=$6
 
-TEMP_PREFIX = $7
+TEMP_PREFIX=$7
 
-THREADS = $8
+THREADS=$8
 
 # =============================
 # Remove  unmapped, mate unmapped

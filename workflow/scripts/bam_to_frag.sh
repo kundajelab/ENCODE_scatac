@@ -1,9 +1,9 @@
 #!/bin/bash
 
-FINAL_BAM_FILE = $1
+FINAL_BAM_FILE=$1
 
-FINAL_FRAG_FILE = $2
-TMP_FRAG_FILE = $3
+FINAL_FRAG_FILE=$2
+TMP_FRAG_FILE=$3
 
 # --min_mapq 0 : no MAPQ constraints, since filtering is already done and everything should be accepted
 # --max_distance 2000: This matches -X2000 argument for bowtie2, so should not filter any further
