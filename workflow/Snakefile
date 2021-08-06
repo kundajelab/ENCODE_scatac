@@ -83,7 +83,7 @@ rule frac_mito:
         bam_mito=(out_prefix + "align/{sample}/mito.bam"),
         bam_no_mito=(out_prefix + "align/{sample}/non_mito.bam"),
     output:
-        mito_samstats_qc_path=(out_prefix + "align/mito_samstats.qc"),
+        mito_samstats_qc_path=(out_prefix + "align/{sample}/mito_samstats.qc"),
         no_mito_samstats_qc_path=(out_prefix + "align/{sample}/non_mito_samstats.qc"),
         qc_frac_mito=(out_prefix + "align/{sample}/frac_mito.qc"),
         tmp_sort_mito=temp(temp_prefix + "align/{sample}/sort_mito.tmp"),
