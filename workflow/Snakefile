@@ -69,7 +69,7 @@ rule align_bowtie2:
     threads:
         max_threads
     shell:
-        "scripts/align.sh {input.fastq1} {input.fastq2}" 
+        "./scripts/align.sh {input.fastq1} {input.fastq2}" 
         " {params.bwt2_idx} {params.multimapping}" 
         " {output.bam_raw} {output.bam_no_mito} {output.bam_mito} {output.flagstat_qc}"
         " {log} {threads}"
@@ -111,7 +111,7 @@ rule dedup_bam:
     threads:
         max_threads
     shell:
-        "scripts/dedup_bam_pe.sh"
+        "./scripts/dedup_bam_pe.sh"
         " {input} {output.bam} {output.ind} {output.flagstat} {output.dup} {output.pbc} {output.filter_temp_prefix} {threads}"
 
 """
