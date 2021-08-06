@@ -220,7 +220,6 @@ with gzip.open(af, "rt") as f1:
                 for i, batch1 in enumerate(it1):
                     batch2 = it2.__next__()
                     batch3 = it3.__next__()
-                    output = o 
         
                     # parallel process the barcode processing and accounting of failures.
                     pool = Pool(processes=cpu)
