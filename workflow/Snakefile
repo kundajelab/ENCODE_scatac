@@ -56,21 +56,21 @@ rule align_bowtie2:
     input:
         fastq1=(out_prefix + "barcode/{sample}_R1_bc.fastq"),
         fastq2=(out_prefix + "barcode/{sample}_R2_bc.fastq"),
-        bwt2_idx=config["bwt2"]["index"] 
     output:
         bam_raw=(out_prefix + "align/{sample}/raw.bam"),
         bam_no_mito=(out_prefix + "align/{sample}/non_mito.bam"),
         bam_mito=(out_prefix + "align/{sample}/mito.bam"),
         flagstat_qc=(out_prefix + "align/{sample}/flagstat_raw.qc")
     params:
-        multimapping=config["bwt2"]["multimapping"] 
+        multimapping=config["bwt2"]["multimapping"],
+        bwt2_idx=config["bwt2"]["index"]
     log:
         log_prefix + "align/{sample}/bwt2.log",
     threads:
         max_threads
     shell:
-        "scripts/align.sh {input.fastq1} {input.fastq2} {input.bwt2_idx}" 
-        " {params.multimapping}" 
+        "scripts/align.sh {input.fastq1} {input.fastq2}" 
+        " {params.bwt2_idx} {params.multimapping}" 
         " {output.bam_raw} {output.bam_no_mito} {output.bam_mito} {output.flagstat_qc}"
         " {log} {threads}"
 
