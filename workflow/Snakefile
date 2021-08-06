@@ -27,7 +27,7 @@ def get_input_fastq_bc(wildcards):
 
 rule all:
     input:
-        directory(out_prefix + "archr_build/project")
+        out_prefix + "archr_build/indicator.txt"
 
 """
 Barcode Correction and Filtering
@@ -82,12 +82,12 @@ rule frac_mito:
         bam_raw=(out_prefix + "align/{sample}/raw.bam"),
         bam_mito=(out_prefix + "align/{sample}/mito.bam"),
         bam_no_mito=(out_prefix + "align/{sample}/non_mito.bam"),
-        tmp_sort_mito=temp(temp_prefix + "align/{sample}/sort_mito.tmp"),
-        tmp_sort_no_mito=temp(temp_prefix + "align/{sample}/sort_no_mito.tmp")
     output:
         mito_samstats_qc_path=(out_prefix + "align/mito_samstats.qc"),
         no_mito_samstats_qc_path=(out_prefix + "align/{sample}/non_mito_samstats.qc"),
-        qc_frac_mito=(out_prefix + "align/{sample}/frac_mito.qc")
+        qc_frac_mito=(out_prefix + "align/{sample}/frac_mito.qc"),
+        tmp_sort_mito=temp(temp_prefix + "align/{sample}/sort_mito.tmp"),
+        tmp_sort_no_mito=temp(temp_prefix + "align/{sample}/sort_no_mito.tmp")
     log:
         log_prefix + "align/{sample}/frac_mito.log"
     threads:
@@ -139,7 +139,8 @@ rule run_archr:
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
         qc_dir=directory(out_prefix + "archr_build/qc"),
-        project_dir=directory(out_prefix + "archr_build/project")
+        project_dir=directory(out_prefix + "archr_build/project"),
+        indicator=(out_prefix + "archr_build/indicator.txt")
     params:
         sample_names=atac_samples,
         seed=seed,
