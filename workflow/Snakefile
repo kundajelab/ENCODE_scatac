@@ -69,7 +69,7 @@ rule align_bowtie2:
     threads:
         max_threads
     shell:
-        "bash " + str(workflow.source_path("./scripts/align.sh"))
+        "bash " + str(workflow.source_path("./scripts/align.sh")) + ""
         " {input.fastq1} {input.fastq2}" 
         " {params.bwt2_idx} {params.multimapping}" 
         " {output.bam_raw} {output.bam_no_mito} {output.bam_mito} {output.flagstat_qc}"
