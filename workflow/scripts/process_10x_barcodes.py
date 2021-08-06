@@ -55,7 +55,7 @@ cpu = snakemake.threads
 
 # Define barcodes whitelist
 # barcodesfilepath = options.barcodesFile
-with gzip.open(barcodesfilepath, "rt") as my_file:
+with open(barcodesfilepath) as my_file:
     barcodesR = my_file.readlines()
 barcodes = [barcode.rstrip() for barcode in barcodesR]
 print("Found and imported " + str(len(barcodes)) + " barcodes")
