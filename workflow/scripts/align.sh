@@ -22,10 +22,9 @@ then
     | samtools view -u /dev/stdin \
     | samtools sort -o $BAM_RAW_PATH - 
 else
-    bowtie2 -k $((MULTIMAPPING+1)) -X2000 --mm -x $BWT_IDX_PATH --threads $THREADS -1 $FASTQ1_PATH -2 $FASTQ2_PATH --sam-append-comment \ 
-    # 2> $LOG_BWT_PATH \
-    # | samtools view -u /dev/stdin \
-    # | samtools sort -o $BAM_RAW_PATH - 
+    bowtie2 -k $((MULTIMAPPING+1)) -X2000 --mm -x $BWT_IDX_PATH --threads $THREADS -1 $FASTQ1_PATH -2 $FASTQ2_PATH --sam-append-comment 2> $LOG_BWT_PATH | 
+    samtools view -u /dev/stdin | 
+    samtools sort -o $BAM_RAW_PATH - 
 fi
 
 printf "asdfasdf\n"
