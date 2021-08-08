@@ -28,6 +28,8 @@ else
     | samtools sort -o $BAM_RAW_PATH - 
 fi
 
+printf "asdfasdf\n"
+
 samtools sort -n --@ $THREADS $BAM_RAW_PATH -O SAM | SAMstats --sorted_sam_file - --outf $FLAGSTAT_QC_PATH
 
 samtools idxstats $BAM_RAW_PATH | cut -f 1 | grep -v -P "^chrM$" | xargs samtools view $BAM_RAW_PATH -@ $THREADS -b> $BAM_NO_MITO_PATH
