@@ -10,7 +10,10 @@ PBC_FILE_QC=$6
 
 TEMP_PREFIX=$7
 
-THREADS=$8
+MULTIMAPPING=$8
+MMP_PATH=$9
+
+THREADS=${10}
 
 # =============================
 # Remove  unmapped, mate unmapped
@@ -22,19 +25,17 @@ FILT_BAM_PREFIX="${TEMP_PREFIX}.filt"
 FILT_BAM_FILE="${FILT_BAM_PREFIX}.bam"
 TMP_FILT_BAM_PREFIX="tmp.${FILT_BAM_PREFIX}.nmsrt"
 TMP_FILT_BAM_FILE="${TMP_FILT_BAM_PREFIX}.bam"
-
-## for multimapping > 0:
-samtools view -F 524 -f 2 -u ${RAW_BAM_FILE} | samtools -n /dev/stdin -o ${TMP_FILT_BAM_FILE}
-
 TMP_FILT_FIXMATE_BAM_FILE="${TMP_FILT_BAM_PREFIX}.fixmate.bam"
 
-samtools view -h ${TMP_FILT_BAM_FILE} | . ${BASH_SOURCE%/*}/assign_multimappers.py -k $multimapping --paired-end | samtools fixmate -r /dev/stdin ${TMP_FILT_FIXMATE_BAM_FILE}
-
-## for multimapping==0:
-MAPQ_THRESH=30
-samtools view -F 1804 -f 2 -q ${MAPQ_THRESH} -u ${RAW_BAM_FILE} | samtools sort -n /dev/stdin -o ${TMP_FILT_BAM_FILE} 
-samtools fixmate -r ${TMP_FILT_BAM_FILE} ${TMP_FILT_FIXMATE_BAM_FILE}
-
+if [[ $MULTIMAPPING == 0 ]]
+then
+    MAPQ_THRESH=30
+    samtools view -F 1804 -f 2 -q ${MAPQ_THRESH} -u ${RAW_BAM_FILE} | samtools sort -n /dev/stdin -o ${TMP_FILT_BAM_FILE} 
+    samtools fixmate -r ${TMP_FILT_BAM_FILE} ${TMP_FILT_FIXMATE_BAM_FILE}
+else
+    samtools view -F 524 -f 2 -u ${RAW_BAM_FILE} | samtools -n /dev/stdin -o ${TMP_FILT_BAM_FILE}
+    samtools view -h ${TMP_FILT_BAM_FILE} | python ${MMP_PATH} -k $MULTIMAPPING --paired-end | samtools fixmate -r /dev/stdin ${TMP_FILT_FIXMATE_BAM_FILE}
+fi
 
 # Remove orphan reads (pair was removed)
 # and read pairs mapping to different chromosomes
@@ -43,7 +44,7 @@ samtools fixmate -r ${TMP_FILT_BAM_FILE} ${TMP_FILT_FIXMATE_BAM_FILE}
 
 samtools view -F 1804 -f 2 -u ${TMP_FILT_FIXMATE_BAM_FILE} | samtools sort /dev/stdin -o ${FILT_BAM_FILE}
 
-rm  ${TMP_FILT_FIXMATE_BAM_FILE}
+rm ${TMP_FILT_FIXMATE_BAM_FILE}
 
 rm ${TMP_FILT_BAM_FILE}
 
@@ -86,7 +87,7 @@ samtools sort -n -@ ${THREADS} ${FINAL_BAM_FILE} -O SAM  | SAMstats --sorted_sam
 # sort by position and strand
 # Obtain unique count statistics
 
-module add bedtools/2.26
+# module add bedtools/2.26
 
 # PBC_FILE_QC="${FINAL_BAM_PREFIX}.pbc.qc"
 

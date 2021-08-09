@@ -24,6 +24,9 @@ def get_input_fastq_r2(wildcards):
 def get_input_fastq_bc(wildcards):
     return config["fastq"][wildcards.sample]["BC"]
 
+def sh_command(script_name):
+    return "bash " + str(workflow.source_path(script_name))
+
 
 rule all:
     input:
@@ -70,7 +73,7 @@ rule align_bowtie2:
     threads:
         max_threads
     shell:
-        "bash " + str(workflow.source_path("./scripts/align.sh")) + ""
+        sh_command("scripts/align.sh") + ""
         " {input.fastq1} {input.fastq2}" 
         " {params.bwt2_idx} {params.multimapping}" 
         " {output.bam_raw} {output.bam_no_mito} {output.bam_mito} {output.flagstat_qc}"
@@ -110,11 +113,15 @@ rule dedup_bam:
         dup=(out_prefix + "filter/{sample}/dup.qc"),
         pbc=(out_prefix + "filter/{sample}/pbc.qc"),
         filter_temp_prefix=temp(directory(temp_prefix + "filter/tmp_{sample}/"))
+    params:
+        multimapping=config["bwt2"]["multimapping"],
+        mmp_path=str(workflow.source_path("scripts/assign_multimappers.py"))
     threads:
         max_threads
     shell:
-        "./scripts/dedup_bam_pe.sh"
-        " {input} {output.bam} {output.ind} {output.flagstat} {output.dup} {output.pbc} {output.filter_temp_prefix} {threads}"
+        sh_command("scripts/dedup_bam_pe.sh") + ""
+        " {input} {output.bam} {output.ind} {output.flagstat} {output.dup} {output.pbc} {output.filter_temp_prefix}"
+        " {params.multimapping} {params.mmp_path} {threads}"
 
 """
 Convert BAM to fragment file
