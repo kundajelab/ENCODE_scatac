@@ -16,6 +16,6 @@ cat ${TMP_FRAG_FILE} | sort -k1,1 -k2,2n | bgzip > ${FINAL_FRAG_FILE}
 
 tabix -p bed ${FINAL_FRAG_FILE}
 
-rm ${TMP_FRAG_FILE}
+# rm ${TMP_FRAG_FILE}
 
 
