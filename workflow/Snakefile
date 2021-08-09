@@ -9,7 +9,7 @@ seed = config["seed"]
 
 genome = config["genome"]
 
-atac_samples = config["fastq"]
+atac_samples = config["fastq"].keys()
 
 # test
 # fragments_prefix = config["fragments_prefix"] 
@@ -146,7 +146,7 @@ Preliminary ArchR analyses
 """
 rule run_archr:
     input:
-        expand(out_prefix + "fragment/{sample}_fragments.tsv.gz", sample=config["fastq"].keys()) 
+        expand(out_prefix + "fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]) 
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
         qc_dir=directory(out_prefix + "archr_build/qc"),
