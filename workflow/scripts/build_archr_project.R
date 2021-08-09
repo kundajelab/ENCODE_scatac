@@ -1,4 +1,12 @@
+Sys.setenv(CONDA_BUILD_SYSROOT="/")
+
+library(devtools)
+
+devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())
 library(ArchR)
+ArchR::installExtraPackages()
+
+devtools::install_github("GreenleafLab/chromVARmotifs")
 library(chromVARmotifs)
 
 # Disable HDF5 file locking

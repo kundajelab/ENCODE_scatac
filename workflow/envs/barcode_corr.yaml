@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - conda-forge::biopython
+  - fuzzywuzzy
+  - fuzzysearch

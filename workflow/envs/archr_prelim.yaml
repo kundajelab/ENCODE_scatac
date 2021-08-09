@@ -1,0 +1,9 @@
+channels:
+  - r
+  - bioconda
+dependencies:
+  - r
+  - r-devtools
+  - r-biocmanager
+  - python
+  - macs2

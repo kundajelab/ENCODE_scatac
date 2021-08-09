@@ -10,10 +10,6 @@ genome = config["genome"]
 
 atac_samples = config["fastq"].keys()
 
-# test
-# fragments_prefix = config["fragments_prefix"] 
-# fragments_suffix = config["fragments_suffix"] 
-
 def get_input_fastq_r1(wildcards):
     return config["fastq"][wildcards.sample]["R1"]
 
@@ -48,6 +44,8 @@ rule barcode_corr:
         max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] 
     threads:
         max_threads
+    conda:
+        "envs/barcode_corr.yaml"
     script:
         "scripts/process_10x_barcodes.py"
 
@@ -71,6 +69,8 @@ rule align_bowtie2:
         log_prefix + "align/{sample}/bwt2.log",
     threads:
         max_threads
+    conda:
+        "envs/align_bowtie2.yaml"
     shell:
         sh_command("scripts/align.sh") + ""
         " {input.fastq1} {input.fastq2}" 
@@ -96,6 +96,8 @@ rule frac_mito:
         log_prefix + "align/{sample}/frac_mito.log"
     threads:
         max_threads
+    conda:
+        "envs/frac_mito.yaml"
     script:
         "scripts/frac_mito.py"
 
@@ -117,6 +119,8 @@ rule dedup_bam:
         mmp_path=str(workflow.source_path("scripts/assign_multimappers.py"))
     threads:
         max_threads
+    conda:
+        "envs/dedup_bam.yaml"
     shell:
         sh_command("scripts/dedup_bam_pe.sh") + ""
         " {input} {output.bam} {output.ind} {output.flagstat} {output.dup} {output.pbc} {output.filter_temp_prefix}"
@@ -143,7 +147,7 @@ rule bam_to_frag:
 """
 Preliminary ArchR analyses
 """
-rule run_archr:
+rule archr_prelim:
     input:
         fragments=expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]),
         qc_frac_mito=expand("align/{sample}/frac_mito.qc", sample=config["fastq"])
