@@ -21,7 +21,7 @@ THREADS=${10}
 # Only keep properly paired reads
 # Obtain name sorted BAM file
 # ==================
-FILT_BAM_PREFIX="${TEMP_PREFIX}.filt"
+FILT_BAM_PREFIX="${TEMP_PREFIX}/filt"
 FILT_BAM_FILE="${FILT_BAM_PREFIX}.bam"
 TMP_FILT_BAM_PREFIX="${FILT_BAM_PREFIX}.nmsrt"
 TMP_FILT_BAM_FILE="${TMP_FILT_BAM_PREFIX}.bam"
@@ -94,9 +94,8 @@ samtools sort -n -@ ${THREADS} ${FINAL_BAM_FILE} -O SAM  | SAMstats --sorted_sam
 # TotalReadPairs [tab] DistinctReadPairs [tab] OneReadPair [tab] TwoReadPairs [tab] NRF=Distinct/Total [tab] PBC1=OnePair/Distinct [tab] PBC2=OnePair/TwoPair
 
 
-samtools sort -n ${FILT_BAM_FILE} -o ${TEMP_PREFIX}.srt.tmp.bam
-bedtools bamtobed -bedpe -i ${TEMP_PREFIX}.srt.tmp.bam | awk 'BEGIN{OFS="\t"}{print $1,$2,$4,$6,$9,$10}' | grep -v 'chrM' | sort | uniq -c | awk 'BEGIN{mt=0;m0=0;m1=0;m2=0} ($1==1){m1=m1+1} ($1==2){m2=m2+1} {m0=m0+1} {mt=mt+$1} END{printf "%d\t%d\t%d\t%d\t%f\t%f\t%f\n",mt,m0,m1,m2,m0/mt,m1/m0,m1/m2}' > ${PBC_FILE_QC}
-rm ${OFPREFIX}.srt.tmp.bam
-
+samtools sort -n ${FILT_BAM_FILE} -o ${TEMP_PREFIX}/srt.tmp.bam
+bedtools bamtobed -bedpe -i ${TEMP_PREFIX}/srt.tmp.bam | awk 'BEGIN{OFS="\t"}{print $1,$2,$4,$6,$9,$10}' | grep -v 'chrM' | sort | uniq -c | awk 'BEGIN{mt=0;m0=0;m1=0;m2=0} ($1==1){m1=m1+1} ($1==2){m2=m2+1} {m0=m0+1} {mt=mt+$1} END{printf "%d\t%d\t%d\t%d\t%f\t%f\t%f\n",mt,m0,m1,m2,m0/mt,m1/m0,m1/m2}' > ${PBC_FILE_QC}
+# rm ${OFPREFIX}.srt.tmp.bam
 
 rm ${FILT_BAM_FILE}
