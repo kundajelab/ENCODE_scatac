@@ -15,6 +15,8 @@ MMP_PATH=$9
 
 THREADS=${10}
 
+mkdir -p $TEMP_PREFIX
+
 # =============================
 # Remove  unmapped, mate unmapped
 # not primary alignment, reads failing platform
