@@ -58,6 +58,7 @@ rule align_bowtie2:
         fastq2=(out_prefix + "barcode/{sample}_R2_bc.fastq"),
     output:
         bam_raw=(out_prefix + "align/{sample}/raw.bam"),
+        bam_raw_ind=(out_prefix + "align/{sample}/raw.bam.bai"),
         bam_no_mito=(out_prefix + "align/{sample}/non_mito.bam"),
         bam_mito=(out_prefix + "align/{sample}/mito.bam"),
         flagstat_qc=(out_prefix + "align/{sample}/flagstat_raw.qc")

@@ -15,7 +15,6 @@ LOG_BWT_PATH=$9
 
 THREADS=${10}
 
-# mkdir -p $(dirname "$BAM_RAW_PATH")
 if [[ $MULTIMAPPING == 0 ]]
 then
     bowtie2 -X2000 --mm -x $BWT_IDX_PATH --threads $THREADS -1 $FASTQ1_PATH -2 $FASTQ2_PATH --sam-append-comment 2> $LOG_BWT_PATH | 
@@ -27,13 +26,12 @@ else
     samtools sort -o $BAM_RAW_PATH -
 fi
 
-# mkdir -p $(dirname "$FLAGSTAT_QC_PATH")
+samtools index $BAM_RAW_PATH
+
 samtools sort -n -@ $THREADS -O SAM $BAM_RAW_PATH | SAMstats --sorted_sam_file - --outf $FLAGSTAT_QC_PATH
 
 printf "ddddd\n"
 
-# mkdir -p $(dirname "$BAM_NO_MITO_PATH")
 samtools idxstats $BAM_RAW_PATH | cut -f 1 | grep -v -P "^chrM$" | xargs samtools view $BAM_RAW_PATH -@ $THREADS -b> $BAM_NO_MITO_PATH
-# mkdir -p $(dirname "$BAM_MITO_PATH")
 samtools idxstats $BAM_RAW_PATH | cut -f 1 | grep -P "^chrM$" | xargs samtools view $BAM_RAW_PATH -@ $THREADS -b> $BAM_MITO_PATH
 
