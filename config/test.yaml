@@ -1,5 +1,6 @@
-out_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test_all/
-log_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test_all/logs/
+workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all/
+
+log_prefix: logs/
 temp_prefix: /srv/scratch/atwang/encode_scatac_
 
 max_threads: 8

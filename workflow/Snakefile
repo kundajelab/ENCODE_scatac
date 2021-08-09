@@ -1,6 +1,5 @@
 configfile: "config/test.yaml" # test
 
-out_prefix = config["out_prefix"]
 log_prefix = config["log_prefix"]
 temp_prefix = config["temp_prefix"]
 
@@ -42,9 +41,9 @@ rule barcode_corr:
         fastq_bc=get_input_fastq_bc,
         bc_whitelist=config["barcode_correction"]["whitelist"] 
     output:
-        fastq1_bc=(out_prefix + "barcode/{sample}_R1_bc.fastq"),
-        fastq2_bc=(out_prefix + "barcode/{sample}_R2_bc.fastq"),
-        qc_barcode_corr=(out_prefix + "barcode/{sample}_barcode_corr.qc")
+        fastq1_bc="barcode/{sample}_R1_bc.fastq",
+        fastq2_bc="barcode/{sample}_R2_bc.fastq",
+        qc_barcode_corr="barcode/{sample}_barcode_corr.qc"
     params:
         max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] 
     threads:
@@ -57,14 +56,14 @@ Read alignment (Bowtie2 aligner)
 """
 rule align_bowtie2:
     input:
-        fastq1=(out_prefix + "barcode/{sample}_R1_bc.fastq"),
-        fastq2=(out_prefix + "barcode/{sample}_R2_bc.fastq"),
+        fastq1="barcode/{sample}_R1_bc.fastq",
+        fastq2="barcode/{sample}_R2_bc.fastq",
     output:
-        bam_raw=(out_prefix + "align/{sample}/raw.bam"),
-        bam_raw_ind=(out_prefix + "align/{sample}/raw.bam.bai"),
-        bam_no_mito=(out_prefix + "align/{sample}/non_mito.bam"),
-        bam_mito=(out_prefix + "align/{sample}/mito.bam"),
-        flagstat_qc=(out_prefix + "align/{sample}/flagstat_raw.qc")
+        bam_raw="align/{sample}/raw.bam",
+        bam_raw_ind="align/{sample}/raw.bam.bai",
+        bam_no_mito="align/{sample}/non_mito.bam",
+        bam_mito="align/{sample}/mito.bam",
+        flagstat_qc="align/{sample}/flagstat_raw.qc"
     params:
         multimapping=config["bwt2"]["multimapping"],
         bwt2_idx=config["bwt2"]["index"]
@@ -84,13 +83,13 @@ Compute fraction of mitochondrial reads
 """
 rule frac_mito:
     input:
-        bam_raw=(out_prefix + "align/{sample}/raw.bam"),
-        bam_mito=(out_prefix + "align/{sample}/mito.bam"),
-        bam_no_mito=(out_prefix + "align/{sample}/non_mito.bam"),
+        bam_raw="align/{sample}/raw.bam",
+        bam_mito="align/{sample}/mito.bam",
+        bam_no_mito="align/{sample}/non_mito.bam",
     output:
-        mito_samstats_qc_path=(out_prefix + "align/{sample}/mito_samstats.qc"),
-        no_mito_samstats_qc_path=(out_prefix + "align/{sample}/non_mito_samstats.qc"),
-        qc_frac_mito=(out_prefix + "align/{sample}/frac_mito.qc"),
+        mito_samstats_qc_path="align/{sample}/mito_samstats.qc",
+        no_mito_samstats_qc_path="align/{sample}/non_mito_samstats.qc",
+        qc_frac_mito="align/{sample}/frac_mito.qc",
         tmp_sort_mito=temp(temp_prefix + "align/{sample}/sort_mito.tmp"),
         tmp_sort_no_mito=temp(temp_prefix + "align/{sample}/sort_no_mito.tmp")
     log:
@@ -105,13 +104,13 @@ Post-alignment filtering
 """
 rule dedup_bam:
     input:
-        out_prefix + "align/{sample}/raw.bam"
+        "align/{sample}/raw.bam"
     output:
-        bam=(out_prefix + "filter/{sample}/final.bam"),
-        ind=(out_prefix + "filter/{sample}/final.bam.bai"),
-        flagstat=(out_prefix + "filter/{sample}/flagstat_final.qc"),
-        dup=(out_prefix + "filter/{sample}/dup.qc"),
-        pbc=(out_prefix + "filter/{sample}/pbc.qc"),
+        bam="filter/{sample}/final.bam",
+        ind="filter/{sample}/final.bam.bai",
+        flagstat="filter/{sample}/flagstat_final.qc",
+        dup="filter/{sample}/dup.qc",
+        pbc="filter/{sample}/pbc.qc",
         filter_temp_prefix=temp(directory(temp_prefix + "filter/tmp_{sample}/"))
     params:
         multimapping=config["bwt2"]["multimapping"],
@@ -128,11 +127,11 @@ Convert BAM to fragment file
 """
 rule bam_to_frag: 
     input:
-        bam=(out_prefix + "filter/{sample}/final.bam"),
-        bam_ind=(out_prefix + "filter/{sample}/final.bam.bai"),
+        bam="filter/{sample}/final.bam",
+        bam_ind="filter/{sample}/final.bam.bai",
     output:
-        frag=(out_prefix + "fragment/{sample}_fragments.tsv.gz"),
-        frag_ind=(out_prefix + "fragment/{sample}_fragments.tsv.gz.tbi"),
+        frag="fragment/{sample}_fragments.tsv.gz",
+        frag_ind="fragment/{sample}_fragments.tsv.gz.tbi",
         tmp_frag=temp(temp_prefix + "fragment/{sample}/bam_to_frag.tmp"),
     threads:
         max_threads
@@ -146,12 +145,13 @@ Preliminary ArchR analyses
 """
 rule run_archr:
     input:
-        expand(out_prefix + "fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]) 
+        fragments=expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]),
+        qc_frac_mito=expand("align/{sample}/frac_mito.qc", sample=config["fastq"])
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
-        qc_dir=directory(out_prefix + "archr_build/qc"),
-        project_dir=directory(out_prefix + "archr_build/project"),
-        indicator=(out_prefix + "archr_build/indicator.txt")
+        qc_dir=directory("archr_build/qc"),
+        project_dir=directory("archr_build/project"),
+        indicator=("archr_build/indicator.txt")
     params:
         sample_names=atac_samples,
         seed=seed,
