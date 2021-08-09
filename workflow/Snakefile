@@ -132,7 +132,7 @@ rule bam_to_frag:
         bam_ind=(out_prefix + "filter/{sample}/final.bam.bai"),
     output:
         frag=(out_prefix + "fragment/{sample}_fragments.tsv.gz"),
-        frag_ind=(out_prefix + "filter/{sample}_fragments.tsv.gz.tbi"),
+        frag_ind=(out_prefix + "fragment/{sample}_fragments.tsv.gz.tbi"),
         tmp_frag=temp(temp_prefix + "fragment/{sample}/bam_to_frag.tmp"),
     threads:
         max_threads
