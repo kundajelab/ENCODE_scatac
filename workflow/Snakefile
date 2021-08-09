@@ -146,7 +146,7 @@ Preliminary ArchR analyses
 """
 rule run_archr:
     input:
-        expand(out_prefix + "fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]) 
+        expand(out_prefix + "fragment/{sample}_fragments.tsv.gz", sample=config["fastq"].keys()) 
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
         qc_dir=directory(out_prefix + "archr_build/qc"),

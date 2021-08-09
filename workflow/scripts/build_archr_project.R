@@ -20,7 +20,7 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
     print(arrow_output_names) ####
     arrows <- createArrowFiles(
         inputFiles = input_paths,
-        sampleNames = unlist(arrow_sample_names),
+        sampleNames = arrow_sample_names,
         outputNames = arrow_output_names,
         # minTSS = 1, ####
         # minFrags = 1, ####
