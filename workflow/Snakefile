@@ -136,6 +136,8 @@ rule bam_to_frag:
         tmp_frag=temp(temp_prefix + "fragment/{sample}/bam_to_frag.tmp"),
     threads:
         max_threads
+    conda:
+        "envs/bam_to_frag.yaml"
     shell:
         sh_command("scripts/bam_to_frag.sh") + " {input.bam} {output.frag} {output.tmp_frag}"
 
