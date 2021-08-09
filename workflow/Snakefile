@@ -25,7 +25,7 @@ def sh_command(script_name):
 
 rule all:
     input:
-        out_prefix + "archr_build/indicator.txt"
+        "archr_build/indicator.txt"
 
 """
 Barcode Correction and Filtering
