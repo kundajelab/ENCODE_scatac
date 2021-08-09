@@ -147,7 +147,7 @@ rule bam_to_frag:
 """
 Preliminary ArchR analyses
 """
-rule archr_prelim:
+rule archr_build:
     input:
         fragments=expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]),
         qc_frac_mito=expand("align/{sample}/frac_mito.qc", sample=config["fastq"])
@@ -178,5 +178,7 @@ rule archr_prelim:
         save=(log_prefix + "archr_build/save.log"),
     threads:
         max_threads
+    conda:
+        "envs/archr_build.yaml"
     script:
         "scripts/build_archr_project.R"
