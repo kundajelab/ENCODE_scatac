@@ -51,7 +51,7 @@ rm ${TMP_FILT_BAM_FILE}
 # =============
 # Mark duplicates
 # =============
-module add picard-tools/1.126
+# module add picard-tools/1.126
 
 TMP_FILT_BAM_FILE="${FILT_BAM_PREFIX}.dupmark.bam"
 MARKDUP="/srv/gs1/software/picard-tools/1.126/MarkDuplicates.jar"
