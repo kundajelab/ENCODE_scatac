@@ -137,7 +137,7 @@ rule bam_to_frag:
     threads:
         max_threads
     shell:
-        "scripts/bam_to_frag.sh {input.bam} {output.frag} {output.tmp_frag}"
+        sh_command("scripts/bam_to_frag.sh") + " {input.bam} {output.frag} {output.tmp_frag}"
 
 """
 Preliminary ArchR analyses
