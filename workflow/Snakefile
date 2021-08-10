@@ -1,5 +1,7 @@
 configfile: "config/test.yaml" # test
 
+workdir: config['workdir']
+
 log_prefix = config["log_prefix"]
 temp_prefix = config["temp_prefix"]
 
