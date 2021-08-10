@@ -1,5 +1,8 @@
+channels:
+  - bioconda
 dependencies:
   - python
+  - bioconda::samtools>=1.13
   - pip
   - pip:
      - "--editable=git+https://github.com/kundajelab/SAMstats@75e60f1e67c6d5d066371a0b53729e4b1f6f76c5#egg=SAMstats"
