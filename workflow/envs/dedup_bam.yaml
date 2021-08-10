@@ -3,7 +3,7 @@ channels:
 dependencies:
   - python
   - bioconda::samtools
-  - bioconda::picard
+  - bioconda::picard-slim
   - bioconda::bedtools
   - pip
   - pip:
