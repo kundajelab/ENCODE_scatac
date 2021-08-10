@@ -11,6 +11,32 @@ dependencies:
   - conda-forge::r-shiny
   - conda-forge::r-rhandsontable
   - conda-forge::r-shinythemes
+  - conda-forge::r-vroom
+  - conda-forge::r-r.utils
+  - conda-forge::r-readr
+  - conda-forge::r-rsqlite
+  - bioconda::bioconductor-xvector
+  - bioconda::bioconductor-iranges
+  - bioconda::bioconductor-biostrings
+  - bioconda::bioconductor-genomicranges
+  - bioconda::bioconductor-genomeinfodb
+  - bioconda::bioconductor-delayedarray
+  - bioconda::bioconductor-summarizedexperiment
+  - bioconda::bioconductor-biocio
+  - bioconda::bioconductor-genomicalignments
+  - bioconda::bioconductor-rsamtools
+  - bioconda::bioconductor-rtracklayer
+  - bioconda::bioconductor-annotationdbi
+  - bioconda::bioconductor-keggrest
+  - bioconda::bioconductor-go.db
+  - bioconda::bioconductor-annotate
+  - bioconda::bioconductor-dirichletmultinomial
+  - bioconda::bioconductor-bsgenome
+  - bioconda::bioconductor-tfbstools
+  - bioconda::bioconductor-complexheatmap
+  - bioconda::bioconductor-chromvar
+  - bioconda::bioconductor-rhdf5
+  - bioconda::r-restfulr
   - bioconda::harmony
   - bioconda::presto
   - bioconda::macs2
