@@ -1,7 +1,9 @@
 channels:
   - bioconda
+  - conda-forge
 dependencies:
   - python
+  - conda-forge::libcurl-static>=7.78.0
   - bioconda::samtools>=1.13
   - pip
   - pip:
