@@ -27,7 +27,8 @@ def sh_command(script_name):
 
 rule all:
     input:
-        "archr_build/indicator.txt"
+        "archr_build/indicator.txt",
+        expand("align/{sample}/frac_mito.qc", sample=config["fastq"])
 
 """
 Barcode Correction and Filtering
@@ -149,8 +150,7 @@ Preliminary ArchR analyses
 """
 rule archr_build:
     input:
-        fragments=expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]),
-        qc_frac_mito=expand("align/{sample}/frac_mito.qc", sample=config["fastq"])
+        fragments=expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"])
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
         qc_dir=directory("archr_build/qc"),

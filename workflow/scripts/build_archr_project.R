@@ -10,7 +10,7 @@ devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager
 devtools::install_github("GreenleafLab/chromVARmotifs", ref="master", repos = BiocManager::repositories(), dependencies = FALSE, INSTALL_opts = '--no-lock')
 
 # Disable HDF5 file locking
-# Workaround for HDF5 I/O issues on shared filesystems
+# Workaround for HDF5 I/O issues on NFS
 # https://github.com/GreenleafLab/ArchR/issues/248#issuecomment-789453997
 Sys.setenv("HDF5_USE_FILE_LOCKING" = "FALSE")
 Sys.setenv("RHDF5_USE_FILE_LOCKING" = "FALSE")
