@@ -91,9 +91,7 @@ rule frac_mito:
     output:
         qc_samstats_mito="align/{sample}/mito_samstats.qc",
         qc_samstats_no_mito="align/{sample}/non_mito_samstats.qc",
-        qc_frac_mito="align/{sample}/frac_mito.qc",
-        tmp_sort_mito=temp(temp_prefix + "align/{sample}/sort_mito.tmp"),
-        tmp_sort_no_mito=temp(temp_prefix + "align/{sample}/sort_no_mito.tmp")
+        qc_frac_mito="align/{sample}/frac_mito.qc"
     log:
         log_prefix + "align/{sample}/frac_mito.log"
     threads:

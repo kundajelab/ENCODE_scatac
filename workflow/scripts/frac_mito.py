@@ -272,18 +272,17 @@ def frac_mito(non_mito_samstat, mito_samstat, qc_path):
         fp.write('mito_reads\t{}\n'.format(Rm))
         fp.write('frac_mito_reads\t{}\n'.format(frac))
 
-def samstat(bam_path, tmp_path, qc_path, threads):
+def samstat(bam_path, qc_path, threads):
     run_shell_cmd(
-        'samtools sort -n {bam} -T {tmp} -@ {threads} -O sam | '
+        'samtools sort -n {bam} -@ {threads} -O sam | '
         'SAMstats --sorted_sam_file - --outf {samstat_qc}'.format(
             bam=bam_path,
-            tmp=tmp_path,
             threads=threads,
             samstat_qc=qc_path,
         )
     )
 
 
-samstat(mito_bam_path, mito_tmp_path, mito_samstats_qc_path, threads)
-samstat(no_mito_bam_path, no_mito_tmp_path, no_mito_samstats_qc_path, threads)
+samstat(mito_bam_path, mito_samstats_qc_path, threads)
+samstat(no_mito_bam_path, no_mito_samstats_qc_path, threads)
 frac_mito(no_mito_samstats_qc_path, mito_samstats_qc_path, frac_mito_qc_path)
