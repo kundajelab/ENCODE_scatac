@@ -39,6 +39,7 @@ dependencies:
   - bioconda::bioconductor-complexheatmap
   - bioconda::bioconductor-chromvar
   - bioconda::bioconductor-rhdf5
+  - bioconda::bioconductor-rhdf5lib
   - bioconda::bioconductor-motifmatchr
   - bioconda::r-restfulr
   - bioconda::harmony
