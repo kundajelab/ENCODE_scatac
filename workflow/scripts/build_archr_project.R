@@ -6,8 +6,8 @@ ip = as.data.frame(installed.packages()[,c(1,3:4)])
 ip = ip[is.na(ip$Priority),1:2,drop=FALSE]
 ip
 
-devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories(), dependencies = FALSE)
-devtools::install_github("GreenleafLab/chromVARmotifs", ref="master", repos = BiocManager::repositories())
+devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories(), dependencies = FALSE, INSTALL_opts = '--no-lock')
+devtools::install_github("GreenleafLab/chromVARmotifs", ref="master", repos = BiocManager::repositories(), dependencies = FALSE, INSTALL_opts = '--no-lock')
 
 # Disable HDF5 file locking
 # Workaround for HDF5 I/O issues on shared filesystems
