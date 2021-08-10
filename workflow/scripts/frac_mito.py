@@ -14,9 +14,6 @@ Derived from: https://github.com/ENCODE-DCC/atac-seq-pipeline
 mito_bam_path = snakemake.input['bam_mito']
 no_mito_bam_path = snakemake.input['bam_no_mito']
 
-mito_tmp_path = snakemake.output['tmp_sort_mito']
-no_mito_tmp_path = snakemake.output['tmp_sort_no_mito']
-
 mito_samstats_qc_path = snakemake.output['qc_samstats_mito']
 no_mito_samstats_qc_path = snakemake.output['qc_samstats_no_mito']
 frac_mito_qc_path = snakemake.output['qc_frac_mito']
