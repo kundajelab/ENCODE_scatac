@@ -15,6 +15,11 @@ dependencies:
   - conda-forge::r-r.utils
   - conda-forge::r-readr
   - conda-forge::r-rsqlite
+  - conda-forge::r-fansi
+  - conda-forge::r-rsqlite
+  - conda-forge::r-rsqlite
+
+
   - bioconda::bioconductor-xvector
   - bioconda::bioconductor-iranges
   - bioconda::bioconductor-biostrings
@@ -36,6 +41,7 @@ dependencies:
   - bioconda::bioconductor-complexheatmap
   - bioconda::bioconductor-chromvar
   - bioconda::bioconductor-rhdf5
+  - bioconda::bioconductor-motifmatchr
   - bioconda::r-restfulr
   - bioconda::harmony
   - bioconda::presto
