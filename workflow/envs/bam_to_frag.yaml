@@ -1,5 +1,5 @@
 channels:
   - bioconda
 dependencies:
-  - htslib
-  - sinto
+  - bioconda::htslib
+  - bioconda::sinto

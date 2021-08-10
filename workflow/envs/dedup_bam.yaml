@@ -2,9 +2,9 @@ channels:
   - bioconda
 dependencies:
   - python
-  - samtools
-  - picard
-  - bedtools
+  - bioconda::samtools
+  - bioconda::picard
+  - bioconda::bedtools
   - pip
   - pip:
-     - "--editable=https://github.com/kundajelab/SAMstats/tree/75e60f1e67c6d5d066371a0b53729e4b1f6f76c5"
+     - "--editable=git+https://github.com/kundajelab/SAMstats/tree/75e60f1e67c6d5d066371a0b53729e4b1f6f76c5"

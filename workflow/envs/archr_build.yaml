@@ -1,9 +1,10 @@
 channels:
-  - r
+  - conda-forge
   - bioconda
 dependencies:
-  - r
-  - r-devtools
-  - r-biocmanager
+  - conda-forge::r-base
+  - conda-forge::r-essentials
+  - conda-forge::r-devtools
+  - conda-forge::r-biocmanager
   - python
-  - macs2
+  - bioconda::macs2

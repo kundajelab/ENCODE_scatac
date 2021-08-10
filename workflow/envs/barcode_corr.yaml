@@ -3,5 +3,5 @@ channels:
 dependencies:
   - python
   - conda-forge::biopython
-  - fuzzywuzzy
-  - fuzzysearch
+  - conda-forge::fuzzywuzzy
+  - conda-forge::fuzzysearch
