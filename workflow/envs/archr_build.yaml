@@ -6,5 +6,12 @@ dependencies:
   - conda-forge::r-essentials
   - conda-forge::r-devtools
   - conda-forge::r-biocmanager
-  - python
+  - conda-forge::r-seurat
+  - conda-forge::r-cairo
+  - conda-forge::r-shiny
+  - conda-forge::r-rhandsontable
+  - conda-forge::r-shinythemes
+  - bioconda::harmony
+  - bioconda::presto
   - bioconda::macs2
+  - python
