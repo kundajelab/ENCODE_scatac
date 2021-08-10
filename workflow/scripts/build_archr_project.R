@@ -2,7 +2,12 @@ Sys.setenv(CONDA_BUILD_SYSROOT="/")
 
 library(devtools)
 
-devtools::install_github("GreenleafLab/ArchR", ref="master", upgrade_dependencies = FALSE)
+
+ip = as.data.frame(installed.packages()[,c(1,3:4)])
+ip = ip[is.na(ip$Priority),1:2,drop=FALSE]
+ip
+
+devtools::install_github("GreenleafLab/ArchR", ref="master")
 devtools::install_github("GreenleafLab/chromVARmotifs", ref="master")
 
 # Disable HDF5 file locking
