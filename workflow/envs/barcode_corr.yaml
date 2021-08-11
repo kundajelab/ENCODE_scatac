@@ -8,4 +8,4 @@ dependencies:
   - conda-forge::tqdm=4.62.0
   - conda-forge::pip=21.2.3
   - pip:
-     - "--editable=git+https://github.com/GreenleafLab/matcha@a6552f6362471680d5935cd9a8ddb98eee15139f#egg=matcha"\
+     - "--editable=git+https://github.com/GreenleafLab/matcha@a6552f6362471680d5935cd9a8ddb98eee15139f#egg=matcha"
