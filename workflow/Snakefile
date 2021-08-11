@@ -146,11 +146,27 @@ rule bam_to_frag:
         sh_command("scripts/bam_to_frag.sh") + " {input.bam} {output.frag} {output.tmp_frag}"
 
 """
+Package fragment file into tarball
+"""
+rule frag_tar: 
+    input:
+        frag="fragment/{sample}_fragments.tsv.gz",
+        frag_ind="fragment/{sample}_fragments.tsv.gz.tbi",
+    output:
+        "fragment/{sample}_fragments.tar",
+    threads:
+        max_threads
+    conda:
+        "envs/frag_tar.yaml"
+    shell:
+        "tar -cvf {output} {input.frag} {input.frag_ind}"
+
+"""
 Preliminary ArchR analyses
 """
 rule archr_build:
     input:
-        fragments=expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"])
+        expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"])
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
         qc_dir=directory("archr_build/qc"),
