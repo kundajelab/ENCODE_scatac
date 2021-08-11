@@ -7,6 +7,7 @@ dependencies:
   - conda-forge::python_abi=3.9
   - conda-forge::pip=21.2.3
   - conda-forge::bash=5.0.018
+  - conda-forge::multiprocess=0.70.12.1
   - bioconda::bowtie2=2.4.4
   - bioconda::samtools=1.13
   - pip:

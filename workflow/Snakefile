@@ -51,7 +51,7 @@ rule barcode_corr:
     conda:
         "envs/barcode_corr.yaml"
     script:
-        "scripts/process_10x_barcodes.py"
+        "scripts/process_10x_barcodes_matcha.py"
 
 """
 Read alignment (Bowtie2 aligner)

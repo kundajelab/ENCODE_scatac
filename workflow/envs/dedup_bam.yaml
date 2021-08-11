@@ -7,6 +7,7 @@ dependencies:
   - conda-forge::libcurl-static=7.78.0
   - conda-forge::bash=5.0.018
   - conda-forge::pip=21.2.3
+  - conda-forge::multiprocess=0.70.12.1
   - bioconda::samtools=1.13
   - bioconda::picard-slim=2.25.7
   - bioconda::bedtools=2.30.0
