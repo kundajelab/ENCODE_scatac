@@ -22,7 +22,7 @@ threads = snakemake.threads
 def get_open_fn(path):
     with open(path, "rb") as f:
         is_gzipped = (f.read(2) == b'\x1f\x8b')
-    return gzip.open if is_gzipped(path) else open
+    return gzip.open if is_gzipped else open
 
 def main(fastq1, fastq2, fastq3, bc_whitelist, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads):
     f = matcha.FastqReader(threads = threads)
