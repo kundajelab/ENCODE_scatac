@@ -16,7 +16,7 @@ dependencies:
   - conda-forge::r-r.utils=2.10.1
   - conda-forge::r-readr=1.4.0
   - conda-forge::r-rsqlite=2.2.5
-  - conda-forge::r-fansi
+  - conda-forge::r-fansi=0.4.2
   - bioconda::bioconductor-xvector=0.32.0
   - bioconda::bioconductor-iranges=2.26.0
   - bioconda::bioconductor-biostrings=2.60.0
