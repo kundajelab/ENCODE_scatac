@@ -1,1 +1,5 @@
-dependencies: []
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - conda-forge::tar=1.34
