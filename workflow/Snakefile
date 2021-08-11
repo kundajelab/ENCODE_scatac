@@ -15,15 +15,6 @@ atac_samples = config["fastq"].keys()
 def get_input_fastq(wildcards):
     return config["fastq"][wildcards.sample][wildcards.read]
 
-def get_input_fastq_r1(wildcards):
-    return config["fastq"][wildcards.sample]["R1"]
-
-def get_input_fastq_r2(wildcards):
-    return config["fastq"][wildcards.sample]["R2"]
-
-def get_input_fastq_bc(wildcards):
-    return config["fastq"][wildcards.sample]["BC"]
-
 def sh_command(script_name):
     return "bash " + str(workflow.source_path(script_name))
 
