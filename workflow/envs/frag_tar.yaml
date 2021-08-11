@@ -2,4 +2,5 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
+  - conda-forge::bash=5.0.018
   - conda-forge::tar=1.34
