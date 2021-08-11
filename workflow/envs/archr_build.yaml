@@ -3,7 +3,7 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
-  - conda-forge::r-base=4.1.1
+  - conda-forge::r-base=4.0.5
   - conda-forge::r-essentials=4.1
   - conda-forge::r-devtools=2.4.2
   - conda-forge::r-biocmanager=1.30.16
