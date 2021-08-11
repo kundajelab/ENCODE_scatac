@@ -1,0 +1,6 @@
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - conda-forge::bash=5.0.018
+  - conda-forge::sed=4.8

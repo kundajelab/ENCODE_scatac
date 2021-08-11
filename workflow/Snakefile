@@ -12,6 +12,9 @@ genome = config["genome"]
 
 atac_samples = config["fastq"].keys()
 
+def get_input_fastq(wildcards):
+    return config["fastq"][wildcards.sample][wildcards.read]
+
 def get_input_fastq_r1(wildcards):
     return config["fastq"][wildcards.sample]["R1"]
 
@@ -31,14 +34,28 @@ rule all:
         expand("fragment/{sample}_fragments.tar", sample=config["fastq"]),
         "archr_build/indicator.txt"
 
+
+"""
+Strip FASTQ header descriptions
+"""
+rule strip_fastq:
+    input:
+        get_input_fastq 
+    output:
+        "barcode/{sample}_{read}.fastq"
+    conda:
+        "envs/strip_fastq.yaml"
+    shell:
+        "sed 's/ .*//' {input} > {output}"
+
 """
 Barcode Correction and Filtering
 """
 rule barcode_corr:
     input:
-        fastq1=get_input_fastq_r1,
-        fastq2=get_input_fastq_r2,
-        fastq_bc=get_input_fastq_bc,
+        fastq1="barcode/{sample}_R1.fastq",
+        fastq2="barcode/{sample}_R2.fastq",
+        fastq_bc="barcode/{sample}_BC.fastq",
         bc_whitelist=config["barcode_correction"]["whitelist"] 
     output:
         fastq1_bc="barcode/{sample}_R1_bc.fastq",
@@ -155,8 +172,6 @@ rule frag_tar:
         frag_ind="fragment/{sample}_fragments.tsv.gz.tbi",
     output:
         "fragment/{sample}_fragments.tar",
-    threads:
-        max_threads
     conda:
         "envs/frag_tar.yaml"
     shell:
