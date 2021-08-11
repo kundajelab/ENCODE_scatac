@@ -68,6 +68,6 @@ def main(fastq1, fastq2, fastq3, bc_whitelist, max_barcode_dist, fastq1_out_path
         f.write(f"Total barcodes processed\t{total_reads_in}\n")
         f.write(f"Barcodes accepted\t{total_reads}\t{total_reads/total_reads_in*100:.2f}\n")
         for val, i in enumerate(barcode_counts):
-            f.write(f"Barcodes with edit distance {i}\t{val}\t{val/total_reads_in*100:.2f}\n")
+            f.write(f"Barcodes with edit distance {val}\t{i}\t{i/total_reads_in*100:.2f}\n")
 
 main(fastq1, fastq2, fastq3, bc_whitelist, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
