@@ -31,8 +31,8 @@ def main(fastq1, fastq2, fastq3, bc_whitelist, max_barcode_dist, fastq1_out_path
     f.add_sequence("R3", fastq3, output_path=fastq2_out_path)
 
     open_fn = get_open_fn(bc_whitelist)
-    with open_fn(bc_whitelist) as f:
-        valid_10x_barcodes = [b.strip() for b in f]
+    with open_fn(bc_whitelist) as file:
+        valid_10x_barcodes = [b.strip() for b in file]
 
     cell_barcode = matcha.HashMatcher(
         valid_10x_barcodes,
