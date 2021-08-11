@@ -27,8 +27,9 @@ def sh_command(script_name):
 
 rule all:
     input:
-        "archr_build/indicator.txt",
-        expand("align/{sample}/frac_mito.qc", sample=config["fastq"])
+        expand("align/{sample}/frac_mito.qc", sample=config["fastq"]),
+        expand("fragment/{sample}_fragments.tar", sample=config["fastq"]),
+        "archr_build/indicator.txt"
 
 """
 Barcode Correction and Filtering
