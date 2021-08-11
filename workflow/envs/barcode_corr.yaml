@@ -1,7 +1,8 @@
 channels:
   - conda-forge
+  - nodefaults
 dependencies:
-  - python
-  - conda-forge::biopython
-  - conda-forge::fuzzywuzzy
-  - conda-forge::fuzzysearch
+  - conda-forge::python=3.9.6
+  - conda-forge::biopython=1.79
+  - conda-forge::fuzzywuzzy=0.18.0
+  - conda-forge::fuzzysearch=0.7.3

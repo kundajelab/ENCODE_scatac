@@ -1,5 +1,6 @@
 channels:
   - bioconda
+  - nodefaults
 dependencies:
-  - bioconda::htslib
-  - bioconda::sinto
+  - bioconda::htslib=1.13
+  - bioconda::sinto=0.7.4
