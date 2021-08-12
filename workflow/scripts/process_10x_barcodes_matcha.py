@@ -1,5 +1,6 @@
 import argparse
 import gzip
+from pathlib import Path
 
 import numpy as np
 import tqdm
@@ -25,20 +26,26 @@ def main():
     parser.add_argument('fastq2', type=str, help='R2 fastq file')
     parser.add_argument('fastq3', type=str, help='R3 fastq file')
     parser.add_argument('barcodes', type=str, help='Gzip file with 10x barcode whitelist')
+    parser.add_argument('output_dir', type=str, help="Directory for saving outputs (R1/R2/stats)")
 
+    #parser.add_argument("--reverse-complement", type=bool, help="Whether to reverse complement the R2 sequence (NextSeq support)")
     parser.add_argument("--max-barcode-dist", type=int, default=2, help="Maximum edit distance allowed between a barcode and a whitelist entry")
     parser.add_argument("--ncores", default=4, help="Number of cores for parallel processing")
     
     args = parser.parse_args()
+
+    output_path = Path(args.output_dir)
+
     f = matcha.FastqReader(threads = args.ncores)
-    f.add_sequence("R1", args.fastq1, output_path="R1.fastq.gz")
+    f.add_sequence("R1", args.fastq1, output_path=output_path / "R1.fastq.gz")
     f.add_sequence("R2", args.fastq2)
-    f.add_sequence("R3", args.fastq3, output_path="R2.fastq.gz")
+    f.add_sequence("R3", args.fastq3, output_path=output_path / "R2.fastq.gz")
 
     valid_10x_barcodes = [b.strip() for b in gzip.open(args.barcodes)]
 
     cell_barcode = matcha.HashMatcher(
-        valid_10x_barcodes,
+        sequences = [reverse_complement(b) for b in valid_10x_barcodes],
+        labels = valid_10x_barcodes,
         max_mismatches=args.max_barcode_dist,
         subsequence_count=2
     )
@@ -48,8 +55,10 @@ def main():
 
     f.set_output_names("{read_name} CB:Z:{cell}")
 
-    barcode_counts = [0] * (args.max_barcode_dist + 1)
+    barcode_counts = np.zeros(args.max_barcode_dist + 2, int)
+
     total_reads = 0
+    total_pass = 0
 
     chunk_size = 10000
     progress = tqdm.tqdm(disable=None, unit="reads")
@@ -58,16 +67,28 @@ def main():
             (f.get_match_result("cell", "second_best_dist") > f.get_match_result("cell", "dist"))
 
         total_reads += len(pass_filter)
+        total_pass += pass_filter.sum()
         values, counts = np.unique(f.get_match_result("cell", "dist"), return_counts=True)
-        for v, c in zip(values, counts):
-            if v <= args.max_barcode_dist:
-                barcode_counts[v] += c
+        barcode_counts[np.minimum(values, args.max_barcode_dist)] += counts
         
         f.write_chunk(pass_filter)
         progress.update(len(pass_filter))
 
-    for val, i in enumerate(barcode_counts):
-        print(val, i)
+    stats_output = open(output_path / "matching_stats.tsv", "w")
+    print(f"{total_pass} reads passing, ({total_pass/total_reads*100:.2f}%)\n", file=stats_output)
+    print("mismatches\treads", file=stats_output)
+    for dist in range(args.max_barcode_dist + 2):
+        print(
+            dist if dist <= args.max_barcode_dist else f">{args.max_barcode_dist}",
+            barcode_counts[dist],
+            sep = "\t",
+            file=stats_output
+        )
+
+rev_comp = bytes.maketrans(b"ATGC",b"TACG")
+def reverse_complement(seq):
+    return bytes.translate(seq, rev_comp)[::-1]
+
 
 if __name__ == "__main__":
     main()

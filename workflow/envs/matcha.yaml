@@ -1,0 +1,7 @@
+channels:
+  - bioconda
+  - conda-forge
+  - nodefaults
+dependencies:
+  - pip:
+     - "git+https://github.com/GreenleafLab/matcha.git"
