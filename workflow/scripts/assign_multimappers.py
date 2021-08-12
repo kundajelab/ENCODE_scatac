@@ -2,13 +2,19 @@ import sys
 import random
 import argparse
 
+"""
+From https://github.com/ENCODE-DCC/atac-seq-pipeline/blob/master/src/assign_multimappers.py
+"""
+
 def parse_args():
     '''
     Gives options
     '''
-    parser = argparse.ArgumentParser(description='Saves reads below a alignment threshold and discards all others')
+    parser = argparse.ArgumentParser(
+        description='Saves reads below a alignment threshold and discards all others')
     parser.add_argument('-k', help='Alignment number cutoff')
-    parser.add_argument('--paired-end', dest='paired_ended', action='store_true', help='Data is paired-end')
+    parser.add_argument('--paired-end', dest='paired_ended',
+                        action='store_true', help='Data is paired-end')
     args = parser.parse_args()
     alignment_cutoff = int(args.k)
     paired_ended = args.paired_ended
@@ -47,7 +53,7 @@ if __name__ == "__main__":
             pass
         else:
             # Discard if there are more than the alignment cutoff
-            if len(current_reads) >= alignment_cutoff:
+            if len(current_reads) > alignment_cutoff:
                 current_reads = [line]
                 current_qname = read_elems[0]
             elif len(current_reads) > 0:

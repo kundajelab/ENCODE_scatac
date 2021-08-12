@@ -33,7 +33,7 @@ rule strip_fastq:
     input:
         get_input_fastq 
     output:
-        "barcode/{sample}_{read}.fastq"
+        "barcode/{sample}_{read}.fastq.gz"
     conda:
         "envs/strip_fastq.yaml"
     shell:
@@ -44,9 +44,9 @@ Barcode Correction and Filtering
 """
 rule barcode_corr:
     input:
-        fastq1="barcode/{sample}_R1.fastq",
-        fastq2="barcode/{sample}_R2.fastq",
-        fastq_bc="barcode/{sample}_BC.fastq",
+        fastq1="barcode/{sample}_R1.fastq.gz",
+        fastq2="barcode/{sample}_R2.fastq.gz",
+        fastq_bc="barcode/{sample}_BC.fastq.gz",
         bc_whitelist=config["barcode_correction"]["whitelist"] 
     output:
         fastq1_bc="barcode/{sample}_R1_bc.fastq",
