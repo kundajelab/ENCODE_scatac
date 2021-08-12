@@ -71,7 +71,8 @@ rule trim_adapter:
     output:
         fastq1_trim="barcode/{sample}/R1_trim.fastq.gz",
         fastq2_trim="barcode/{sample}/R2_trim.fastq.gz",
-        qc="barcode/{sample}/fastp.json",
+        qc_html="barcode/{sample}/fastp.html",
+        qc_json="barcode/{sample}/fastp.json",
     params:
         max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] 
     threads:
@@ -79,7 +80,7 @@ rule trim_adapter:
     conda:
         "envs/trim_adapter.yaml"
     shell:
-        "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim} -G -Q -L -j -w {threads}"
+        "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim} -G -Q -L -w {threads}"
 
 """
 Read alignment (Bowtie2 aligner)
