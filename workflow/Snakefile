@@ -33,25 +33,25 @@ rule strip_fastq:
     input:
         get_input_fastq 
     output:
-        "barcode/{sample}_{read}.fastq.gz"
+        "barcode/{sample}/{read}.fastq.gz"
     conda:
         "envs/strip_fastq.yaml"
     shell:
         "zcat {input} | sed 's/ .*//' | gzip -c > {output}"
 
 """
-Barcode Correction and Filtering
+Barcode correction and filtering
 """
 rule barcode_corr:
     input:
-        fastq1="barcode/{sample}_R1.fastq.gz",
-        fastq2="barcode/{sample}_R2.fastq.gz",
-        fastq_bc="barcode/{sample}_BC.fastq.gz",
+        fastq1="barcode/{sample}/R1.fastq.gz",
+        fastq2="barcode/{sample}/R2.fastq.gz",
+        fastq_bc="barcode/{sample}/BC.fastq.gz",
         bc_whitelist=config["barcode_correction"]["whitelist"] 
     output:
-        fastq1_bc="barcode/{sample}_R1_bc.fastq",
-        fastq2_bc="barcode/{sample}_R2_bc.fastq",
-        qc_barcode_corr="barcode/{sample}_barcode_corr.qc"
+        fastq1_bc="barcode/{sample}/R1_bc.fastq.gz",
+        fastq2_bc="barcode/{sample}/R2_bc.fastq.gz",
+        qc_barcode_corr="barcode/{sample}/barcode_corr.qc"
     params:
         max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] 
     threads:
@@ -62,12 +62,32 @@ rule barcode_corr:
         "scripts/process_10x_barcodes_matcha.py"
 
 """
+Read adapter trimming
+"""
+rule trim_adapter:
+    input:
+        fastq1_bc="barcode/{sample}/R1_bc.fastq.gz",
+        fastq2_bc="barcode/{sample}/R2_bc.fastq.gz",
+    output:
+        fastq1_trim="barcode/{sample}/R1_trim.fastq.gz",
+        fastq2_trim="barcode/{sample}/R2_trim.fastq.gz",
+        qc="barcode/{sample}/fastp.json",
+    params:
+        max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] 
+    threads:
+        max_threads
+    conda:
+        "envs/trim_adapter.yaml"
+    shell:
+        "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim} -G -Q -L -j -w {threads}"
+
+"""
 Read alignment (Bowtie2 aligner)
 """
 rule align_bowtie2:
     input:
-        fastq1="barcode/{sample}_R1_bc.fastq",
-        fastq2="barcode/{sample}_R2_bc.fastq",
+        fastq1="barcode/{sample}/R1_trim.fastq.gz",
+        fastq2="barcode/{sample}/R2_trim.fastq.gz",
     output:
         bam_raw="align/{sample}/raw.bam",
         bam_raw_ind="align/{sample}/raw.bam.bai",
