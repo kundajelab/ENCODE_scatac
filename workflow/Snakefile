@@ -37,7 +37,7 @@ rule strip_fastq:
     conda:
         "envs/strip_fastq.yaml"
     shell:
-        "sed 's/ .*//' {input} > {output}"
+        "zcat {input} | sed 's/ .*//' | gzip -c > {output}"
 
 """
 Barcode Correction and Filtering
