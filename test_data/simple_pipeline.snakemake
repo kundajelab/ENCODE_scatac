@@ -1,0 +1,162 @@
+# A simplified version of the ATAC-seq mapping pipeline, which will hopefully also run faster
+# What's here: fastqs -> fragment files
+# To run a test run:
+#    - replace blacklist and bowtie2 paths
+#    - run the barcode_matching_test snakemake to download sequence data
+#    - run the pipeline from in the 10x_atac folder
+
+# What's missing: 
+#    - certain QC stats in a nice output format
+#    - conda environment spec (need samtools, bowtie2, tabix, bgzip, matcha, pysam)
+#    - ArchR analysis bits
+#    - intermediate bam output is not coordsorted yet
+#    - flag for skipping 8bp on multiome barcodes
+#
+# Possible improvements: 
+#    - Greater use of snakemakes `pipe` output to minimize number of intermediate files
+config = {
+    "technology": "10x_atac",
+    "fastq": {read: f"{read}.fastq.gz" for read in ["I1", "I2", "R1", "R2", "R3"]},
+    "barcode_correction": {
+        "10x_whitelist": "737K-cratac-v1.txt.gz",
+        "max_barcode_dist": 1
+    },
+    "bowtie2": {
+        "index": "/oak/stanford/groups/wjg/share/uPrep/genomes/hg38/indexes/bowtie2/hg38",
+        "multimapping": 4
+    },
+    "blacklist": "/oak/stanford/groups/wjg/share/uPrep/genomes/hg38/annotations/hg38.blacklist.bed"
+}
+
+rule all:
+    input: "05_fragments/fragments.tsv.gz.tbi"
+
+# Trim adapters
+
+rule trim_read_names:
+    input: lambda w: config["fastq"][w.read]
+    output: "01_trimmed_names/{read}.fastq.gz"
+    shell: "gunzip -c {input} | awk 'NR % 4 == 1 {{print $1}} NR % 4 != 1 {{print $0}}' | gzip -c > {output}"
+
+if config["technology"] == "10x_atac":
+    rule match_barcodes:
+        input: 
+            fastqs = expand(rules.trim_read_names.output, read=["R1", "R2", "R3"]),
+            whitelist = config["barcode_correction"]["10x_whitelist"]
+        output: 
+            R1 = "02_barcode_matching/R1.fastq.gz",
+            R2 = "02_barcode_matching/R2.fastq.gz",
+            matching_stats = "qc_stats/barcode_matching.tsv"
+        params:
+            script = srcdir("../workflow/scripts/process_10x_barcodes_matcha.py"),
+            output_dir = "02_barcode_matching"
+        conda:
+            "../workflow/envs/matcha.yaml"
+        shell: "python {params.script} {input.fastqs} {input.whitelist} {params.output_dir} --max-barcode-dist=1; "
+               "mv {params.output_dir}/matching_stats.tsv {output.matching_stats}"
+elif config["technology"] == "ren":
+    rule match_barcodes:
+        input:
+            fastqs = expand(rules.trim_read_names.output, read=["I1", "I2", "R1", "R2"]),
+            i5_whitelist = "test_data/ren_lab/ren_barcodes_i5.tsv",
+            T7_whitelist = "test_data/ren_lab/ren_barcodes_T7.tsv"
+        output:
+            R1 = "02_barcode_matching/R1.fastq.gz",
+            R2 = "02_barcode_matching/R2.fastq.gz",
+            matching_stats = "qc_stats/barcode_matching.tsv"
+        params:
+            script = srcdir("../workflow/scripts/process_ren_barcodes_matcha.py"),
+            output_dir = "02_barcode_matching/barcoded_fastqs/"
+        conda:
+            "../workflow/envs/matcha.yaml"
+        shell: "python {params.script} {input.fastqs} {input.i5_whitelist} {input.T7_whitelist} {params.output_dir} --max-barcode-dist=1;"
+                "mv {params.output_dir}/matching_stats.tsv {output.matching_stats}"
+
+# Remove adapter ends from the raw fastq reads
+rule trim_adapters:
+    input: 
+        R1 = rules.match_barcodes.output.R1,
+        R2 = rules.match_barcodes.output.R2
+    output:
+        R1 = "03_trimmed_fastqs/R1.fastq.gz",
+        R2 = "03_trimmed_fastqs/R2.fastq.gz"
+    threads: 1
+    log: 'qc_stats/trim_adapters.txt'
+    shell:
+        "SeqPurge -a1 CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -a2 CTGTCTCTTATACACATCTGACGCTGCCGACGA "
+            " -qcut 0 -ncut 0 "
+            " -threads {threads} -out1 {output.R1} -out2 {output.R2} "
+            " -in1 {input.R1} -in2 {input.R2} > {log}"
+
+def multimap_params1(multimapping):
+    if multimapping == 0:
+        return ""
+    else:
+        return f"-k {multimapping+1}"
+
+# Align reads using bowtie2
+rule bowtie2: 
+    input:
+        R1 = rules.trim_adapters.output.R1,
+        R2 = rules.trim_adapters.output.R2
+    output:
+        bam = "04_bams/unfiltered.bam"
+    params:
+        cluster_time = "02:00:00",
+        bowtie_genome_path = config["bowtie2"]["index"],
+        map_params = lambda w: multimap_params1(config["bowtie2"]["multimapping"])
+    threads: 16
+    log: 'qc_stats/bowtie_log.txt'
+    shell:
+        "bowtie2 -X 2000 --threads {threads} --reorder -x {params.bowtie_genome_path} "
+        "        -1 {input.R1} -2 {input.R2} --sam-append-comment {params.map_params} 2> {log} "
+        "    | samtools view -b -S - -o {output.bam}"
+
+
+rule filter_alignments:
+    input: rules.bowtie2.output.bam
+    output: "04_bams/filtered.bam"
+    params:
+        filter_command = (f" | python {srcdir('assign_multimappers_v1.5.py')} --paired-end -k {config['bowtie2']['multimapping']}" 
+                          if config["bowtie2"]["multimapping"] 
+                          else f"-1 {config['bowtie2']['mapq_threshold']}")
+    threads: 1
+    # -F 1804: exclude flag, exludes unmapped, next segment unmapped, secondary alignments, not passing platform q, PCR or optical duplicates
+    # By doing a the flag exclude after assign_multimappers.py, we ensure that only a single alignment is output per read
+    shell: "samtools view -h -f 2 {input} {params.filter_command} | samtools view -F 1804 -b - > {output}"
+
+rule make_fragments:
+    input: 
+        bam = rules.filter_alignments.output
+    output: "05_fragments/fragments_unfiltered.tsv"
+    params:
+        script = srcdir("bam_to_fragments.py"),
+        memory = "4G"
+    threads: 4
+    shell: "python {params.script} {input} | "
+           "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' -S {params.memory} --parallel={threads} | " # Sort the file by chr, start, end, then barcode_id
+           "uniq -c  | " # Filter unique lines and mark number of duplicates at start of line
+           "sed -e 's/^ *\([0-9]*\) \(.*\)$/\\2\\t\\1/' > {output}" # Reformat uniq -c output to have count as the last column rather than first
+           
+
+#######################################################################################
+# FILTER MITOCHONDRIA, BLACKLIST, AND NON-STANDARD CROMOSOMES
+#######################################################################################
+
+# Remove mitochondrial chromosomes
+rule remove_mitochondria:
+    input: rules.make_fragments.output
+    output: "05_fragments/fragments_nomito.tsv"
+    shell: "grep -v '^chrM' {input} > {output}"
+
+# Filter blacklist and make final tabix file
+rule filter_blacklist_and_compress:
+    input: rules.remove_mitochondria.output
+    output: 
+        fragments = "05_fragments/fragments.tsv.gz",
+        index = "05_fragments/fragments.tsv.gz.tbi"
+    params:
+        blacklist_file = config["blacklist"]
+    shell: "bedtools subtract -a {input} -b {params.blacklist_file} -A | "
+           "bgzip > {output.fragments};"
+           "tabix --zero-based --preset bed {output.fragments}"

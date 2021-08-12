@@ -1,0 +1,4 @@
+*.fastq.gz
+737K-cratac-v1.txt.gz
+10x_atac
+ren_lab/barcoded_fastqs
