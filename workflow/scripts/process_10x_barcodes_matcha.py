@@ -1,42 +1,55 @@
 import gzip
+from pathlib import Path
 
 import numpy as np
-import tqdm
 
 import matcha
 
-fastq1 = snakemake.input['fastq1']
-fastq2 = snakemake.input['fastq_bc']
-fastq3 = snakemake.input['fastq2']
-bc_whitelist = snakemake.input['bc_whitelist']
+# Processes 10x ATAC-seq fastqs
+# Inputs: 10x fastq files R1,R2,R3, and barcode whitelist
+# Outputs: 
+#   - R1.fastq: Input R1 filtered for matching barcodes, with corrected barcode
+#     appended to the read name
+#   - R2.fastq: Input R3 (NOT R2) filtered for matching barcodes, with corrected barcode
+#     appended to the read name
+#
+# Limitations:
+#  - Current QC output is just printing a few lines to stdout at the end of the run
+#  - Currently doesn't have arguments for the output filenames
+#  - Only outputs corrected barcode, skipping the uncorrected barcode.
 
-max_barcode_dist = snakemake.params['max_barcode_dist']
+def main():
+    parser = argparse.ArgumentParser(description='Process raw fastq reads to append cell barcodes')
+    parser.add_argument('fastq1', type=str, help='R1 fastq file')
+    parser.add_argument('fastq2', type=str, help='R2 fastq file')
+    parser.add_argument('fastq3', type=str, help='R3 fastq file')
+    parser.add_argument('barcodes', type=str, help='Text file with 10x barcode whitelist (optionally gzipped)')
+    parser.add_argument('output_dir', type=str, help="Directory for saving outputs (R1/R2/stats)")
 
-fastq1_out_path = snakemake.output['fastq1_bc']
-fastq2_out_path = snakemake.output['fastq2_bc']
+    parser.add_argument("--reverse-complement", action="store_true", help="Whether to reverse complement the R2 sequence (NextSeq support)")
+    parser.add_argument("--gzip", action="store_true", help="If set, output fastq.gz files rather than fastq")
+    parser.add_argument("--max-barcode-dist", type=int, default=2, help="Maximum edit distance allowed between a barcode and a whitelist entry")
+    parser.add_argument("--ncores", default=4, help="Number of cores for parallel processing")
+    
+    args = parser.parse_args()
 
-qc_path = snakemake.output['qc_barcode_corr']
+    output_path = Path(args.output_dir)
 
-threads = snakemake.threads
+    f = matcha.FastqReader(threads = args.ncores)
+    extension = "fastq.gz" if args.gzip else "fastq"
+    f.add_sequence("R1", args.fastq1, output_path=output_path / f"R1.{extension}")
+    f.add_sequence("R2", args.fastq2)
+    f.add_sequence("R3", args.fastq3, output_path=output_path / f"R2.{extension}")
 
-def get_open_fn(path):
-    with open(path, "rb") as f:
-        is_gzipped = (f.read(2) == b'\x1f\x8b')
-    return gzip.open if is_gzipped else open
-
-def main(fastq1, fastq2, fastq3, bc_whitelist, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads):
-    f = matcha.FastqReader(threads = threads)
-    f.add_sequence("R1", fastq1, output_path=fastq1_out_path)
-    f.add_sequence("R2", fastq2)
-    f.add_sequence("R3", fastq3, output_path=fastq2_out_path)
-
-    open_fn = get_open_fn(bc_whitelist)
-    with open_fn(bc_whitelist) as file:
-        valid_10x_barcodes = [b.strip() for b in file]
-
+    valid_10x_barcodes = [b.strip() for b in read_gzip(args.barcodes)]
+    if args.reverse_complement:
+        barcode_sequences = [reverse_complement(b) for b in valid_10x_barcodes]
+    else:
+        barcode_sequences = valid_10x_barcodes
     cell_barcode = matcha.HashMatcher(
-        valid_10x_barcodes,
-        max_mismatches=max_barcode_dist,
+        sequences = barcode_sequences,
+        labels = valid_10x_barcodes,
+        max_mismatches=args.max_barcode_dist,
         subsequence_count=2
     )
 
@@ -44,30 +57,43 @@ def main(fastq1, fastq2, fastq3, bc_whitelist, max_barcode_dist, fastq1_out_path
 
     f.set_output_names("{read_name} CB:Z:{cell}")
 
-    barcode_counts = [0] * (max_barcode_dist + 1)
+    barcode_counts = np.zeros(args.max_barcode_dist + 2, int)
+
     total_reads = 0
-    total_reads_in = 0
+    total_pass = 0
 
     chunk_size = 10000
-    progress = tqdm.tqdm(disable=None, unit="reads")
-    while reads_in := f.read_chunk(chunk_size):
-        pass_filter = (f.get_match_result("cell", "dist") <= max_barcode_dist) & \
+    while f.read_chunk(chunk_size):
+        pass_filter = (f.get_match_result("cell", "dist") <= args.max_barcode_dist) & \
             (f.get_match_result("cell", "second_best_dist") > f.get_match_result("cell", "dist"))
 
         total_reads += len(pass_filter)
-        total_reads_in += reads_in
+        total_pass += pass_filter.sum()
         values, counts = np.unique(f.get_match_result("cell", "dist"), return_counts=True)
-        for v, c in zip(values, counts):
-            if v <= max_barcode_dist:
-                barcode_counts[v] += c
+        barcode_counts[np.minimum(values, args.max_barcode_dist + 1)] += counts
         
         f.write_chunk(pass_filter)
-        progress.update(len(pass_filter))
 
-    with open(qc_path, 'w') as f:
-        f.write(f"Total barcodes processed\t{total_reads_in}\n")
-        f.write(f"Barcodes accepted\t{total_reads}\t{total_reads/total_reads_in*100:.2f}\n")
-        for val, i in enumerate(barcode_counts):
-            f.write(f"Barcodes with edit distance {val}\t{i}\t{i/total_reads_in*100:.2f}\n")
+    stats_output = open(output_path / "matching_stats.tsv", "w")
+    print(f"{total_pass}/{total_reads} reads passing, ({total_pass/total_reads*100:.2f}%)\n", file=stats_output)
+    print("mismatches\treads", file=stats_output)
+    for dist in range(args.max_barcode_dist + 2):
+        print(
+            dist if dist <= args.max_barcode_dist else f">{args.max_barcode_dist}",
+            barcode_counts[dist],
+            sep = "\t",
+            file=stats_output
+        )
 
-main(fastq1, fastq2, fastq3, bc_whitelist, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
+def read_gzip(path):
+    if path.endswith(".gz"):
+        return gzip.open(path, "rb")
+    else:
+        return open(path, "rb")
+
+rev_comp = bytes.maketrans(b"ATGC",b"TACG")
+def reverse_complement(seq):
+    return bytes.translate(seq, rev_comp)[::-1]
+
+if __name__ == "__main__":
+    main()
