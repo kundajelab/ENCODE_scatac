@@ -63,7 +63,7 @@ def get_barcode_corr_inputs(wildcards):
     fastq = [f"barcode/{sample}/{v}.fastq.gz" for v in paths.values()]
     whitelist = config["barcode_correction"]["whitelist"].values
 
-    return (fastq, whitelist)
+    return fastq
 
 rule barcode_corr:
     input:
