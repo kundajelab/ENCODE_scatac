@@ -17,7 +17,10 @@ def get_input_fastq(wildcards):
 
 def get_fastq_set_fetcher(path_template):
     def fastq_set_fetcher(wildcards):
-        return expand(path_template, read=config["fastq"][wildcards.sample].keys())
+        a = expand(path_template, read=config["fastq"][wildcards.sample].keys())
+        print(a) ####
+        print(config["fastq"][wildcards.sample].keys()) ####
+        return a
     return fastq_set_fetcher
 
 def get_fastq_keys(wildcards):
