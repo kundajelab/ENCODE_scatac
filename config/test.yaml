@@ -9,6 +9,8 @@ seed: 8757647
 
 ### END-TO-END TEST DATASET ###
 
+technology: 10x_atac
+
 genome: hg38
 
 fastq:
@@ -22,7 +24,8 @@ fastq:
     BC: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/D14_S8_L001_R2_001.fastq.gz
 
 barcode_correction:
-  whitelist: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
+  whitelist: 
+    BC: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
   max_barcode_dist: 2
 
 bwt2:

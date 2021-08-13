@@ -175,7 +175,6 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
         logFile = log_paths[["save"]],
     )
 
-    touch(output_paths[["indicator"]])
 }
 
-build_archr_project(snakemake@params[["sample_names"]], snakemake@input, snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["seed"]], snakemake@params[["genome"]])
+build_archr_project(snakemake@params[["sample_names"]], snakemake@input[["frag"]], snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["seed"]], snakemake@params[["genome"]])

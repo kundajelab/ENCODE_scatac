@@ -15,6 +15,14 @@ atac_samples = config["fastq"].keys()
 def get_input_fastq(wildcards):
     return config["fastq"][wildcards.sample][wildcards.read]
 
+def get_fastq_set_fetcher(path_template):
+    def fastq_set_fetcher(wildcards):
+        return expand(path_template, read=config["fastq"][wildcards.sample].keys())
+    return fastq_set_fetcher
+
+def get_fastq_keys(wildcards):
+    return config["fastq"][wildcards.sample].keys()
+
 def sh_command(script_name):
     return "bash " + str(workflow.source_path(script_name))
 
@@ -44,16 +52,17 @@ Barcode correction and filtering
 """
 rule barcode_corr:
     input:
-        fastq1="barcode/{sample}/R1.fastq.gz",
-        fastq2="barcode/{sample}/R2.fastq.gz",
-        fastq_bc="barcode/{sample}/BC.fastq.gz",
-        bc_whitelist=config["barcode_correction"]["whitelist"] 
+        fastq=get_fastq_set_fetcher("barcode/{sample}/{read}.fastq.gz")
+        whitelist=config["barcode_correction"]["whitelist"].values()
     output:
         fastq1_bc="barcode/{sample}/R1_bc.fastq.gz",
         fastq2_bc="barcode/{sample}/R2_bc.fastq.gz",
         qc_barcode_corr="barcode/{sample}/barcode_corr.qc"
     params:
         max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] 
+        technology=config["technology"]
+        fastq_names=get_fastq_keys
+        whitelist_names=config["barcode_correction"]["whitelist"].keys()
     threads:
         max_threads
     conda:
@@ -105,6 +114,8 @@ rule align_bowtie2:
         max_threads
     conda:
         "envs/align_bowtie2.yaml"
+    shadow: 
+        "minimal"
     shell:
         sh_command("scripts/align.sh") + ""
         " {input.fastq1} {input.fastq2}" 
@@ -130,6 +141,8 @@ rule frac_mito:
         max_threads
     conda:
         "envs/frac_mito.yaml"
+    shadow: 
+        "minimal"
     script:
         "scripts/frac_mito.py"
 
@@ -153,6 +166,8 @@ rule dedup_bam:
         max_threads
     conda:
         "envs/dedup_bam.yaml"
+    shadow: 
+        "minimal"
     shell:
         sh_command("scripts/dedup_bam_pe.sh") + ""
         " {input} {output.bam} {output.ind} {output.flagstat} {output.dup} {output.pbc} {output.filter_temp_prefix}"
@@ -173,6 +188,8 @@ rule bam_to_frag:
         max_threads
     conda:
         "envs/bam_to_frag.yaml"
+    shadow: 
+        "minimal"
     shell:
         sh_command("scripts/bam_to_frag.sh") + " {input.bam} {output.frag} {output.tmp_frag}"
 
@@ -195,12 +212,13 @@ Preliminary ArchR analyses
 """
 rule archr_build:
     input:
-        expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"])
+        frag=expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]),
+        frag_ind=expand("fragment/{sample}_fragments.tsv.gz.tbi", sample=config["fastq"]),
     output:
         arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
         qc_dir=directory("archr_build/qc"),
         project_dir=directory("archr_build/project"),
-        indicator=("archr_build/indicator.txt")
+        indicator=touch("archr_build/indicator.txt")
     params:
         sample_names=atac_samples,
         seed=seed,
@@ -225,5 +243,7 @@ rule archr_build:
         max_threads
     conda:
         "envs/archr_build.yaml"
+    shadow: 
+        "minimal"
     script:
         "scripts/build_archr_project.R"
