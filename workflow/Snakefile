@@ -59,9 +59,9 @@ rule barcode_corr:
         fastq2_bc="barcode/{sample}/R2_bc.fastq.gz",
         qc_barcode_corr="barcode/{sample}/barcode_corr.qc"
     params:
-        max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] 
-        technology=config["technology"]
-        fastq_names=get_fastq_keys
+        max_barcode_dist=config["barcode_correction"]["max_barcode_dist"],
+        technology=config["technology"],
+        fastq_names=get_fastq_keys,
         whitelist_names=config["barcode_correction"]["whitelist"].keys()
     threads:
         max_threads
