@@ -29,7 +29,9 @@ config = {
 }
 
 rule all:
-    input: "05_fragments/fragments.tsv.gz.tbi"
+    input: 
+        "05_fragments/fragments.tsv.gz",
+        "qc_stats/summary.txt"
 
 # Trim adapters
 
@@ -49,10 +51,11 @@ if config["technology"] == "10x_atac":
             matching_stats = "qc_stats/barcode_matching.tsv"
         params:
             script = srcdir("../workflow/scripts/process_10x_barcodes_matcha.py"),
-            output_dir = "02_barcode_matching"
+            output_dir = "02_barcode_matching",
+            barcode_dist = config["barcode_correction"]["max_barcode_dist"]
         conda:
             "../workflow/envs/matcha.yaml"
-        shell: "python {params.script} {input.fastqs} {input.whitelist} {params.output_dir} --max-barcode-dist=1; "
+        shell: "python {params.script} {input.fastqs} {input.whitelist} {params.output_dir} --max-barcode-dist={params.barcode_dist}; "
                "mv {params.output_dir}/matching_stats.tsv {output.matching_stats}"
 elif config["technology"] == "ren":
     rule match_barcodes:
@@ -82,11 +85,9 @@ rule trim_adapters:
         R2 = "03_trimmed_fastqs/R2.fastq.gz"
     threads: 1
     log: 'qc_stats/trim_adapters.txt'
-    shell:
-        "SeqPurge -a1 CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -a2 CTGTCTCTTATACACATCTGACGCTGCCGACGA "
-            " -qcut 0 -ncut 0 "
-            " -threads {threads} -out1 {output.R1} -out2 {output.R2} "
-            " -in1 {input.R1} -in2 {input.R2} > {log}"
+    shell: "fastp --in1 {input.R1} --in2 {input.R2} --out1 {output.R1} --out2 {output.R2}"
+           " -j /dev/null -h /dev/null -G -Q -L -w {threads} 2> {log}"
+
 
 def multimap_params1(multimapping):
     if multimapping == 0:
@@ -128,15 +129,20 @@ rule filter_alignments:
 rule make_fragments:
     input: 
         bam = rules.filter_alignments.output
-    output: "05_fragments/fragments_unfiltered.tsv"
+    output: 
+        fragments = "05_fragments/fragments_unfiltered.tsv",
+        read_count = "qc_stats/read_counts/all_aligned.txt",
+        dedup_count = "qc_stats/read_counts/unique_aligned.txt"
     params:
         script = srcdir("bam_to_fragments.py"),
         memory = "4G"
     threads: 4
     shell: "python {params.script} {input} | "
+           "tee >(wc -l > {output.read_count}) | " # Count the number of fragments before sort+unique
            "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' -S {params.memory} --parallel={threads} | " # Sort the file by chr, start, end, then barcode_id
            "uniq -c  | " # Filter unique lines and mark number of duplicates at start of line
-           "sed -e 's/^ *\([0-9]*\) \(.*\)$/\\2\\t\\1/' > {output}" # Reformat uniq -c output to have count as the last column rather than first
+           "sed -e 's/^ *\([0-9]*\) \(.*\)$/\\2\\t\\1/' | " # Reformat uniq -c output to have count as the last column rather than first
+           "tee {output.fragments} | wc -l > {output.dedup_count}" # Save the count of total reads
            
 
 #######################################################################################
@@ -145,18 +151,50 @@ rule make_fragments:
 
 # Remove mitochondrial chromosomes
 rule remove_mitochondria:
-    input: rules.make_fragments.output
-    output: "05_fragments/fragments_nomito.tsv"
-    shell: "grep -v '^chrM' {input} > {output}"
+    input: rules.make_fragments.output.fragments
+    output: 
+        fragments = "05_fragments/fragments_nomito.tsv",
+        read_count = "qc_stats/read_counts/aligned_no_mito.txt"
+    shell: "grep -v '^chrM' {input} | "
+           "tee {output.fragments} | wc -l > {output.read_count} "
 
-# Filter blacklist and make final tabix file
+
+# Read in file with duplicate count in column 5; output format:
+# TotalReadPairs [tab] DistinctReadPairs [tab] OneReadPair [tab] TwoReadPairs [tab] NRF=Distinct/Total [tab] PBC1=OnePair/Distinct [tab] PBC2=OnePair/TwoPair
+duplicate_stats_awk = """ \
+BEGIN {mt=0; m0=0; m1=0; m2=0} \
+($5==1) {m1=m1+1} \
+($5==2) {m2=m2+1} \
+{m0=m0+1; mt=mt+$5} \
+END { \
+  printf "TotalReadPairs\\tDistinctReadPairs\\tOneReadPair\\tTwoReadPairs\\tNRF=Distinct/Total\\tPBC1=OnePair/Distinct\\tPBC2=OnePair/TwoPair\\n"; \
+  printf "%d\\t%d\\t%d\\t%d\\t%f\\t%f\\t%f\\n",mt,m0,m1,m2,m0/mt,m1/m0,m1/m2 \
+} 
+"""
+
+# Filter blacklist, calculate duplicate stats, and make tabix
 rule filter_blacklist_and_compress:
-    input: rules.remove_mitochondria.output
+    input: rules.remove_mitochondria.output.fragments
     output: 
         fragments = "05_fragments/fragments.tsv.gz",
+        stats = "qc_stats/read_counts/dupicate_stats.tsv",
         index = "05_fragments/fragments.tsv.gz.tbi"
     params:
         blacklist_file = config["blacklist"]
-    shell: "bedtools subtract -a {input} -b {params.blacklist_file} -A | "
+    shell: "bedtools subtract -a {input} -b {params.blacklist_file} -A | " # Remove regions from blacklist
+           "tee >(awk '{duplicate_stats_awk}' > {output.stats}) | "
            "bgzip > {output.fragments};"
            "tabix --zero-based --preset bed {output.fragments}"
+
+rule stats_summary:
+    input:
+        barcode_matching = rules.match_barcodes.output.matching_stats,
+        adapter_stats = rules.trim_adapters.log[0],
+        total_align = rules.make_fragments.output.read_count,
+        unique_align = rules.make_fragments.output.dedup_count,
+        no_mito = rules.remove_mitochondria.output.read_count,
+        duplicate_stats = rules.filter_blacklist_and_compress.output.stats
+    output: "qc_stats/summary.txt"
+    script: "summarize_fragment_stats.py"
+
+
