@@ -53,10 +53,14 @@ rule strip_fastq:
 """
 Barcode correction and filtering
 """
+
+def get_fastq_set(wildcards):
+    return expand("barcode/{sample}/{read}.fastq.gz", read=config["fastq"][wildcards.sample].keys())
+
 rule barcode_corr:
     input:
-        fastq=get_fastq_set_fetcher("barcode/{sample}/{read}.fastq.gz"),
-        # whitelist=config["barcode_correction"]["whitelist"].values()
+        fastq=get_fastq_set,
+        whitelist=config["barcode_correction"]["whitelist"].values()
     output:
         fastq1_bc="barcode/{sample}/R1_bc.fastq.gz",
         fastq2_bc="barcode/{sample}/R2_bc.fastq.gz",
