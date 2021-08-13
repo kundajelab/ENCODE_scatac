@@ -30,7 +30,9 @@ def main():
     parser.add_argument('T7_barcodes', type=str, help='tsv file with T7 barcodes')
     parser.add_argument('output_dir', type=str, help="Directory for saving outputs (R1/R2/stats)")
 
-    #parser.add_argument("--reverse-complement", type=bool, help="Whether to reverse complement the R2 sequence (NextSeq support)")
+    parser.add_argument("--reverse-complement-I1", action="store_true", help="Whether to reverse complement the I1 sequence")
+    parser.add_argument("--reverse-complement-I2", action="store_true", help="Whether to reverse complement the I2 sequence")
+    parser.add_argument("--gzip", action="store_true", help="If set, output fastq.gz files rather than fastq")
     parser.add_argument("--max-barcode-dist", type=int, default=2, help="Maximum edit distance allowed between a barcode and a whitelist entry")
     parser.add_argument("--ncores", default=4, help="Number of cores for parallel processing")
     
@@ -39,23 +41,34 @@ def main():
     output_path = Path(args.output_dir)
 
     f = matcha.FastqReader(threads = args.ncores)
-    f.add_sequence("R1", args.fastq_R1, output_path=output_path / "R1.fastq.gz")
-    f.add_sequence("R2", args.fastq_R2, output_path=output_path / "R2.fastq.gz")
+    extension = "fastq.gz" if args.gzip else "fastq"
+    f.add_sequence("R1", args.fastq_R1, output_path=output_path / f"R1.{extension}")
+    f.add_sequence("R2", args.fastq_R2, output_path=output_path / f"R2.{extension}")
     f.add_sequence("I1", args.fastq_I1)
     f.add_sequence("I2", args.fastq_I2)
 
     valid_i5_barcodes = pd.read_csv(args.i5_barcodes, sep="\t")
     valid_T7_barcodes = pd.read_csv(args.T7_barcodes, sep="\t")
 
+    if args.reverse_complement_I2:
+        i5_sequences = [reverse_complement(b.encode()) for b in valid_i5_barcodes["sequence"]]
+    else:
+        i5_sequences = valid_i5_barcodes["sequence"]
+    
     i5_barcode = matcha.HashMatcher(
-        sequences = [reverse_complement(b.encode()) for b in valid_i5_barcodes["sequence"]],
+        sequences = i5_sequences,
         labels = valid_i5_barcodes["sequence"],
         max_mismatches=args.max_barcode_dist,
         subsequence_count=2
     )
 
+    if args.reverse_complement_I1:
+        T7_sequences = [reverse_complement(b.encode()) for b in valid_T7_barcodes["sequence"]]
+    else:
+        T7_sequences = valid_T7_barcodes["sequence"]
+
     T7_barcode = matcha.HashMatcher(
-        sequences = [reverse_complement(b.encode()) for b in valid_T7_barcodes["sequence"]],
+        sequences = T7_sequences,
         labels = valid_T7_barcodes["sequence"],
         max_mismatches=args.max_barcode_dist,
         subsequence_count=2

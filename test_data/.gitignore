@@ -2,3 +2,7 @@
 737K-cratac-v1.txt.gz
 10x_atac
 ren_lab/barcoded_fastqs
+# A few things here that are test runs I've done in my working directory -Ben
+10x_atac_run
+full_10x_run
+.slurm-logs

@@ -9,9 +9,9 @@ import matcha
 # Processes 10x ATAC-seq fastqs
 # Inputs: 10x fastq files R1,R2,R3, and barcode whitelist
 # Outputs: 
-#   - R1.fastq.gz: Input R1 filtered for matching barcodes, with corrected barcode
+#   - R1.fastq: Input R1 filtered for matching barcodes, with corrected barcode
 #     appended to the read name
-#   - R2.fastq.gz: Input R3 (NOT R2) filtered for matching barcodes, with corrected barcode
+#   - R2.fastq: Input R3 (NOT R2) filtered for matching barcodes, with corrected barcode
 #     appended to the read name
 #
 # Limitations:
@@ -27,7 +27,8 @@ def main():
     parser.add_argument('barcodes', type=str, help='Gzip file with 10x barcode whitelist')
     parser.add_argument('output_dir', type=str, help="Directory for saving outputs (R1/R2/stats)")
 
-    #parser.add_argument("--reverse-complement", type=bool, help="Whether to reverse complement the R2 sequence (NextSeq support)")
+    parser.add_argument("--reverse-complement", action="store_true", help="Whether to reverse complement the R2 sequence (NextSeq support)")
+    parser.add_argument("--gzip", action="store_true", help="If set, output fastq.gz files rather than fastq")
     parser.add_argument("--max-barcode-dist", type=int, default=2, help="Maximum edit distance allowed between a barcode and a whitelist entry")
     parser.add_argument("--ncores", default=4, help="Number of cores for parallel processing")
     
@@ -36,14 +37,18 @@ def main():
     output_path = Path(args.output_dir)
 
     f = matcha.FastqReader(threads = args.ncores)
-    f.add_sequence("R1", args.fastq1, output_path=output_path / "R1.fastq.gz")
+    extension = "fastq.gz" if args.gzip else "fastq"
+    f.add_sequence("R1", args.fastq1, output_path=output_path / f"R1.{extension}")
     f.add_sequence("R2", args.fastq2)
-    f.add_sequence("R3", args.fastq3, output_path=output_path / "R2.fastq.gz")
+    f.add_sequence("R3", args.fastq3, output_path=output_path / f"R2.{extension}")
 
     valid_10x_barcodes = [b.strip() for b in gzip.open(args.barcodes)]
-
+    if args.reverse_complement:
+        barcode_sequences = [reverse_complement(b) for b in valid_10x_barcodes]
+    else:
+        barcode_sequences = valid_10x_barcodes
     cell_barcode = matcha.HashMatcher(
-        sequences = [reverse_complement(b) for b in valid_10x_barcodes],
+        sequences = barcode_sequences,
         labels = valid_10x_barcodes,
         max_mismatches=args.max_barcode_dist,
         subsequence_count=2

@@ -6,87 +6,92 @@
 #    - run the pipeline from in the 10x_atac folder
 
 # What's missing: 
-#    - certain QC stats in a nice output format
 #    - conda environment spec (need samtools, bowtie2, tabix, bgzip, matcha, pysam)
 #    - ArchR analysis bits
 #    - intermediate bam output is not coordsorted yet
 #    - flag for skipping 8bp on multiome barcodes
 #
-# Possible improvements: 
-#    - Greater use of snakemakes `pipe` output to minimize number of intermediate files
-config = {
-    "technology": "10x_atac",
-    "fastq": {read: f"{read}.fastq.gz" for read in ["I1", "I2", "R1", "R2", "R3"]},
-    "barcode_correction": {
-        "10x_whitelist": "737K-cratac-v1.txt.gz",
-        "max_barcode_dist": 1
-    },
-    "bowtie2": {
-        "index": "/oak/stanford/groups/wjg/share/uPrep/genomes/hg38/indexes/bowtie2/hg38",
-        "multimapping": 4
-    },
-    "blacklist": "/oak/stanford/groups/wjg/share/uPrep/genomes/hg38/annotations/hg38.blacklist.bed"
-}
+configfile: "config.yaml"
 
 rule all:
     input: 
-        "05_fragments/fragments.tsv.gz",
-        "qc_stats/summary.txt"
+        expand("{sample}/possorted_bam.bam", sample=config["samples"].keys()),
+        expand("{sample}/fragments.tsv.gz", sample=config["samples"].keys()),
+        expand("{sample}/qc_summary.txt", sample=config["samples"].keys())
 
 # Trim adapters
 
 rule trim_read_names:
-    input: lambda w: config["fastq"][w.read]
-    output: "01_trimmed_names/{read}.fastq.gz"
-    shell: "gunzip -c {input} | awk 'NR % 4 == 1 {{print $1}} NR % 4 != 1 {{print $0}}' | gzip -c > {output}"
+    input: lambda w: config["samples"][w.sample][w.read]
+    output: temp("{sample}/temp/{read}.fastq")
+    group: "fastqs"
+    shell: "gunzip -c {input} | awk 'NR % 4 == 1 {{print $1}} NR % 4 != 1 {{print $0}}' > {output}"
 
-if config["technology"] == "10x_atac":
-    rule match_barcodes:
-        input: 
-            fastqs = expand(rules.trim_read_names.output, read=["R1", "R2", "R3"]),
-            whitelist = config["barcode_correction"]["10x_whitelist"]
-        output: 
-            R1 = "02_barcode_matching/R1.fastq.gz",
-            R2 = "02_barcode_matching/R2.fastq.gz",
-            matching_stats = "qc_stats/barcode_matching.tsv"
-        params:
-            script = srcdir("../workflow/scripts/process_10x_barcodes_matcha.py"),
-            output_dir = "02_barcode_matching",
-            barcode_dist = config["barcode_correction"]["max_barcode_dist"]
-        conda:
-            "../workflow/envs/matcha.yaml"
-        shell: "python {params.script} {input.fastqs} {input.whitelist} {params.output_dir} --max-barcode-dist={params.barcode_dist}; "
-               "mv {params.output_dir}/matching_stats.tsv {output.matching_stats}"
-elif config["technology"] == "ren":
-    rule match_barcodes:
-        input:
-            fastqs = expand(rules.trim_read_names.output, read=["I1", "I2", "R1", "R2"]),
-            i5_whitelist = "test_data/ren_lab/ren_barcodes_i5.tsv",
-            T7_whitelist = "test_data/ren_lab/ren_barcodes_T7.tsv"
-        output:
-            R1 = "02_barcode_matching/R1.fastq.gz",
-            R2 = "02_barcode_matching/R2.fastq.gz",
-            matching_stats = "qc_stats/barcode_matching.tsv"
-        params:
-            script = srcdir("../workflow/scripts/process_ren_barcodes_matcha.py"),
-            output_dir = "02_barcode_matching/barcoded_fastqs/"
-        conda:
-            "../workflow/envs/matcha.yaml"
-        shell: "python {params.script} {input.fastqs} {input.i5_whitelist} {input.T7_whitelist} {params.output_dir} --max-barcode-dist=1;"
-                "mv {params.output_dir}/matching_stats.tsv {output.matching_stats}"
+rule match_barcodes_10x:
+    input: 
+        fastqs = expand(rules.trim_read_names.output, read=["R1", "R2", "R3"], allow_missing=True),
+        whitelist = config["barcode_correction"]["10x_whitelist"]
+    output: 
+        R1 = temp("{sample}/temp/barcoded_10x_atac/R1.fastq"),
+        R2 = temp("{sample}/temp/barcoded_10x_atac/R2.fastq"),
+        matching_stats = "{sample}/qc_stats/barcode_matching.tsv"
+    params:
+        script = srcdir("../workflow/scripts/process_10x_barcodes_matcha.py"),
+        output_dir = "{sample}/temp/barcoded_10x_atac",
+        barcode_dist = config["barcode_correction"]["max_barcode_dist_10x"],
+        reverse_complement = lambda w: "--reverse-complement" 
+                if "barcode_reverse_complement" in config["samples"][w.sample] 
+                else ""
+    conda:
+        "../workflow/envs/matcha.yaml"
+    group: "fastqs"
+    shell: "python {params.script} {input.fastqs} {input.whitelist} {params.output_dir} "
+            " --max-barcode-dist={params.barcode_dist} {params.reverse_complement}; "
+            "mv {params.output_dir}/matching_stats.tsv {output.matching_stats}"
+
+rule match_barcodes_ren:
+    input:
+        fastqs = expand(rules.trim_read_names.output, read=["I1", "I2", "R1", "R2"], allow_missing=True),
+        i5_whitelist = "test_data/ren_lab/ren_barcodes_i5.tsv",
+        T7_whitelist = "test_data/ren_lab/ren_barcodes_T7.tsv"
+    output:
+        R1 = "{sample}/temp/barcoded_ren/R1.fastq.gz",
+        R2 = "{sample}/temp/barcoded_ren/R2.fastq.gz",
+        matching_stats = "{sample}/qc_stats/barcode_matching.tsv"
+    params:
+        script = srcdir("../workflow/scripts/process_ren_barcodes_matcha.py"),
+        output_dir = "{sample}/temp/barcoded_ren",
+        barcode_dist = config["barcode_correction"]["max_barcode_dist_ren"],
+        reverse_complement_I1 = lambda w: "--reverse-complement-I1" 
+                if "barcode_reverse_complement" in config["samples"][w.sample] and
+                    "I1" in config["samples"][w.sample]["barcode_reverse_complement"]
+                else "",
+        reverse_complement_I2 = lambda w: "--reverse-complement-I2" 
+                if "barcode_reverse_complement" in config["samples"][w.sample] and
+                    "I2" in config["samples"][w.sample]["barcode_reverse_complement"]
+                else ""
+    conda:
+        "../workflow/envs/matcha.yaml"
+    group: "fastqs"
+    shell: "python {params.script} {input.fastqs} {input.i5_whitelist} {input.T7_whitelist} "
+            "{params.output_dir} --max-barcode-dist={params.max_barcode_dist} "
+            "{params.reverse_complement_I1} {params.reverse_complement_I2};"
+            "mv {params.output_dir}/matching_stats.tsv {output.matching_stats}"
 
 # Remove adapter ends from the raw fastq reads
 rule trim_adapters:
     input: 
-        R1 = rules.match_barcodes.output.R1,
-        R2 = rules.match_barcodes.output.R2
+        # Use the inputs here to specify which barcode types to run for the sample
+        R1 = lambda w: f"{w.sample}/temp/barcoded_{config['samples'][w.sample]['barcode_type']}/R1.fastq",
+        R2 = lambda w: f"{w.sample}/temp/barcoded_{config['samples'][w.sample]['barcode_type']}/R2.fastq"
     output:
-        R1 = "03_trimmed_fastqs/R1.fastq.gz",
-        R2 = "03_trimmed_fastqs/R2.fastq.gz"
+        R1 = temp("{sample}/temp/R1_trimmed.fastq"),
+        R2 = temp("{sample}/temp/R2_trimmed.fastq"),
+        stats = '{sample}/qc_stats/trim_adapters.txt'
     threads: 1
-    log: 'qc_stats/trim_adapters.txt'
+    group: "fastqs"
     shell: "fastp --in1 {input.R1} --in2 {input.R2} --out1 {output.R1} --out2 {output.R2}"
-           " -j /dev/null -h /dev/null -G -Q -L -w {threads} 2> {log}"
+           " -j /dev/null -h /dev/null -G -Q -L -w {threads} 2> {output.stats}"
 
 
 def multimap_params1(multimapping):
@@ -101,42 +106,54 @@ rule bowtie2:
         R1 = rules.trim_adapters.output.R1,
         R2 = rules.trim_adapters.output.R2
     output:
-        bam = "04_bams/unfiltered.bam"
+        bam = temp("{sample}/temp/unfiltered.bam")
     params:
         cluster_time = "02:00:00",
         bowtie_genome_path = config["bowtie2"]["index"],
         map_params = lambda w: multimap_params1(config["bowtie2"]["multimapping"])
     threads: 16
-    log: 'qc_stats/bowtie_log.txt'
+    group: "mapping"
+    log: '{sample}/qc_stats/bowtie_log.txt'
     shell:
         "bowtie2 -X 2000 --threads {threads} --reorder -x {params.bowtie_genome_path} "
         "        -1 {input.R1} -2 {input.R2} --sam-append-comment {params.map_params} 2> {log} "
-        "    | samtools view -b -S - -o {output.bam}"
+        "    | samtools view -u -S - -o {output.bam}"
 
 
 rule filter_alignments:
     input: rules.bowtie2.output.bam
-    output: "04_bams/filtered.bam"
+    output: temp("{sample}/temp/filtered.bam")
     params:
         filter_command = (f" | python {srcdir('assign_multimappers_v1.5.py')} --paired-end -k {config['bowtie2']['multimapping']}" 
                           if config["bowtie2"]["multimapping"] 
                           else f"-1 {config['bowtie2']['mapq_threshold']}")
     threads: 1
+    group: "mapping"
     # -F 1804: exclude flag, exludes unmapped, next segment unmapped, secondary alignments, not passing platform q, PCR or optical duplicates
     # By doing a the flag exclude after assign_multimappers.py, we ensure that only a single alignment is output per read
-    shell: "samtools view -h -f 2 {input} {params.filter_command} | samtools view -F 1804 -b - > {output}"
+    shell: "samtools view -h -f 2 {input} {params.filter_command} | samtools view -F 1804 -u - > {output}"
+
+rule sort_alignments:
+    input: rules.filter_alignments.output
+    output: 
+        bam = "{sample}/possorted_bam.bam",
+        bai = "{sample}/possorted_bam.bam.bai"
+    threads: 4
+    shell: "samtools sort {input} -@ {threads} -o {output.bam} 2> /dev/null; "
+           "samtools index {output.bam};"
 
 rule make_fragments:
     input: 
         bam = rules.filter_alignments.output
     output: 
-        fragments = "05_fragments/fragments_unfiltered.tsv",
-        read_count = "qc_stats/read_counts/all_aligned.txt",
-        dedup_count = "qc_stats/read_counts/unique_aligned.txt"
+        fragments = temp("{sample}/temp/fragments_unfiltered.tsv"),
+        read_count = temp("{sample}/temp/read_counts/all_aligned.txt"),
+        dedup_count = temp("{sample}/temp/read_counts/unique_aligned.txt")
     params:
         script = srcdir("bam_to_fragments.py"),
         memory = "4G"
     threads: 4
+    group: "fragments"
     shell: "python {params.script} {input} | "
            "tee >(wc -l > {output.read_count}) | " # Count the number of fragments before sort+unique
            "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' -S {params.memory} --parallel={threads} | " # Sort the file by chr, start, end, then barcode_id
@@ -153,8 +170,9 @@ rule make_fragments:
 rule remove_mitochondria:
     input: rules.make_fragments.output.fragments
     output: 
-        fragments = "05_fragments/fragments_nomito.tsv",
-        read_count = "qc_stats/read_counts/aligned_no_mito.txt"
+        fragments = temp("{sample}/temp/fragments_nomito.tsv"),
+        read_count = temp("{sample}/temp/read_counts/aligned_no_mito.txt")
+    group: "fragments"
     shell: "grep -v '^chrM' {input} | "
            "tee {output.fragments} | wc -l > {output.read_count} "
 
@@ -176,11 +194,12 @@ END { \
 rule filter_blacklist_and_compress:
     input: rules.remove_mitochondria.output.fragments
     output: 
-        fragments = "05_fragments/fragments.tsv.gz",
-        stats = "qc_stats/read_counts/dupicate_stats.tsv",
-        index = "05_fragments/fragments.tsv.gz.tbi"
+        fragments = "{sample}/fragments.tsv.gz",
+        stats = "{sample}/qc_stats/dupicate_stats.tsv",
+        index = "{sample}/fragments.tsv.gz.tbi"
     params:
         blacklist_file = config["blacklist"]
+    group: "fragments"
     shell: "bedtools subtract -a {input} -b {params.blacklist_file} -A | " # Remove regions from blacklist
            "tee >(awk '{duplicate_stats_awk}' > {output.stats}) | "
            "bgzip > {output.fragments};"
@@ -188,13 +207,14 @@ rule filter_blacklist_and_compress:
 
 rule stats_summary:
     input:
-        barcode_matching = rules.match_barcodes.output.matching_stats,
-        adapter_stats = rules.trim_adapters.log[0],
+        barcode_matching = rules.match_barcodes_10x.output.matching_stats, # Should be the same file for other barcode techs too
+        adapter_stats = rules.trim_adapters.output.stats,
         total_align = rules.make_fragments.output.read_count,
         unique_align = rules.make_fragments.output.dedup_count,
         no_mito = rules.remove_mitochondria.output.read_count,
         duplicate_stats = rules.filter_blacklist_and_compress.output.stats
-    output: "qc_stats/summary.txt"
+    output: "{sample}/qc_summary.txt"
+    group: "fragments"
     script: "summarize_fragment_stats.py"
 
 
