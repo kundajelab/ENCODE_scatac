@@ -1,0 +1,18 @@
+samples:
+  full_10x_run:
+    barcode_type: 10x_atac
+    I1: "full_10x_run/atac_pbmc_500_nextgem_fastqs/atac_pbmc_500_nextgem_S1_L001_I1_001.fastq.gz"
+    R1: "full_10x_run/atac_pbmc_500_nextgem_fastqs/atac_pbmc_500_nextgem_S1_L001_R1_001.fastq.gz"
+    R2: "full_10x_run/atac_pbmc_500_nextgem_fastqs/atac_pbmc_500_nextgem_S1_L001_R2_001.fastq.gz"
+    R3: "full_10x_run/atac_pbmc_500_nextgem_fastqs/atac_pbmc_500_nextgem_S1_L001_R3_001.fastq.gz"
+
+barcode_correction:
+    10x_whitelist: "10x_atac/737K-cratac-v1.txt.gz"
+    max_barcode_dist_10x: 1
+    max_barcode_dist_ren: 2
+
+bowtie2:
+    index: "/oak/stanford/groups/wjg/share/uPrep/genomes/hg38/indexes/bowtie2/hg38"
+    multimapping: 4
+  
+blacklist: "/oak/stanford/groups/wjg/share/uPrep/genomes/hg38/annotations/hg38.blacklist.bed"

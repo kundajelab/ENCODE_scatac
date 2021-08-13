@@ -1,0 +1,67 @@
+
+# Download 100k reads from each dataset as a basic test for barcode matching
+# Usage: In ENCOD_scatac root folder, run: snakemake -s test_data/barcode_matching_test.snakemake
+
+# Command to get 100k reads starting at read 5M in the file since the beginning is
+# often low-quality
+# The || true at the end is so curl doesn't mess up snakemake when it complains
+# about stopping the download early. Unfortunately it also means we won't see
+# errors properly
+download_100k_reads = "curl -s {params.url} | gunzip -c | tail -n +20000001 | head -n 400000 | gzip -c > {output} || true"
+
+rule all:
+    input:
+        expand("test_data/ren_lab/{read}.fastq.gz", read=["I1", "I2", "R1", "R2"]),
+        expand("test_data/10x_atac/{read}.fastq.gz", read=["I1", "R1", "R2", "R3"]),
+        "test_data/10x_atac/737K-cratac-v1.txt.gz",
+        "test_data/10x_atac/barcoded_fastqs/matching_stats.tsv",
+        "test_data/ren_lab/barcoded_fastqs/matching_stats.tsv"
+
+rule download_ren_data:
+    output: "test_data/ren_lab/{read}.fastq.gz"
+    params:
+        url = "http://renlab.sdsc.edu/kai/raw/Undetermined_S0_L002_{read}_001.fastq.gz"
+    shell: download_100k_reads
+
+rule download_10x_atac:
+    output: "test_data/10x_atac/{read}.fastq.gz"
+    params:
+        url = "http://mitra.stanford.edu/kundaje/surag/ENCODE_scatac/data/D14/D14_S8_L001_{read}_001.fastq.gz"
+    shell: download_100k_reads
+
+rule download_10x_whitelist:
+    output: "test_data/10x_atac/737K-cratac-v1.txt.gz"
+    params:
+        url = "https://github.com/10XGenomics/cellranger-atac/blob/main/lib/python/barcodes/737K-cratac-v1.txt?raw=true"
+    shell: "curl -s -L {params.url} | gzip -c > {output}"
+
+rule match_10x_barcodes:
+    input: 
+        fastqs = expand("test_data/10x_atac/{read}.fastq.gz", read=["R1", "R2", "R3"]),
+        whitelist = "test_data/10x_atac/737K-cratac-v1.txt.gz"
+    output: 
+        R1 = "test_data/10x_atac/barcoded_fastqs/R1.fastq.gz",
+        R2 = "test_data/10x_atac/barcoded_fastqs/R2.fastq.gz",
+        matching_stats = "test_data/10x_atac/barcoded_fastqs/matching_stats.tsv"
+    params:
+        script = "workflow/scripts/process_10x_barcodes_matcha.py",
+        output_dir = "test_data/10x_atac/barcoded_fastqs/"
+    conda:
+        "../workflow/envs/matcha.yaml"
+    shell: "python {params.script} {input.fastqs} {input.whitelist} {params.output_dir} --max-barcode-dist=1"
+
+rule match_ren_barcodes:
+    input:
+        fastqs = expand("test_data/ren_lab/{read}.fastq.gz", read=["I1", "I2", "R1", "R2"]),
+        i5_whitelist = "test_data/ren_lab/ren_barcodes_i5.tsv",
+        T7_whitelist = "test_data/ren_lab/ren_barcodes_T7.tsv"
+    output:
+        R1 = "test_data/ren_lab/barcoded_fastqs/R1.fastq.gz",
+        R2 = "test_data/ren_lab/barcoded_fastqs/R2.fastq.gz",
+        matching_stats = "test_data/ren_lab/barcoded_fastqs/matching_stats.tsv"
+    params:
+        script = "workflow/scripts/process_ren_barcodes_matcha.py",
+        output_dir = "test_data/ren_lab/barcoded_fastqs/"
+    conda:
+        "../workflow/envs/matcha.yaml"
+    shell: "python {params.script} {input.fastqs} {input.i5_whitelist} {input.T7_whitelist} {params.output_dir} --max-barcode-dist=1"
