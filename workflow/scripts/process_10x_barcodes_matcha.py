@@ -3,7 +3,6 @@ import gzip
 from pathlib import Path
 
 import numpy as np
-import tqdm
 
 import matcha
 
@@ -61,7 +60,6 @@ def main():
     total_pass = 0
 
     chunk_size = 10000
-    progress = tqdm.tqdm(disable=None, unit="reads")
     while f.read_chunk(chunk_size):
         pass_filter = (f.get_match_result("cell", "dist") <= args.max_barcode_dist) & \
             (f.get_match_result("cell", "second_best_dist") > f.get_match_result("cell", "dist"))
@@ -69,13 +67,12 @@ def main():
         total_reads += len(pass_filter)
         total_pass += pass_filter.sum()
         values, counts = np.unique(f.get_match_result("cell", "dist"), return_counts=True)
-        barcode_counts[np.minimum(values, args.max_barcode_dist)] += counts
+        barcode_counts[np.minimum(values, args.max_barcode_dist + 1)] += counts
         
         f.write_chunk(pass_filter)
-        progress.update(len(pass_filter))
 
     stats_output = open(output_path / "matching_stats.tsv", "w")
-    print(f"{total_pass} reads passing, ({total_pass/total_reads*100:.2f}%)\n", file=stats_output)
+    print(f"{total_pass}/{total_reads} reads passing, ({total_pass/total_reads*100:.2f}%)\n", file=stats_output)
     print("mismatches\treads", file=stats_output)
     for dist in range(args.max_barcode_dist + 2):
         print(

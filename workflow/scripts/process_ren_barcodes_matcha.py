@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pandas as pd
 import numpy as np
-import tqdm
 
 import matcha
 
@@ -73,7 +72,6 @@ def main():
     total_pass = 0
 
     chunk_size = 10000
-    progress = tqdm.tqdm(disable=None, unit="reads")
 
     dists = np.zeros((2, chunk_size), int)
     second_dists = np.zeros((2, chunk_size), int)
@@ -97,10 +95,9 @@ def main():
         barcode_counts[(indices[0], indices[1])] += counts
         
         f.write_chunk(pass_filter)
-        progress.update(len(pass_filter))
     
     stats_output = open(output_path / "matching_stats.tsv", "w")
-    print(f"{total_pass} reads passing, ({total_pass/total_reads*100:.2f}%)\n", file=stats_output)
+    print(f"{total_pass}/{total_reads} reads passing, ({total_pass/total_reads*100:.2f}%)\n", file=stats_output)
     print("mismatches_i5\tmismatches_T7\treads", file=stats_output)
     for i5_dist in range(args.max_barcode_dist + 2):
         for T7_dist in range(args.max_barcode_dist + 2):
