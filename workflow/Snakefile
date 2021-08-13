@@ -55,7 +55,7 @@ Barcode correction and filtering
 """
 
 def get_fastq_set(wildcards):
-    return expand("barcode/{sample}/{read}.fastq.gz", read=config["fastq"][wildcards.sample])
+    return expand("barcode/{sample}/{read}.fastq.gz", read=config["fastq"][wildcards.sample], sample=[wildcards.sample])
 
 def get_barcode_corr_inputs(wildcards):
     inputs = {}
@@ -68,7 +68,7 @@ def get_barcode_corr_inputs(wildcards):
 
 rule barcode_corr:
     input:
-        get_barcode_corr_inputs
+        fastq=get_fastq_set
     output:
         fastq1_bc="barcode/{sample}/R1_bc.fastq.gz",
         fastq2_bc="barcode/{sample}/R2_bc.fastq.gz",
