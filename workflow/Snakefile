@@ -57,7 +57,7 @@ use rule match_barcodes as match_barcodes_10x with:
         fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
         fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
         fq_R3 = "temp/{sample}/fastqs/stripped_R3.fastq",
-        wl_R2 = lambda w: samples[w.sample]["bc_whitelists"]["R2"]
+        wl_R2 = lambda w: samples[w.sample]["bc_whitelist"]["R2"]
     output: 
         fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_10x.fastq"),
         fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_10x.fastq"),
@@ -73,8 +73,8 @@ use rule match_barcodes as match_barcodes_ren with:
         fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
         fq_I1 = "temp/{sample}/fastqs/stripped_I1.fastq",
         fq_I2 = "temp/{sample}/fastqs/stripped_I2.fastq",
-        wl_I1 = lambda w: samples[w.sample]["bc_whitelists"]["I1"],
-        wl_I2 = lambda w: samples[w.sample]["bc_whitelists"]["I2"]
+        wl_I1 = lambda w: samples[w.sample]["bc_whitelist"]["I1"],
+        wl_I2 = lambda w: samples[w.sample]["bc_whitelist"]["I2"]
     output: 
         fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_ren.fastq"),
         fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_ren.fastq"),
