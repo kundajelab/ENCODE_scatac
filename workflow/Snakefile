@@ -9,7 +9,7 @@ genome = config["genome"]
 samples = config["samples"]
 
 def get_input_fastq(wildcards):
-    return config["samples"][wildcards.sample]["fastq"][wildcards.read]
+    return samples[wildcards.sample]["fastq"][wildcards.read]
 
 def script_path(script_name):
     return str(workflow.source_path(script_name))
@@ -29,7 +29,7 @@ rule strip_fastq:
     input:
         get_input_fastq 
     output:
-        pipe("temp/{sample}/fastqs/{read}.fastq")
+        pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
     conda:
         "envs/fastqs.yaml"
     group: 
@@ -54,9 +54,9 @@ rule match_barcodes:
 # config["technology"] == "10x"
 use rule match_barcodes as match_barcodes_10x with:
     input: 
-        fq_R1 = "temp/{sample}/fastqs/R1.fastq",
-        fq_R2 = "temp/{sample}/fastqs/R2.fastq",
-        fq_R3 = "temp/{sample}/fastqs/R3.fastq",
+        fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
+        fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
+        fq_R3 = "temp/{sample}/fastqs/stripped_R3.fastq",
         wl_R2 = lambda w: samples[w.sample]["bc_whitelists"]["R2"]
     output: 
         fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_10x.fastq"),
@@ -69,10 +69,10 @@ use rule match_barcodes as match_barcodes_10x with:
 # config["technology"] == "ren"
 use rule match_barcodes as match_barcodes_ren with:
     input:
-        fq_R1 = "temp/{sample}/fastqs/R1.fastq",
-        fq_R2 = "temp/{sample}/fastqs/R2.fastq",
-        fq_I1 = "temp/{sample}/fastqs/I1.fastq",
-        fq_I2 = "temp/{sample}/fastqs/I2.fastq",
+        fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
+        fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
+        fq_I1 = "temp/{sample}/fastqs/stripped_I1.fastq",
+        fq_I2 = "temp/{sample}/fastqs/stripped_I2.fastq",
         wl_I1 = lambda w: samples[w.sample]["bc_whitelists"]["I1"],
         wl_I2 = lambda w: samples[w.sample]["bc_whitelists"]["I2"]
     output: 

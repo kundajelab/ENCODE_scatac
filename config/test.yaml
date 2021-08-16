@@ -9,7 +9,7 @@ genome: hg38
 
 samples:
   H1:
-    technology: 10x_atac
+    technology: 10x
     fastq:
       R1: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/H1_S1_L001_R1_001.fastq.gz
       R2: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/H1_S1_L001_R2_001.fastq.gz
@@ -20,7 +20,7 @@ samples:
       R2: False
     max_barcode_dist: 2
   D14:
-    technology: 10x_atac
+    technology: 10x
     fastq:
       R1: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/D14_S8_L001_R1_001.fastq.gz
       R2: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/D14_S8_L001_R2_001.fastq.gz
