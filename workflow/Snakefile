@@ -72,7 +72,8 @@ use rule match_barcodes as match_barcodes_10x with:
         qc_matching = "results/{sample}/qc/barcode_matching.tsv"
     params:
         rc_R2 = lambda w: samples[w.sample]["bc_revcomp"]["R2"],
-        barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"]
+        barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"],
+        technology = "10x"
 
 use rule match_barcodes as match_barcodes_ren with:
     # config["technology"] == "ren"
@@ -90,7 +91,8 @@ use rule match_barcodes as match_barcodes_ren with:
     params:
         rc_I1 = lambda w: samples[w.sample]["bc_revcomp"]["I1"],
         rc_I2 = lambda w: samples[w.sample]["bc_revcomp"]["I2"],
-        barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"]
+        barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"],
+        technology = "ren"
 
 rule trim_adapter:
     """
