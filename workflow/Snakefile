@@ -88,8 +88,8 @@ Read adapter trimming
 """
 rule trim_adapter:
     input:
-        fastq1_bc = lambda w: f"{w.temp}/{w.sample}/fastqs/R1_bc_{config[w.sample]["technology"]}.fastq",
-        fastq2_bc = lambda w: f"{w.temp}/{w.sample}/fastqs/R2_bc_{config[w.sample]["technology"]}.fastq"
+        fastq1_bc = lambda w: f"temp/{w.sample}/fastqs/R1_bc_{config[w.sample]["technology"]}.fastq",
+        fastq2_bc = lambda w: f"temp/{w.sample}/fastqs/R2_bc_{config[w.sample]["technology"]}.fastq"
     output:
         fastq1_trim = pipe("temp/{sample}/fastqs/R1_trim.fastq.gz"),
         fastq2_trim = pipe("temp/{sample}/fastqs/R2_trim.fastq.gz"),
