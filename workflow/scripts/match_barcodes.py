@@ -161,7 +161,7 @@ try:
     fastq1_out_path = snakemake.output['fastq1_bc']
     fastq2_out_path = snakemake.output['fastq2_bc']
 
-    qc_path = snakemake.output['qc_barcode_corr']
+    qc_path = snakemake.output['qc_matching']
 
     threads = snakemake.threads
 
