@@ -118,7 +118,7 @@ rule trim_adapter:
         "fastqs"
     shell:
         "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim}"
-        " -h {log.html} -j {log.json} -G -Q -L -w {threads}"
+        " -h {log.html} -j {log.json} -G -Q -L -w {threads} 2> {output.stats}"
 
 """
 ######################
