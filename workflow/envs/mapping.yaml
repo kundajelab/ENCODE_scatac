@@ -1,0 +1,10 @@
+channels:
+  - bioconda
+  - conda-forge
+  - nodefaults
+dependencies:
+  - bioconda::samtools=1.13
+  - bioconda::bowtie2=2.4.4
+  - conda-forge::bash=5.0.018
+  - conda-forge::python=3.9.6
+  - conda-forge::libcurl-static=7.78.0

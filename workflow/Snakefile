@@ -2,40 +2,24 @@ configfile: "config/test.yaml" # test
 
 workdir: config['workdir']
 
-log_prefix = config["log_prefix"]
-temp_prefix = config["temp_prefix"]
-
 max_threads = config["max_threads"]
 seed = config["seed"]
 
 genome = config["genome"]
 
-atac_samples = config["fastq"].keys()
-
 def get_input_fastq(wildcards):
-    return config["fastq"][wildcards.sample][wildcards.read]
+    return config["samples"][wildcards.sample]["fastq"][wildcards.read]
 
-def get_fastq_set_fetcher(path_template):
-    def fastq_set_fetcher(wildcards):
-        a = expand(path_template, read=config["fastq"][wildcards.sample].keys())
-        print(a) ####
-        print(config["fastq"][wildcards.sample].keys()) ####
-        return a
-    return fastq_set_fetcher
-
-def get_fastq_keys(wildcards):
-    return config["fastq"][wildcards.sample].keys()
-
-def sh_command(script_name):
-    return "bash " + str(workflow.source_path(script_name))
+def script_path(script_name):
+    return str(workflow.source_path(script_name))
 
 
 rule all:
-    input:
-        expand("align/{sample}/frac_mito.qc", sample=config["fastq"]),
-        expand("fragment/{sample}_fragments.tar", sample=config["fastq"]),
-        "archr_build/indicator.txt"
-
+    input: 
+        expand("results/{sample}/mapping/possorted_bam.bam", sample=config["samples"].keys()),
+        expand("results/{sample}/fragments/fragments.tsv.gz", sample=config["samples"].keys()),
+        expand("results/{sample}/qc/summary.txt", sample=config["samples"].keys()),
+        expand("results/{sample}/archr/indicator.txt", sample=config["samples"].keys()),
 
 """
 Strip FASTQ header descriptions
@@ -44,220 +28,319 @@ rule strip_fastq:
     input:
         get_input_fastq 
     output:
-        "barcode/{sample}/{read}.fastq.gz"
+        pipe("temp/{sample}/fastqs/{read}.fastq")
     conda:
-        "envs/strip_fastq.yaml"
+        "envs/fastqs.yaml"
+    group: 
+        "fastqs"
     shell:
-        "zcat {input} | sed 's/ .*//' | gzip -c > {output}"
+        "zcat {input} | sed 's/ .*//' {output}"
 
 """
 Barcode correction and filtering
 """
-
-def get_fastq_set(wildcards):
-    return expand("barcode/{sample}/{read}.fastq.gz", read=config["fastq"][wildcards.sample], sample=[wildcards.sample])
-
-def get_barcode_corr_inputs(wildcards):
-    sample = wildcards.sample
-    paths = config["fastq"][wildcards.sample]
-    fastq = [f"barcode/{sample}/{v}.fastq.gz" for v in paths.keys()]
-    whitelist = config["barcode_correction"]["whitelist"].values
-
-    return fastq + whitelist
-
-rule barcode_corr:
-    input:
-        get_barcode_corr_inputs,
-        # whitelist=config["barcode_correction"]["whitelist"]
-    output:
-        fastq1_bc="barcode/{sample}/R1_bc.fastq.gz",
-        fastq2_bc="barcode/{sample}/R2_bc.fastq.gz",
-        qc_barcode_corr="barcode/{sample}/barcode_corr.qc"
-    params:
-        max_barcode_dist=config["barcode_correction"]["max_barcode_dist"],
-        technology=config["technology"],
-        fastq_names=get_fastq_keys,
-        whitelist_names=config["barcode_correction"]["whitelist"].keys()
+# base rule across technologies
+rule match_barcodes:  
     threads:
         max_threads
     conda:
-        "envs/barcode_corr.yaml"
+        "envs/fastqs.yaml"
+    group: 
+        "fastqs"
     script:
-        "scripts/process_10x_barcodes_matcha.py"
+        "scripts/match_barcodes.py"
+
+# config["technology"] == "10x"
+rule match_barcodes as match_barcodes_10x with:
+    input: 
+        fq_R1 = "temp/{sample}/fastqs/R1.fastq",
+        fq_R2 = "temp/{sample}/fastqs/R2.fastq",
+        fq_R3 = "temp/{sample}/fastqs/R3.fastq",
+        wl_R2 = lambda w: config[w.sample]["bc_whitelists"]["R2"],
+    output: 
+        fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_10x.fastq"),
+        fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_10x.fastq"),
+        qc_matching = "results/{sample}/qc/barcode_matching.tsv"
+    params:
+        rc_R2 = lambda w: config[w.sample]["bc_revcomp"]["R2"]
+        barcode_dist = lambda w: config[w.sample]["max_barcode_dist"],
+
+# config["technology"] == "ren"
+rule match_barcodes as match_barcodes_ren with:
+    input:
+        fq_R1 = "temp/{sample}/fastqs/R1.fastq",
+        fq_R2 = "temp/{sample}/fastqs/R2.fastq",
+        fq_I1 = "temp/{sample}/fastqs/I1.fastq",
+        fq_I2 = "temp/{sample}/fastqs/I2.fastq",
+        wl_I1 = lambda w: config[w.sample]["bc_whitelists"]["I1"],
+        wl_I2 = lambda w: config[w.sample]["bc_whitelists"]["I2"],
+    output: 
+        fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_ren.fastq"),
+        fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_ren.fastq"),
+        qc_matching = "results/{sample}/qc/barcode_matching.tsv"
+    params:
+        rc_I1 = lambda w: config[w.sample]["bc_revcomp"]["I1"]
+        rc_I2 = lambda w: config[w.sample]["bc_revcomp"]["I2"]
+        barcode_dist = lambda w: config[w.sample]["max_barcode_dist"],
 
 """
 Read adapter trimming
 """
 rule trim_adapter:
     input:
-        fastq1_bc="barcode/{sample}/R1_bc.fastq.gz",
-        fastq2_bc="barcode/{sample}/R2_bc.fastq.gz",
+        fastq1_bc = lambda w: f"{w.temp}/{w.sample}/fastqs/R1_bc_{config[w.sample]["technology"]}.fastq",
+        fastq2_bc = lambda w: f"{w.temp}/{w.sample}/fastqs/R2_bc_{config[w.sample]["technology"]}.fastq",
     output:
-        fastq1_trim="barcode/{sample}/R1_trim.fastq.gz",
-        fastq2_trim="barcode/{sample}/R2_trim.fastq.gz",
-        qc_html="barcode/{sample}/fastp_qc.html",
-        qc_json="barcode/{sample}/fastp_qc.json",
+        fastq1_trim = pipe("temp/{sample}/fastqs/R1_trim.fastq.gz"),
+        fastq2_trim = pipe("temp/{sample}/fastqs/R2_trim.fastq.gz"),
+        stats = "results/{sample}/qc/trim_adapters.txt"
     params:
-        max_barcode_dist=config["barcode_correction"]["max_barcode_dist"] 
+        max_barcode_dist = config["barcode_correction"]["max_barcode_dist"] 
+    log:
+        html = "logs/{sample}/qc/fastp_qc.html",
+        json = "logs/{sample}/qc/fastp_qc.json"
     threads:
         max_threads
     conda:
-        "envs/trim_adapter.yaml"
+        "envs/fastqs.yaml"
+    group: 
+        "fastqs"
     shell:
         "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim}"
-        " -h {output.qc_html} -j {output.qc_json} -G -Q -L -w {threads}"
+        " -h {log.html} -j {log.json} -G -Q -L -w {threads}"
 
 """
-Read alignment (Bowtie2 aligner)
+Read mapping (Bowtie2 aligner)
 """
-rule align_bowtie2:
+rule bowtie2:
     input:
-        fastq1="barcode/{sample}/R1_trim.fastq.gz",
-        fastq2="barcode/{sample}/R2_trim.fastq.gz",
+        fastq1 = "temp/{sample}/fastqs/R1_trim.fastq.gz",
+        fastq2 = "temp/{sample}/fastqs/R2_trim.fastq.gz",
     output:
-        bam_raw="align/{sample}/raw.bam",
-        bam_raw_ind="align/{sample}/raw.bam.bai",
-        bam_no_mito="align/{sample}/non_mito.bam",
-        bam_mito="align/{sample}/mito.bam",
-        flagstat_qc="align/{sample}/flagstat_raw.qc"
+        bam_raw = pipe("temp/{sample}/mapping/raw.bam"),
     params:
-        multimapping=config["bwt2"]["multimapping"],
-        bwt2_idx=config["bwt2"]["index"]
+        k = 1 + config["mapping"]["multimapping"],
+        bwt2_idx = config["mapping"]["index"]
     log:
-        log_prefix + "align/{sample}/bwt2.log",
+        "logs/align/{sample}/bwt2.log",
     threads:
         max_threads
     conda:
-        "envs/align_bowtie2.yaml"
-    shadow: 
-        "minimal"
+        "envs/mapping.yaml"
+    group: 
+        "mapping"
     shell:
-        sh_command("scripts/align.sh") + ""
-        " {input.fastq1} {input.fastq2}" 
-        " {params.bwt2_idx} {params.multimapping}" 
-        " {output.bam_raw} {output.bam_no_mito} {output.bam_mito} {output.flagstat_qc}"
-        " {log} {threads}"
-
-"""
-Compute fraction of mitochondrial reads
-"""
-rule frac_mito:
-    input:
-        bam_raw="align/{sample}/raw.bam",
-        bam_mito="align/{sample}/mito.bam",
-        bam_no_mito="align/{sample}/non_mito.bam",
-    output:
-        qc_samstats_mito="align/{sample}/mito_samstats.qc",
-        qc_samstats_no_mito="align/{sample}/non_mito_samstats.qc",
-        qc_frac_mito="align/{sample}/frac_mito.qc"
-    log:
-        log_prefix + "align/{sample}/frac_mito.log"
-    threads:
-        max_threads
-    conda:
-        "envs/frac_mito.yaml"
-    shadow: 
-        "minimal"
-    script:
-        "scripts/frac_mito.py"
+        "bowtie2 -X 2000 --threads {threads} --reorder -x {params.bwt2_idx} "
+        "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
+        "samtools view -u -S - -o {output.bam_raw}"
 
 """
 Post-alignment filtering
 """
-rule dedup_bam:
+rule filter_alignments:
     input:
-        "align/{sample}/raw.bam"
+        "temp/{sample}/mapping/raw.bam"
     output:
-        bam="filter/{sample}/final.bam",
-        ind="filter/{sample}/final.bam.bai",
-        flagstat="filter/{sample}/flagstat_final.qc",
-        dup="filter/{sample}/dup.qc",
-        pbc="filter/{sample}/pbc.qc",
-        filter_temp_prefix=temp(directory(temp_prefix + "filter/tmp_{sample}/"))
+        pipe("temp/{sample}/mapping/filtered.bam")
     params:
-        multimapping=config["bwt2"]["multimapping"],
-        mmp_path=str(workflow.source_path("scripts/assign_multimappers.py"))
+        multimapping = config["mapping"]["multimapping"],
+        mmp_path = script_path("scripts/assign_multimappers.py")
+    conda:
+        "envs/mapping.yaml"
+    group: 
+        "mapping"
+    shell:
+        "samtools view -h -f 2 {input} | "
+        "python {params.mmp_path} --paired-end -k {params.multimapping} | "
+        "samtools view -F 1804 -u - > {output}"
+
+"""
+Sort alignments
+"""
+rule sort_alignments:
+    input: 
+        "temp/{sample}/mapping/filtered.bam"
+    output: 
+        bam = "results/{sample}/mapping/possorted_bam.bam",
+        bai = "results/{sample}/mapping/possorted_bam.bam.bai"
     threads:
         max_threads
     conda:
-        "envs/dedup_bam.yaml"
+        "envs/mapping.yaml"
     shadow: 
         "minimal"
-    shell:
-        sh_command("scripts/dedup_bam_pe.sh") + ""
-        " {input} {output.bam} {output.ind} {output.flagstat} {output.dup} {output.pbc} {output.filter_temp_prefix}"
-        " {params.multimapping} {params.mmp_path} {threads}"
+    group: 
+        "mapping"
+    shell: 
+        "samtools sort {input} -@ {threads} -o {output.bam} 2> /dev/null; "
+        "samtools index {output.bam};"
 
 """
 Convert BAM to fragment file
 """
 rule bam_to_frag: 
     input:
-        bam="filter/{sample}/final.bam",
-        bam_ind="filter/{sample}/final.bam.bai",
+        bam = "results/{sample}/mapping/possorted_bam.bam",
+        bai = "results/{sample}/mapping/possorted_bam.bam.bai"
     output:
-        frag="fragment/{sample}_fragments.tsv.gz",
-        frag_ind="fragment/{sample}_fragments.tsv.gz.tbi",
-        tmp_frag=temp(temp_prefix + "fragment/{sample}/bam_to_frag.tmp"),
+        pipe("temp/{sample}/fragments/fragments_unsorted.tsv")
     threads:
         max_threads
     conda:
-        "envs/bam_to_frag.yaml"
-    shadow: 
-        "minimal"
+        "envs/fragments.yaml"
+    group: 
+        "fragments"
     shell:
-        sh_command("scripts/bam_to_frag.sh") + " {input.bam} {output.frag} {output.tmp_frag}"
+        "sinto fragments -b ${input.bam} -f ${output} --min_mapq 0 --max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads}"
 
 """
-Package fragment file into tarball
+Sort fragments and compute counts
+"""
+rule make_fragments:
+    input: 
+        pipe("temp/{sample}/fragments/fragments_unsorted.tsv")
+    output: 
+        fragments = pipe("temp/{sample}/fragments/fragments_unfiltered.tsv"),
+        read_count = pipe("temp/{sample}/fragments/read_counts/all_aligned.txt"),
+        dedup_count = pipe("temp/{sample}/fragments/read_counts/unique_aligned.txt")
+    params:
+        script = srcdir("bam_to_fragments.py"),
+    threads: 
+        max_threads
+    conda:
+        "envs/fragments.yaml"
+    group: 
+        "fragments"
+    shell: 
+        "cat {input} |"
+        "tee >(wc -l > {output.read_count}) | " # Count the number of fragments before sort+unique
+        "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' --parallel={threads} | " # Sort the file by chr, start, end, then barcode_id
+        "uniq -c | " # Filter unique lines and mark number of duplicates at start of line
+        "sed -e 's/^ *\([0-9]*\) \(.*\)$/\\2\\t\\1/' | " # Reformat uniq -c output to have count as the last column rather than first
+        "tee {output.fragments} | wc -l > {output.dedup_count}" # Save the count of total reads
+
+""""
+Remove mitochondrial chromosomes
+""""
+rule remove_mito:
+    input: 
+        "temp/{sample}/fragments/fragments_unfiltered.tsv"
+    output: 
+        fragments = pipe("temp/{sample}/fragments/fragments_nomito.tsv"),
+        read_count = pipe("temp/{sample}/fragments/aligned_no_mito.txt")
+    conda:
+        "envs/fragments.yaml"
+    group: 
+        "fragments"
+    shell: 
+        "grep -v '^chrM' {input} | "
+        "tee {output.fragments} | "
+        "wc -l > {output.read_count}"
+
+"""
+Filter blacklist, calculate duplicate stats, and make tabix
+"""
+rule filter_blacklist_and_compress:
+    input: 
+        "temp/{sample}/fragments/fragments_nomito.tsv"
+    output: 
+        fragments = "results/{sample}/fragments/fragments.tsv.gz",
+        stats = "results/{sample}/qc/dupicate_stats.tsv",
+        index = "results/{sample}/fragments/fragments.tsv.gz.tbi"
+    params:
+        blacklist_file = config["blacklist"]
+    conda:
+        "envs/fragments.yaml"
+    group: 
+        "fragments"
+    shell: 
+        "dup_stats() { " # Read in file with duplicate count in column 5
+            "awk '"
+                "BEGIN {mt=0; m0=0; m1=0; m2=0} ($5==1) {m1=m1+1} ($5==2) {m2=m2+1} {m0=m0+1; mt=mt+$5} "
+                "END { "
+                    "printf \"TotalReadPairs\\tDistinctReadPairs\\tOneReadPair\\tTwoReadPairs\\tNRF=Distinct/Total\\tPBC1=OnePair/Distinct\\tPBC2=OnePair/TwoPair\\n\"; "
+                    "printf \"%d\\t%d\\t%d\\t%d\\t%f\\t%f\\t%f\\n\",mt,m0,m1,m2,m0/mt,m1/m0,m1/m2 "
+                "} "
+            "' \"${@:--}\""
+        "}" #Output format: TotalReadPairs [tab] DistinctReadPairs [tab] OneReadPair [tab] TwoReadPairs [tab] NRF=Distinct/Total [tab] PBC1=OnePair/Distinct [tab] PBC2=OnePair/TwoPair
+        "bedtools subtract -a {input} -b {params.blacklist_file} -A | " # Remove regions from blacklist
+        "tee >(dup_stats > {output.stats}) | "
+        "bgzip > {output.fragments}; "
+        "tabix --zero-based --preset bed {output.fragments}"
+
+
+"""
+Package fragments + index into tarball
 """
 rule frag_tar: 
     input:
-        frag="fragment/{sample}_fragments.tsv.gz",
-        frag_ind="fragment/{sample}_fragments.tsv.gz.tbi",
+        frag = "results/{sample}/fragments/fragments.tsv.gz",
+        frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output:
-        "fragment/{sample}_fragments.tar",
+        "results/{sample}/fragments/fragments.tsv.gz",
     conda:
-        "envs/frag_tar.yaml"
+        "envs/fragments.yaml"
     shell:
         "tar -cvf {output} {input.frag} {input.frag_ind}"
+
+"""
+Aggregate fragments QC
+"""
+rule stats_summary:
+    input:
+        barcode_matching = "results/{sample}/qc/barcode_matching.tsv,
+        adapter_stats = "results/{sample}/qc/trim_adapters.txt",
+        total_align = "temp/{sample}/fragments/read_counts/all_aligned.txt",
+        unique_align = "temp/{sample}/fragments/read_counts/unique_aligned.txt",
+        no_mito = "temp/{sample}/fragments/aligned_no_mito.txt",
+        duplicate_stats = "results/{sample}/qc/dupicate_stats.tsv"
+    output: 
+        "results/{sample}/qc/summary.txt"
+    conda:
+        "envs/fragments.yaml"
+    group: 
+        "fragments"
+    script: 
+        "summarize_fragment_stats.py"
 
 """
 Preliminary ArchR analyses
 """
 rule archr_build:
     input:
-        frag=expand("fragment/{sample}_fragments.tsv.gz", sample=config["fastq"]),
-        frag_ind=expand("fragment/{sample}_fragments.tsv.gz.tbi", sample=config["fastq"]),
+        frag = "results/{sample}/fragments/fragments.tsv.gz",
+        frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output:
-        arrows_temp_dir=temp(directory(temp_prefix + "archr_build/arrows_init")),
-        qc_dir=directory("archr_build/qc"),
-        project_dir=directory("archr_build/project"),
-        indicator=touch("archr_build/indicator.txt")
+        arrows_temp_dir = temp(directory("temp/{sample}/archr/arrows_init")),
+        qc_dir = directory("results/{sample}/archr/qc"),
+        project_dir = directory("results/{sample}/archr/project"),
+        indicator = touch("results/{sample}/archr/indicator.txt")
     params:
-        sample_names=atac_samples,
-        seed=seed,
-        genome=genome
+        sample_name = lambda w: w.sample,
+        seed = seed,
+        genome = genome
     log:
-        log_dir=(log_prefix + "archr_build"),
-        arrow_create=(log_prefix + "archr_build/arrow_create.log"),
-        doublets=(log_prefix + "archr_build/doublets.log"),
-        lsi=(log_prefix + "archr_build/lsi.log"),
-        cluster=(log_prefix + "archr_build/cluster.log"),
-        marker_genes=(log_prefix + "archr_build/marker_genes.log"),
-        pseudobulk_rep=(log_prefix + "archr_build/pseudobulk_rep.log"),
-        peak_call=(log_prefix + "archr_build/peak_call.log"),
-        peak_matrix=(log_prefix + "archr_build/peak_matrix.log"),
-        marker_peaks=(log_prefix + "archr_build/marker_peaks.log"),
-        fetch_motif=(log_prefix + "archr_build/fetch_motif.log"),
-        enr_motif=(log_prefix + "archr_build/enr_motif.log"),
-        fetch_tf=(log_prefix + "archr_build/fetch_tf.log"),
-        enr_tf=(log_prefix + "archr_build/enr_tf.log"),
-        save=(log_prefix + "archr_build/save.log"),
+        log_dir = "/logs/{sample}/archr",
+        arrow_create = "/logs/{sample}/archr/arrow_create.log",
+        doublets = "/logs/{sample}/archr/doublets.log",
+        lsi = "/logs/{sample}/archr/lsi.log",
+        cluster = "/logs/{sample}/archr/cluster.log",
+        marker_genes = "/logs/{sample}/archr/marker_genes.log",
+        pseudobulk_rep = "/logs/{sample}/archr/pseudobulk_rep.log",
+        peak_call = "/logs/{sample}/archr/peak_call.log",
+        peak_matrix = "/logs/{sample}/archr/peak_matrix.log",
+        marker_peaks = "/logs/{sample}/archr/marker_peaks.log",
+        fetch_motif = "/logs/{sample}/archr/fetch_motif.log",
+        enr_motif = "/logs/{sample}/archr/enr_motif.log",
+        fetch_tf = "/logs/{sample}/archr/fetch_tf.log",
+        enr_tf = "/logs/{sample}/archr/enr_tf.log",
+        save = "/logs/{sample}/archr/save.log",
     threads:
         max_threads
     conda:
-        "envs/archr_build.yaml"
+        "envs/archr.yaml"
+    group:
+        "archr"
     shadow: 
         "minimal"
     script:

@@ -1,0 +1,13 @@
+channels:
+  - bioconda
+  - conda-forge
+  - nodefaults
+dependencies:
+  - bioconda::samtools=1.13
+  - bioconda::htslib=1.13
+  - bioconda::sinto=0.7.4
+  - bioconda::bedtools=2.30.0
+  - conda-forge::bash=5.0.018
+  - conda-forge::sed=4.8
+  - conda-forge::python=3.9.6
+  - conda-forge::libcurl-static=7.78.0

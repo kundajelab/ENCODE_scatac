@@ -14,27 +14,27 @@ library(chromVARmotifs)
 Sys.setenv("HDF5_USE_FILE_LOCKING" = "FALSE")
 Sys.setenv("RHDF5_USE_FILE_LOCKING" = "FALSE")
 
-build_archr_project <- function(arrow_sample_names, input_paths, output_paths, threads, log_paths, seed, genome) {
+build_archr_project <- function(arrow_sample_name, input_path, output_paths, threads, log_paths, seed, genome) {
     set.seed(seed)
 
     addArchRThreads(threads = threads)
     addArchRGenome(genome)
 
-    input_paths = unlist(input_paths)
-    arrow_output_names = paste0(output_paths[["arrows_temp_dir"]], "/", arrow_sample_names)
+    # input_paths = unlist(input_paths)
+    arrow_output_name = output_paths[["arrows_temp_dir"]] + "/" + arrow_sample_name
     dir.create(output_paths[["arrows_temp_dir"]])
     # print(input_paths) ####
     # print(arrow_output_names) ####
     arrows <- createArrowFiles(
-        inputFiles = input_paths,
-        sampleNames = arrow_sample_names,
-        outputNames = arrow_output_names,
+        inputFiles = c(input_path),
+        sampleNames = c(arrow_sample_name),
+        outputNames = c(arrow_output_name),
         # minTSS = 1, ####
         # minFrags = 1, ####
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
         force = TRUE,
-        subThreading = FALSE, # required or else file locking gets turned back on
+        subThreading = FALSE, # required for no file locking
         logFile = log_paths[["arrow_create"]],
         QCDir = output_paths[["qc_dir"]]
     )
@@ -51,9 +51,11 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
     )
 
     # Create project
+    dir.create(output_paths[["project_dir"]])
+    setwd(output_paths[["project_dir"]])
     proj <- ArchRProject(
         ArrowFiles = arrows, 
-        outputDirectory = output_paths[["project_dir"]],
+        outputDirectory = "",
         copyArrows = FALSE 
     )
     markers_dir = file.path(output_paths[["project_dir"]], "Markers")
@@ -177,4 +179,4 @@ build_archr_project <- function(arrow_sample_names, input_paths, output_paths, t
 
 }
 
-build_archr_project(snakemake@params[["sample_names"]], snakemake@input[["frag"]], snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["seed"]], snakemake@params[["genome"]])
+build_archr_project(snakemake@params[["sample_name"]], snakemake@input[["frag"]], snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["seed"]], snakemake@params[["genome"]])

@@ -1,53 +1,34 @@
-workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all/
-
-log_prefix: logs/
-temp_prefix: /srv/scratch/atwang/encode_scatac_
+workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_2/
 
 max_threads: 8
 seed: 8757647
 
-
 ### END-TO-END TEST DATASET ###
-
-technology: 10x_atac
 
 genome: hg38
 
-fastq:
+samples:
   H1:
-    R1: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/H1_S1_L001_R1_001.fastq.gz
-    R2: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/H1_S1_L001_R3_001.fastq.gz
-    BC: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/H1_S1_L001_R2_001.fastq.gz
+    technology: 10x_atac
+    fastq:
+      R1: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/H1_S1_L001_R1_001.fastq.gz
+      R2: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/H1_S1_L001_R2_001.fastq.gz
+      R3: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/H1_S1_L001_R3_001.fastq.gz
+    bc_whitelist: 
+      R2: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
+    max_barcode_dist: 
+      R2: 2
   D14:
-    R1: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/D14_S8_L001_R1_001.fastq.gz
-    R2: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/D14_S8_L001_R3_001.fastq.gz
-    BC: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/D14_S8_L001_R2_001.fastq.gz
-
-barcode_correction:
-  whitelist: 
-    BC: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
-  max_barcode_dist: 2
+    technology: 10x_atac
+    fastq:
+      R1: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/D14_S8_L001_R1_001.fastq.gz
+      R2: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/D14_S8_L001_R2_001.fastq.gz
+      R3: /mnt/lab_data2/atwang/data/encode_scatac/test/scATAC-reprog/fastq/D14_S8_L001_R3_001.fastq.gz
+    bc_whitelist: 
+      R2: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
+    max_barcode_dist: 
+      R2: 2
 
 bwt2:
   index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
   multimapping: 4
-
-
-
-### ARCHR TEST DATASET ###
-
-# genome: hg19
-
-# atac_samples: 
-#   - scATAC_BMMC_R1
-#   - scATAC_CD34_BMMC_R1
-#   - scATAC_PBMC_R1
-
-# fragments_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test/HemeFragments/
-# fragments_suffix: .fragments.tsv.gz
-
-# atac_samples: 
-#   - atac_v1_pbmc_10k
-
-# fragments_prefix: /mnt/lab_data2/atwang/data/encode_scatac/test/PBMC/
-# fragments_suffix: _fragments.tsv.gz
