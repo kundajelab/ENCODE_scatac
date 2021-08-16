@@ -62,7 +62,7 @@ rule match_barcodes as match_barcodes_10x with:
         fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_10x.fastq"),
         qc_matching = "results/{sample}/qc/barcode_matching.tsv"
     params:
-        rc_R2 = lambda w: config[w.sample]["bc_revcomp"]["R2"]
+        rc_R2 = lambda w: config[w.sample]["bc_revcomp"]["R2"],
         barcode_dist = lambda w: config[w.sample]["max_barcode_dist"],
 
 # config["technology"] == "ren"
