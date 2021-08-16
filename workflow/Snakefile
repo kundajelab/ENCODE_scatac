@@ -51,7 +51,7 @@ rule match_barcodes:
         "scripts/match_barcodes.py"
 
 # config["technology"] == "10x"
-rule match_barcodes as match_barcodes_10x with:
+use rule match_barcodes as match_barcodes_10x with:
     input: 
         fq_R1 = "temp/{sample}/fastqs/R1.fastq",
         fq_R2 = "temp/{sample}/fastqs/R2.fastq",
@@ -66,7 +66,7 @@ rule match_barcodes as match_barcodes_10x with:
         barcode_dist = lambda w: config[w.sample]["max_barcode_dist"]
 
 # config["technology"] == "ren"
-rule match_barcodes as match_barcodes_ren with:
+use rule match_barcodes as match_barcodes_ren with:
     input:
         fq_R1 = "temp/{sample}/fastqs/R1.fastq",
         fq_R2 = "temp/{sample}/fastqs/R2.fastq",
