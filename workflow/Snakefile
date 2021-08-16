@@ -17,10 +17,11 @@ def script_path(script_name):
 
 rule all:
     input: 
-        expand("results/{sample}/mapping/possorted_bam.bam", sample=config["samples"].keys()),
-        expand("results/{sample}/fragments/fragments.tsv.gz", sample=config["samples"].keys()),
-        expand("results/{sample}/qc/summary.txt", sample=config["samples"].keys()),
-        expand("results/{sample}/archr/indicator.txt", sample=config["samples"].keys())
+        expand("results/{sample}/fastqs/R1_trim.fastq.gz", sample=samples.keys())
+        expand("results/{sample}/mapping/possorted_bam.bam", sample=samples.keys()),
+        expand("results/{sample}/fragments/fragments.tsv.gz", sample=samples.keys()),
+        expand("results/{sample}/qc/summary.txt", sample=samples.keys()),
+        expand("results/{sample}/archr/indicator.txt", sample=samples.keys())
 
 """
 Strip FASTQ header descriptions
@@ -92,8 +93,8 @@ rule trim_adapter:
         fastq1_bc = lambda w: f"temp/{w.sample}/fastqs/R1_bc_{samples[w.sample]['technology']}.fastq",
         fastq2_bc = lambda w: f"temp/{w.sample}/fastqs/R2_bc_{samples[w.sample]['technology']}.fastq"
     output:
-        fastq1_trim = pipe("temp/{sample}/fastqs/R1_trim.fastq.gz"),
-        fastq2_trim = pipe("temp/{sample}/fastqs/R2_trim.fastq.gz"),
+        fastq1_trim = "results/{sample}/fastqs/R1_trim.fastq.gz",
+        fastq2_trim = "results/{sample}/fastqs/R2_trim.fastq.gz",
         stats = "results/{sample}/qc/trim_adapters.txt"
     params:
         max_barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"]
@@ -115,8 +116,8 @@ Read mapping (Bowtie2 aligner)
 """
 rule bowtie2:
     input:
-        fastq1 = "temp/{sample}/fastqs/R1_trim.fastq.gz",
-        fastq2 = "temp/{sample}/fastqs/R2_trim.fastq.gz"
+        fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
+        fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
     output:
         bam_raw = pipe("temp/{sample}/mapping/raw.bam"),
     params:
