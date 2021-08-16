@@ -259,6 +259,7 @@ rule remove_mito:
         "tee {output.fragments} | "
         "wc -l > {output.read_count}"
 
+
 rule filter_blacklist_and_compress:
     """
     Filter blacklist, calculate duplicate stats, and make tabix
@@ -270,23 +271,15 @@ rule filter_blacklist_and_compress:
         stats = "results/{sample}/qc/dupicate_stats.tsv",
         index = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     params:
-        blacklist_file = config["blacklist"]
+        blacklist_file = config["blacklist"],
+        duplicate_stats = srcdir("duplicate_stats.awk")
     conda:
         "envs/fragments.yaml"
     group: 
         "fragments"
     shell: 
-        "dup_stats() { " # Read in file with duplicate count in column 5
-            "awk '"
-                "BEGIN {mt=0; m0=0; m1=0; m2=0} ($5==1) {m1=m1+1} ($5==2) {m2=m2+1} {m0=m0+1; mt=mt+$5} "
-                "END { "
-                    "printf \"TotalReadPairs\\tDistinctReadPairs\\tOneReadPair\\tTwoReadPairs\\tNRF=Distinct/Total\\tPBC1=OnePair/Distinct\\tPBC2=OnePair/TwoPair\\n\"; "
-                    "printf \"%d\\t%d\\t%d\\t%d\\t%f\\t%f\\t%f\\n\",mt,m0,m1,m2,m0/mt,m1/m0,m1/m2 "
-                "} "
-            "' \"${@:--}\""
-        "}" #Output format: TotalReadPairs [tab] DistinctReadPairs [tab] OneReadPair [tab] TwoReadPairs [tab] NRF=Distinct/Total [tab] PBC1=OnePair/Distinct [tab] PBC2=OnePair/TwoPair
         "bedtools subtract -a {input} -b {params.blacklist_file} -A | " # Remove regions from blacklist
-        "tee >(dup_stats > {output.stats}) | "
+        "tee >(awk -f {params.duplicate_stats} > {output.stats}) | "
         "bgzip > {output.fragments}; "
         "tabix --zero-based --preset bed {output.fragments}"
 
