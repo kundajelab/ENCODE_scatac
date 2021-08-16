@@ -274,7 +274,7 @@ rule filter_blacklist_and_compress:
         index = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     params:
         blacklist_file = config["blacklist"],
-        duplicate_stats = srcdir("duplicate_stats.awk")
+        duplicate_stats = srcdir("scripts/duplicate_stats.awk")
     conda:
         "envs/fragments.yaml"
     group: 
