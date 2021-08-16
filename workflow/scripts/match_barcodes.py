@@ -155,50 +155,49 @@ def match_ren(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fa
                 )
 
 
-if __name__ == 'main':
-    try:
-        max_barcode_dist = snakemake.params['max_barcode_dist']
-        technology = snakemake.params['technology']
-        fastq_names = snakemake.params['fastq_names']
-        whitelist_names = snakemake.params['whitelist_names']
+try:
+    max_barcode_dist = snakemake.params['max_barcode_dist']
+    technology = snakemake.params['technology']
+    fastq_names = snakemake.params['fastq_names']
+    whitelist_names = snakemake.params['whitelist_names']
 
-        fastq1_out_path = snakemake.output['fastq1_bc']
-        fastq2_out_path = snakemake.output['fastq2_bc']
+    fastq1_out_path = snakemake.output['fastq1_bc']
+    fastq2_out_path = snakemake.output['fastq2_bc']
 
-        qc_path = snakemake.output['qc_barcode_corr']
+    qc_path = snakemake.output['qc_barcode_corr']
 
-        threads = snakemake.threads
+    threads = snakemake.threads
 
-        if technology == "10x":
-            fastqs = {
-                "R1": snakemake.input["fq_R1"],
-                "R2": snakemake.input["fq_R2"],
-                "BC": snakemake.input["fq_BC"],
-            }
-            whitelists = {
-                "R2": snakemake.input["wl_R2"],
-            }
-            revcomp = {
-                "R2": snakemake.params["rc_R2"],
-            }
-            match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
+    if technology == "10x":
+        fastqs = {
+            "R1": snakemake.input["fq_R1"],
+            "R2": snakemake.input["fq_R2"],
+            "BC": snakemake.input["fq_BC"],
+        }
+        whitelists = {
+            "R2": snakemake.input["wl_R2"],
+        }
+        revcomp = {
+            "R2": snakemake.params["rc_R2"],
+        }
+        match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
 
-        elif technology == "ren":
-            fastqs = {
-                "R1": snakemake.input["fq_R1"],
-                "R2": snakemake.input["fq_R2"],
-                "I1": snakemake.input["fq_I1"],
-                "I2": snakemake.input["fq_I2"],
-            }
-            whitelists = {
-                "I1": snakemake.input["wl_I1"],
-                "I2": snakemake.input["wl_I2"],
-            }
-            revcomp = {
-                "I1": snakemake.params["rc_I1"],
-                "I2": snakemake.params["rc_I2"],
-            }
-            match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
+    elif technology == "ren":
+        fastqs = {
+            "R1": snakemake.input["fq_R1"],
+            "R2": snakemake.input["fq_R2"],
+            "I1": snakemake.input["fq_I1"],
+            "I2": snakemake.input["fq_I2"],
+        }
+        whitelists = {
+            "I1": snakemake.input["wl_I1"],
+            "I2": snakemake.input["wl_I2"],
+        }
+        revcomp = {
+            "I1": snakemake.params["rc_I1"],
+            "I2": snakemake.params["rc_I2"],
+        }
+        match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
 
-    except NameError:
-        pass
+except NameError:
+    pass
