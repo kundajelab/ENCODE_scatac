@@ -1,6 +1,6 @@
 workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_2/
 
-max_threads: 4
+max_threads_per_rule: 4
 seed: 8757647
 
 ### END-TO-END TEST DATASET ###

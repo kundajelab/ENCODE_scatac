@@ -2,7 +2,7 @@ configfile: "config/test.yaml" # test
 
 workdir: config['workdir']
 
-max_threads = config["max_threads"]
+max_threads = config["max_threads_per_rule"]
 seed = config["seed"]
 
 genome = config["genome"]
@@ -43,7 +43,7 @@ rule strip_fastq:
     group: 
         "fastqs"
     shell:
-        "zcat {input} | sed 's/ .*//' {output}"
+        "zcat {input} | sed 's/ .*//' > {output}"
 
 rule match_barcodes:  
     """
