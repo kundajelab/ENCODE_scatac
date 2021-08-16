@@ -95,7 +95,7 @@ rule trim_adapter:
         fastq2_trim = pipe("temp/{sample}/fastqs/R2_trim.fastq.gz"),
         stats = "results/{sample}/qc/trim_adapters.txt"
     params:
-        max_barcode_dist = config["barcode_correction"]["max_barcode_dist"] 
+        max_barcode_dist = lambda w: config[w.sample]["max_barcode_dist"]
     log:
         html = "logs/{sample}/qc/fastp_qc.html",
         json = "logs/{sample}/qc/fastp_qc.json"
