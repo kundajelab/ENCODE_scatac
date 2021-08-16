@@ -6,6 +6,7 @@ max_threads = config["max_threads"]
 seed = config["seed"]
 
 genome = config["genome"]
+samples = config["samples"]
 
 def get_input_fastq(wildcards):
     return config["samples"][wildcards.sample]["fastq"][wildcards.read]
@@ -56,14 +57,14 @@ use rule match_barcodes as match_barcodes_10x with:
         fq_R1 = "temp/{sample}/fastqs/R1.fastq",
         fq_R2 = "temp/{sample}/fastqs/R2.fastq",
         fq_R3 = "temp/{sample}/fastqs/R3.fastq",
-        wl_R2 = lambda w: config[w.sample]["bc_whitelists"]["R2"]
+        wl_R2 = lambda w: samples[w.sample]["bc_whitelists"]["R2"]
     output: 
         fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_10x.fastq"),
         fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_10x.fastq"),
         qc_matching = "results/{sample}/qc/barcode_matching.tsv"
     params:
-        rc_R2 = lambda w: config[w.sample]["bc_revcomp"]["R2"],
-        barcode_dist = lambda w: config[w.sample]["max_barcode_dist"]
+        rc_R2 = lambda w: samples["bc_revcomp"]["R2"],
+        barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"]
 
 # config["technology"] == "ren"
 use rule match_barcodes as match_barcodes_ren with:
@@ -72,30 +73,30 @@ use rule match_barcodes as match_barcodes_ren with:
         fq_R2 = "temp/{sample}/fastqs/R2.fastq",
         fq_I1 = "temp/{sample}/fastqs/I1.fastq",
         fq_I2 = "temp/{sample}/fastqs/I2.fastq",
-        wl_I1 = lambda w: config[w.sample]["bc_whitelists"]["I1"],
-        wl_I2 = lambda w: config[w.sample]["bc_whitelists"]["I2"]
+        wl_I1 = lambda w: samples[w.sample]["bc_whitelists"]["I1"],
+        wl_I2 = lambda w: samples[w.sample]["bc_whitelists"]["I2"]
     output: 
         fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_ren.fastq"),
         fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_ren.fastq"),
         qc_matching = "results/{sample}/qc/barcode_matching.tsv"
     params:
-        rc_I1 = lambda w: config[w.sample]["bc_revcomp"]["I1"],
-        rc_I2 = lambda w: config[w.sample]["bc_revcomp"]["I2"],
-        barcode_dist = lambda w: config[w.sample]["max_barcode_dist"]
+        rc_I1 = lambda w: samples[w.sample]["bc_revcomp"]["I1"],
+        rc_I2 = lambda w: samples[w.sample]["bc_revcomp"]["I2"],
+        barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"]
 
 """
 Read adapter trimming
 """
 rule trim_adapter:
     input:
-        fastq1_bc = lambda w: f"temp/{w.sample}/fastqs/R1_bc_{config[w.sample]['technology']}.fastq",
-        fastq2_bc = lambda w: f"temp/{w.sample}/fastqs/R2_bc_{config[w.sample]['technology']}.fastq"
+        fastq1_bc = lambda w: f"temp/{w.sample}/fastqs/R1_bc_{samples[w.sample]['technology']}.fastq",
+        fastq2_bc = lambda w: f"temp/{w.sample}/fastqs/R2_bc_{samples[w.sample]['technology']}.fastq"
     output:
         fastq1_trim = pipe("temp/{sample}/fastqs/R1_trim.fastq.gz"),
         fastq2_trim = pipe("temp/{sample}/fastqs/R2_trim.fastq.gz"),
         stats = "results/{sample}/qc/trim_adapters.txt"
     params:
-        max_barcode_dist = lambda w: config[w.sample]["max_barcode_dist"]
+        max_barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"]
     log:
         html = "logs/{sample}/qc/fastp_qc.html",
         json = "logs/{sample}/qc/fastp_qc.json"
