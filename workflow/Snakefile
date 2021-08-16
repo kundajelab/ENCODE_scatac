@@ -67,8 +67,8 @@ use rule match_barcodes as match_barcodes_10x with:
         fq_R3 = "temp/{sample}/fastqs/stripped_R3.fastq",
         wl_R2 = lambda w: samples[w.sample]["bc_whitelist"]["R2"]
     output: 
-        fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_10x.fastq"),
-        fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_10x.fastq"),
+        fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_10x.fastq"),
+        fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_10x.fastq"),
         qc_matching = "results/{sample}/qc/barcode_matching.tsv"
     params:
         rc_R2 = lambda w: samples["bc_revcomp"]["R2"],
