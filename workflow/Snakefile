@@ -17,7 +17,7 @@ def script_path(script_name):
 
 rule all:
     input: 
-        expand("results/{sample}/fastqs/R1_trim.fastq.gz", sample=samples.keys())
+        expand("results/{sample}/fastqs/R1_trim.fastq.gz", sample=samples.keys()),
         expand("results/{sample}/mapping/possorted_bam.bam", sample=samples.keys()),
         expand("results/{sample}/fragments/fragments.tsv.gz", sample=samples.keys()),
         expand("results/{sample}/qc/summary.txt", sample=samples.keys()),
