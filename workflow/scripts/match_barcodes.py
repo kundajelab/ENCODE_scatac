@@ -169,7 +169,7 @@ try:
         fastqs = {
             "R1": snakemake.input["fq_R1"],
             "R2": snakemake.input["fq_R2"],
-            "BC": snakemake.input["fq_BC"],
+            "R3": snakemake.input["fq_R3"],
         }
         whitelists = {
             "R2": snakemake.input["wl_R2"],
