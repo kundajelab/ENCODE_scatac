@@ -156,7 +156,7 @@ def match_ren(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fa
 
 
 try:
-    max_barcode_dist = snakemake.params['max_barcode_dist']
+    max_barcode_dist = snakemake.params['barcode_dist']
     technology = snakemake.params['technology']
     fastq_names = snakemake.params['fastq_names']
     whitelist_names = snakemake.params['whitelist_names']
