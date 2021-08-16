@@ -31,7 +31,7 @@ samples:
       R2: False
     max_barcode_dist: 2
 
-bwt2:
+mapping:
   index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
   multimapping: 4
 
