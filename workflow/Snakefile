@@ -37,7 +37,7 @@ rule strip_fastq:
     input:
         get_input_fastq 
     output:
-        pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
+        temp("temp/{sample}/fastqs/stripped_{read}.fastq")
     conda:
         "envs/fastqs.yaml"
     group: 
@@ -220,13 +220,13 @@ rule make_fragments:
     Sort fragments and compute counts
     """
     input: 
-        pipe("temp/{sample}/fragments/fragments_unsorted.tsv")
+        "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
         fragments = pipe("temp/{sample}/fragments/fragments_unfiltered.tsv"),
         read_count = pipe("temp/{sample}/fragments/read_counts/all_aligned.txt"),
         dedup_count = pipe("temp/{sample}/fragments/read_counts/unique_aligned.txt")
     params:
-        script = srcdir("bam_to_fragments.py"),
+        script = srcdir("bam_to_fragments.py")
     threads: 
         max_threads
     conda:
