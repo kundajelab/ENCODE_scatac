@@ -215,7 +215,7 @@ rule bam_to_frag:
     group: 
         "fragments"
     shell:
-        "sinto fragments -b ${input.bam} -f ${output} --min_mapq 0 --max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads}"
+        "sinto fragments -b {input.bam} -f {output} --min_mapq 0 --max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads}"
 
 rule make_fragments:
     """
@@ -224,9 +224,9 @@ rule make_fragments:
     input: 
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
-        fragments = temp("temp/{sample}/fragments/fragments_unfiltered.tsv"),
-        read_count = temp("temp/{sample}/fragments/read_counts/all_aligned.txt"),
-        dedup_count = temp("temp/{sample}/fragments/read_counts/unique_aligned.txt")
+        fragments = pipe("temp/{sample}/fragments/fragments_unfiltered.tsv"),
+        read_count = pipe("temp/{sample}/fragments/read_counts/all_aligned.txt"),
+        dedup_count = pipe("temp/{sample}/fragments/read_counts/unique_aligned.txt")
     params:
         script = srcdir("bam_to_fragments.py")
     threads: 
@@ -296,6 +296,8 @@ rule frag_tar:
         "results/{sample}/fragments/fragments.tsv.gz",
     conda:
         "envs/fragments.yaml"
+    group: 
+        "fragments"
     shell:
         "tar -cvf {output} {input.frag} {input.frag_ind}"
 
