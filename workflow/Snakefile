@@ -159,7 +159,8 @@ rule filter_alignments:
     input:
         "temp/{sample}/mapping/raw.bam"
     output:
-        pipe("temp/{sample}/mapping/filtered.bam")
+        bam = pipe("temp/{sample}/mapping/filtered.bam")
+        read_count = temp("temp/{sample}/mapping/read_counts/all_aligned.txt"),
     params:
         multimapping = config["mapping"]["multimapping"],
         mmp_path = script_path("scripts/assign_multimappers.py")
@@ -170,7 +171,8 @@ rule filter_alignments:
     shell:
         "samtools view -h -f 2 {input} | "
         "python {params.mmp_path} --paired-end -k {params.multimapping} | "
-        "samtools view -F 1804 -u - > {output}"
+        "samtools view -F 1804 -u - | tee {output.bam} | "
+        "samtools view -f 3 -F 4 - - | wc -l > {output.read_count}"
 
 rule sort_alignments:
     """
@@ -225,10 +227,7 @@ rule make_fragments:
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
         fragments = temp("temp/{sample}/fragments/fragments_unfiltered.tsv"),
-        read_count = temp("temp/{sample}/fragments/read_counts/all_aligned.txt"),
         dedup_count = temp("temp/{sample}/fragments/read_counts/unique_aligned.txt")
-    params:
-        script = srcdir("bam_to_fragments.py")
     threads: 
         max_threads
     conda:
@@ -236,11 +235,7 @@ rule make_fragments:
     group: 
         "fragments"
     shell: 
-        "cat {input} |"
-        "tee >(wc -l > {output.read_count}) | " # Count the number of fragments before sort+unique
-        "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' --parallel={threads} | " # Sort the file by chr, start, end, then barcode_id
-        "uniq -c | " # Filter unique lines and mark number of duplicates at start of line
-        "sed -e 's/^ *\([0-9]*\) \(.*\)$/\\2\\t\\1/' | " # Reformat uniq -c output to have count as the last column rather than first
+        "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' --parallel={threads} {input} | " # Sort the file by chr, start, end, then barcode_id
         "tee {output.fragments} | wc -l > {output.dedup_count}" # Save the count of total reads
 
 rule remove_mito:
