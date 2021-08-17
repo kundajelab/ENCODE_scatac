@@ -159,7 +159,7 @@ rule filter_alignments:
     input:
         "temp/{sample}/mapping/raw.bam"
     output:
-        bam = pipe("temp/{sample}/mapping/filtered.bam")
+        bam = pipe("temp/{sample}/mapping/filtered.bam"),
         read_count = temp("temp/{sample}/mapping/read_counts/all_aligned.txt"),
     params:
         multimapping = config["mapping"]["multimapping"],
