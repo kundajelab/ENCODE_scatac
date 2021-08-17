@@ -35,5 +35,5 @@ mapping:
   index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
   multimapping: 4
 
-blacklist: /oak/stanford/groups/wjg/share/uPrep/genomes/hg38/annotations/hg38.blacklist.bed
+blacklist: /oak/stanford/groups/akundaje/atwang/genomes/hg38/annotations/hg38.blacklist.bed
 
