@@ -224,9 +224,9 @@ rule make_fragments:
     input: 
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
-        fragments = pipe("temp/{sample}/fragments/fragments_unfiltered.tsv"),
-        read_count = pipe("temp/{sample}/fragments/read_counts/all_aligned.txt"),
-        dedup_count = pipe("temp/{sample}/fragments/read_counts/unique_aligned.txt")
+        fragments = temp("temp/{sample}/fragments/fragments_unfiltered.tsv"),
+        read_count = temp("temp/{sample}/fragments/read_counts/all_aligned.txt"),
+        dedup_count = temp("temp/{sample}/fragments/read_counts/unique_aligned.txt")
     params:
         script = srcdir("bam_to_fragments.py")
     threads: 
