@@ -160,7 +160,7 @@ rule filter_alignments:
         "temp/{sample}/mapping/raw.bam"
     output:
         bam = pipe("temp/{sample}/mapping/filtered.bam"),
-        read_count = temp("temp/{sample}/mapping/read_counts/all_aligned.txt"),
+        read_count = temp("temp/{sample}/mapping/all_aligned.txt"),
     params:
         multimapping = config["mapping"]["multimapping"],
         mmp_path = script_path("scripts/assign_multimappers.py")
@@ -227,7 +227,7 @@ rule make_fragments:
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
         fragments = temp("temp/{sample}/fragments/fragments_unfiltered.tsv"),
-        dedup_count = temp("temp/{sample}/fragments/read_counts/unique_aligned.txt")
+        dedup_count = temp("temp/{sample}/fragments/unique_aligned.txt")
     threads: 
         max_threads
     conda:
@@ -304,8 +304,8 @@ rule stats_summary:
     input:
         barcode_matching = "results/{sample}/qc/barcode_matching.tsv",
         adapter_stats = "results/{sample}/qc/trim_adapters.txt",
-        total_align = "temp/{sample}/fragments/read_counts/all_aligned.txt",
-        unique_align = "temp/{sample}/fragments/read_counts/unique_aligned.txt",
+        total_align = "temp/{sample}/mapping/all_aligned.txt",
+        unique_align = "temp/{sample}/fragments/unique_aligned.txt",
         no_mito = "temp/{sample}/fragments/aligned_no_mito.txt",
         duplicate_stats = "results/{sample}/qc/duplicate_stats.tsv"
     output: 
