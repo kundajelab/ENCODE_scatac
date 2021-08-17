@@ -320,7 +320,7 @@ rule stats_summary:
     group: 
         "fragments"
     script: 
-        "summarize_fragment_stats.py"
+        "scripts/summarize_fragment_stats.py"
 
 """
 ######################
