@@ -281,7 +281,6 @@ rule filter_blacklist_and_compress:
         "fragments"
     shell: 
         "bedtools subtract -a {input} -b {params.blacklist_file} -A | " # Remove regions from blacklist
-        "tee /dev/stdout | " ####
         "tee >(awk -f {params.duplicate_stats} > {output.stats}) | "
         "bgzip > {output.fragments}; "
         "tabix --zero-based --preset bed {output.fragments}"
