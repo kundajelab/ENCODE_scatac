@@ -20,7 +20,8 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
     addArchRThreads(threads = threads)
     addArchRGenome(genome)
 
-    # input_paths = unlist(input_paths)
+    # input_paths = unlist(input_paths)]
+    print(output_paths) ####
     arrow_output_name = output_paths[["arrows_temp_dir"]] + "/" + arrow_sample_name
     dir.create(output_paths[["arrows_temp_dir"]])
     # print(input_paths) ####
