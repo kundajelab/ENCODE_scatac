@@ -207,8 +207,8 @@ rule bam_to_frag:
     Convert BAM to fragment file
     """
     input:
-        bam = "results/{sample}/mapping/possorted_bam.bam",
-        bai = "results/{sample}/mapping/possorted_bam.bam.bai"
+        bam = "results/{sample}/mapping/possorted.bam",
+        bai = "results/{sample}/mapping/possorted.bam.bai"
     output:
         temp("temp/{sample}/fragments/fragments_unsorted.tsv")
     threads:
