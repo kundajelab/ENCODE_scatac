@@ -1,4 +1,4 @@
-workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_2/
+workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_3/
 
 max_threads_per_rule: 4
 seed: 8757647
