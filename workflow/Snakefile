@@ -51,7 +51,7 @@ rule match_barcodes:
     """
     # base rule across technologies
     threads:
-        1
+        max_threads
     conda:
         "envs/fastqs.yaml"
     group: 
