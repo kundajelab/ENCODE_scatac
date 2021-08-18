@@ -70,8 +70,6 @@ def match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fa
         
         f.write_chunk(pass_filter)
         
-        f.write_chunk(pass_filter)
-
     with open(qc_path, "w") as stats_output:
         print(f"{total_pass}/{total_reads} reads passing, ({total_pass/total_reads*100:.2f}%)\n", file=stats_output)
         print("mismatches\treads", file=stats_output)
