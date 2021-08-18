@@ -19,7 +19,7 @@ rule all:
     input: 
         expand("results/{sample}/fastqs/R1_trim.fastq.gz", sample=samples.keys()),
         expand("results/{sample}/mapping/possorted.bam", sample=samples.keys()),
-        expand("results/{sample}/fragments/fragments.tsv.gz", sample=samples.keys()),
+        expand("results/{sample}/fragments/fragments.tar", sample=samples.keys()),
         expand("results/{sample}/qc/summary.txt", sample=samples.keys()),
         expand("results/{sample}/archr/indicator.txt", sample=samples.keys())
 
@@ -288,7 +288,7 @@ rule frag_tar:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output:
-        "results/{sample}/fragments/fragments.tsv.gz",
+        "results/{sample}/fragments/fragments.tar",
     conda:
         "envs/fragments.yaml"
     group: 
