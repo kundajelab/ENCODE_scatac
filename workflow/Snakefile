@@ -218,7 +218,7 @@ rule bam_to_frag:
     group: 
         "fragments"
     shell:
-        "sinto fragments -b {input.bam} -f {output} --min_mapq 0 --max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads}"
+        "sinto fragments -b {input.bam} -f {output} --min_mapq 0 --max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads} 2> /dev/null"
 
 rule make_fragments:
     """
@@ -294,7 +294,7 @@ rule frag_tar:
     group: 
         "fragments"
     shell:
-        "tar -cvf {output} {input.frag} {input.frag_ind}"
+        "tar -cf {output} {input.frag} {input.frag_ind}"
 
 rule stats_summary:
     """
@@ -340,21 +340,21 @@ rule archr_build:
         seed = seed,
         genome = genome
     log:
-        log_dir = "/logs/{sample}/archr",
-        arrow_create = "/logs/{sample}/archr/arrow_create.log",
-        doublets = "/logs/{sample}/archr/doublets.log",
-        lsi = "/logs/{sample}/archr/lsi.log",
-        cluster = "/logs/{sample}/archr/cluster.log",
-        marker_genes = "/logs/{sample}/archr/marker_genes.log",
-        pseudobulk_rep = "/logs/{sample}/archr/pseudobulk_rep.log",
-        peak_call = "/logs/{sample}/archr/peak_call.log",
-        peak_matrix = "/logs/{sample}/archr/peak_matrix.log",
-        marker_peaks = "/logs/{sample}/archr/marker_peaks.log",
-        fetch_motif = "/logs/{sample}/archr/fetch_motif.log",
-        enr_motif = "/logs/{sample}/archr/enr_motif.log",
-        fetch_tf = "/logs/{sample}/archr/fetch_tf.log",
-        enr_tf = "/logs/{sample}/archr/enr_tf.log",
-        save = "/logs/{sample}/archr/save.log"
+        log_dir = "logs/{sample}/archr",
+        arrow_create = "logs/{sample}/archr/arrow_create.log",
+        doublets = "logs/{sample}/archr/doublets.log",
+        lsi = "logs/{sample}/archr/lsi.log",
+        cluster = "logs/{sample}/archr/cluster.log",
+        marker_genes = "logs/{sample}/archr/marker_genes.log",
+        pseudobulk_rep = "logs/{sample}/archr/pseudobulk_rep.log",
+        peak_call = "logs/{sample}/archr/peak_call.log",
+        peak_matrix = "logs/{sample}/archr/peak_matrix.log",
+        marker_peaks = "logs/{sample}/archr/marker_peaks.log",
+        fetch_motif = "logs/{sample}/archr/fetch_motif.log",
+        enr_motif = "logs/{sample}/archr/enr_motif.log",
+        fetch_tf = "logs/{sample}/archr/fetch_tf.log",
+        enr_tf = "logs/{sample}/archr/enr_tf.log",
+        save = "logs/{sample}/archr/save.log"
     threads:
         max_threads
     conda:
