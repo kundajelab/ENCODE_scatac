@@ -134,7 +134,7 @@ rule bowtie2:
         fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
     output:
-        bam_raw = pipe("temp/{sample}/mapping/raw.bam"),
+        bam_raw = temp("temp/{sample}/mapping/raw.bam"),
     params:
         k = 1 + config["mapping"]["multimapping"],
         bwt2_idx = config["mapping"]["index"]
