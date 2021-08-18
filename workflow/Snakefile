@@ -18,7 +18,7 @@ def script_path(script_name):
 rule all:
     input: 
         expand("results/{sample}/fastqs/R1_trim.fastq.gz", sample=samples.keys()),
-        expand("results/{sample}/mapping/possorted_bam.bam", sample=samples.keys()),
+        expand("results/{sample}/mapping/possorted.bam", sample=samples.keys()),
         expand("results/{sample}/fragments/fragments.tsv.gz", sample=samples.keys()),
         expand("results/{sample}/qc/summary.txt", sample=samples.keys()),
         expand("results/{sample}/archr/indicator.txt", sample=samples.keys())
@@ -120,6 +120,7 @@ rule trim_adapter:
         "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim}"
         " -h {log.html} -j {log.json} -G -Q -L -w {threads} 2> {output.stats}"
 
+
 """
 ######################
 Map and filter reads
@@ -134,7 +135,7 @@ rule bowtie2:
         fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
     output:
-        bam_raw = pipe("temp/{sample}/mapping/raw.bam"),
+        bam_raw = temp("temp/{sample}/mapping/raw.bam"),
     params:
         k = 1 + config["mapping"]["multimapping"],
         bwt2_idx = config["mapping"]["index"]
@@ -151,7 +152,6 @@ rule bowtie2:
         "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
         "samtools view -u -S - -o {output.bam_raw}"
 
-
 rule filter_alignments:
     """
     Post-alignment filtering
@@ -159,8 +159,8 @@ rule filter_alignments:
     input:
         "temp/{sample}/mapping/raw.bam"
     output:
-        bam = pipe("temp/{sample}/mapping/filtered.bam"),
-        read_count = pipe("temp/{sample}/mapping/all_aligned.txt"),
+        bam = temp("temp/{sample}/mapping/filtered.bam"),
+        read_count = temp("temp/{sample}/mapping/all_aligned.txt"),
     params:
         multimapping = config["mapping"]["multimapping"],
         mmp_path = script_path("scripts/assign_multimappers.py")
@@ -181,8 +181,8 @@ rule sort_alignments:
     input: 
         "temp/{sample}/mapping/filtered.bam"
     output: 
-        bam = "results/{sample}/mapping/possorted_bam.bam",
-        bai = "results/{sample}/mapping/possorted_bam.bam.bai"
+        bam = "results/{sample}/mapping/possorted.bam",
+        bai = "results/{sample}/mapping/possorted.bam.bai"
     threads:
         max_threads
     conda:
@@ -194,6 +194,7 @@ rule sort_alignments:
     shell: 
         "samtools sort {input} -@ {threads} -o {output.bam} 2> /dev/null; "
         "samtools index {output.bam};"
+
 
 """
 ######################
@@ -256,7 +257,6 @@ rule remove_mito:
         "tee {output.fragments} | "
         "wc -l > {output.read_count}"
 
-
 rule filter_blacklist_and_compress:
     """
     Filter blacklist, calculate duplicate stats, and make tabix
@@ -296,7 +296,6 @@ rule frag_tar:
     shell:
         "tar -cvf {output} {input.frag} {input.frag_ind}"
 
-
 rule stats_summary:
     """
     Aggregate fragments QC
@@ -316,6 +315,7 @@ rule stats_summary:
         "fragments"
     script: 
         "scripts/summarize_fragment_stats.py"
+
 
 """
 ######################
