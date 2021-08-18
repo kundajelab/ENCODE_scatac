@@ -37,7 +37,7 @@ rule strip_fastq:
     input:
         get_input_fastq 
     output:
-        pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
+        temp("temp/{sample}/fastqs/stripped_{read}.fastq")
     conda:
         "envs/fastqs.yaml"
     group: 
