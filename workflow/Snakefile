@@ -332,7 +332,7 @@ rule archr_build:
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output:
         # arrows_temp_dir = temp(directory("temp/{sample}/archr/arrows_init")),
-        qc_dir = directory("results/{sample}/archr/qc"),
+        qc_dir = directory("results/{sample}/qc/archr"),
         project_dir = directory("results/{sample}/archr/project"),
         indicator = touch("results/{sample}/archr/indicator.txt")
     params:
