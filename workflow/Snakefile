@@ -108,8 +108,8 @@ rule trim_adapter:
     params:
         max_barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"]
     log:
-        html = "logs/{sample}/qc/fastp_qc.html",
-        json = "logs/{sample}/qc/fastp_qc.json"
+        html = "logs/{sample}/fastqs/fastp.html",
+        json = "logs/{sample}/fastqs/fastp.json"
     threads:
         max_threads
     conda:
@@ -140,7 +140,7 @@ rule bowtie2:
         k = 1 + config["mapping"]["multimapping"],
         bwt2_idx = config["mapping"]["index"]
     log:
-        "logs/align/{sample}/bwt2.log",
+        "logs/{sample}/mapping/bwt2.log"
     threads:
         max_threads
     conda:
@@ -183,6 +183,8 @@ rule sort_alignments:
     output: 
         bam = "results/{sample}/mapping/possorted.bam",
         bai = "results/{sample}/mapping/possorted.bam.bai"
+    log:
+        "logs/{sample}/mapping/sort.log"
     threads:
         max_threads
     conda:
@@ -192,7 +194,7 @@ rule sort_alignments:
     group: 
         "mapping"
     shell: 
-        "samtools sort {input} -@ {threads} -o {output.bam} 2> /dev/null; "
+        "samtools sort {input} -@ {threads} -o {output.bam} 2> {log}; "
         "samtools index {output.bam};"
 
 
@@ -211,6 +213,8 @@ rule bam_to_frag:
         bai = "results/{sample}/mapping/possorted.bam.bai"
     output:
         temp("temp/{sample}/fragments/fragments_unsorted.tsv")
+    log:
+        "logs/{sample}/fragments/sinto.log"
     threads:
         max_threads
     conda:
@@ -218,7 +222,7 @@ rule bam_to_frag:
     group: 
         "fragments"
     shell:
-        "sinto fragments -b {input.bam} -f {output} --min_mapq 0 --max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads} 2> /dev/null"
+        "sinto fragments -b {input.bam} -f {output} --min_mapq 0 --max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads} > {log}"
 
 rule make_fragments:
     """
@@ -340,7 +344,6 @@ rule archr_build:
         seed = seed,
         genome = genome
     log:
-        # log_dir = "logs/{sample}/archr",
         arrow_create = "logs/{sample}/archr/arrow_create.log",
         doublets = "logs/{sample}/archr/doublets.log",
         lsi = "logs/{sample}/archr/lsi.log",
@@ -361,7 +364,7 @@ rule archr_build:
         "envs/archr.yaml"
     group:
         "archr"
-    # shadow: 
-    #     "full"
+    shadow: 
+        "minimal"
     script:
         "scripts/build_archr_project.R"
