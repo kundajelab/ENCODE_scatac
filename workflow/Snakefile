@@ -361,7 +361,7 @@ rule archr_build:
         "envs/archr.yaml"
     group:
         "archr"
-    shadow: 
-        "full"
+    # shadow: 
+    #     "full"
     script:
         "scripts/build_archr_project.R"
