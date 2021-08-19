@@ -23,7 +23,7 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
     # input_paths = unlist(input_paths)]
     # print(output_paths) ####
     # print(output_paths[["arrows_temp_dir"]]) ####
-    arrow_output_name = paste(output_paths[["arrows_temp_dir"]], "/", arrow_sample_name)
+    arrow_output_name = paste(output_paths[["arrows_temp_dir"]], "/", arrow_sample_name,  sep = "")
     dir.create(output_paths[["arrows_temp_dir"]])
     # print(input_paths) ####
     # print(arrow_output_names) ####
