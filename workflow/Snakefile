@@ -362,6 +362,6 @@ rule archr_build:
     group:
         "archr"
     shadow: 
-        "minimal"
+        "shallow"
     script:
         "scripts/build_archr_project.R"
