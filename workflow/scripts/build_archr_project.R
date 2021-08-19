@@ -23,8 +23,8 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
     # input_paths = unlist(input_paths)]
     # print(output_paths) ####
     # print(output_paths[["arrows_temp_dir"]]) ####
-    arrow_output_name = paste(output_paths[["arrows_temp_dir"]], "/", arrow_sample_name,  sep = "")
-    dir.create(output_paths[["arrows_temp_dir"]])
+    arrow_output_name = paste(output_paths[["project_dir"]], "/", arrow_sample_name,  sep = "")
+    # dir.create(output_paths[["arrows_temp_dir"]])
     # print(input_paths) ####
     # print(arrow_output_names) ####
     arrows <- createArrowFiles(
@@ -53,11 +53,11 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
     )
 
     # Create project
-    dir.create(output_paths[["project_dir"]])
-    setwd(output_paths[["project_dir"]])
+    # dir.create(output_paths[["project_dir"]])
+    # setwd(output_paths[["project_dir"]])
     proj <- ArchRProject(
         ArrowFiles = arrows, 
-        outputDirectory = "",
+        outputDirectory = output_paths[["project_dir"]],
         copyArrows = FALSE 
     )
     markers_dir = file.path(output_paths[["project_dir"]], "Markers")

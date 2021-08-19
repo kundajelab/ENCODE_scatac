@@ -331,7 +331,7 @@ rule archr_build:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output:
-        arrows_temp_dir = temp(directory("temp/{sample}/archr/arrows_init")),
+        # arrows_temp_dir = temp(directory("temp/{sample}/archr/arrows_init")),
         qc_dir = directory("results/{sample}/archr/qc"),
         project_dir = directory("results/{sample}/archr/project"),
         indicator = touch("results/{sample}/archr/indicator.txt")
@@ -340,7 +340,7 @@ rule archr_build:
         seed = seed,
         genome = genome
     log:
-        log_dir = "logs/{sample}/archr",
+        # log_dir = "logs/{sample}/archr",
         arrow_create = "logs/{sample}/archr/arrow_create.log",
         doublets = "logs/{sample}/archr/doublets.log",
         lsi = "logs/{sample}/archr/lsi.log",
