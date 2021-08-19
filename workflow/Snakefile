@@ -190,7 +190,7 @@ rule sort_alignments:
     conda:
         "envs/mapping.yaml"
     shadow: 
-        "minimal"
+        "simple"
     group: 
         "mapping"
     shell: 
@@ -365,6 +365,6 @@ rule archr_build:
     group:
         "archr"
     shadow: 
-        "minimal"
+        "simple"
     script:
         "scripts/build_archr_project.R"
