@@ -1,5 +1,9 @@
 Sys.setenv(CONDA_BUILD_SYSROOT="/")
 
+console_log <- file(snakemake@log[["console"]], open = "wt")
+sink(console_log)
+sink(console_log, type = "message")
+
 # library(devtools)
 
 # devtools::install_github("GreenleafLab/ArchR@2be1294eb1fbff364fb538d71f4f545ee4384d09", ref="master", repos = BiocManager::repositories(), dependencies = FALSE, INSTALL_opts = '--no-lock')
@@ -183,3 +187,6 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
 }
 
 build_archr_project(snakemake@params[["sample_name"]], snakemake@input[["frag"]], snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["seed"]], snakemake@params[["genome"]])
+
+sink(type = "message")
+sink()

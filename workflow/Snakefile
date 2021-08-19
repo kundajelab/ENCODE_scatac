@@ -344,6 +344,7 @@ rule archr_build:
         seed = seed,
         genome = genome
     log:
+        console = "logs/{sample}/archr/console.log",
         arrow_create = "logs/{sample}/archr/arrow_create.log",
         doublets = "logs/{sample}/archr/doublets.log",
         lsi = "logs/{sample}/archr/lsi.log",
