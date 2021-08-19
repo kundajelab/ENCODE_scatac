@@ -12,6 +12,8 @@ sink(console_log, type = "message")
 library(ArchR)
 library(chromVARmotifs)
 
+addArchRVerbose(verbose = FALSE)
+
 # Disable HDF5 file locking
 # Workaround for HDF5 I/O issues on NFS
 # https://github.com/GreenleafLab/ArchR/issues/248#issuecomment-789453997
