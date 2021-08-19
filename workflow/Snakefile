@@ -356,7 +356,7 @@ rule archr_build:
         enr_tf = "logs/{sample}/archr/enr_tf.log",
         save = "logs/{sample}/archr/save.log"
     threads:
-        1
+        max_threads
     conda:
         "envs/archr.yaml"
     group:
