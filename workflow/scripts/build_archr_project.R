@@ -26,7 +26,7 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
     "ArrowFiles"
     arrow_output_dir = paste("arrowtmp/", arrow_sample_name, sep = "")
     arrow_output_name = paste(arrow_output_dir, arrow_sample_name, sep = "")
-    dir.create(output_paths[["project_dir"]])
+    dir.create(arrow_output_dir)
     # print(input_paths) ####
     # print(arrow_output_names) ####
     arrows <- createArrowFiles(
