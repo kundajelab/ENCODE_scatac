@@ -117,13 +117,13 @@ def match_ren(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fa
 
     chunk_size = 10000
 
-    dists = np.zeros((2, chunk_size), int)
-    second_dists = np.zeros((2, chunk_size), int)
+    dists = [None, None]
+    second_dists = [None, None]
     while f.read_chunk(chunk_size):
-        dists[0,:] = f.get_match_result("i5", "dist")
-        second_dists[0,:] = f.get_match_result("i5", "second_best_dist")
-        dists[1,:] = f.get_match_result("T7", "dist")
-        second_dists[1,:] = f.get_match_result("T7", "second_best_dist")
+        dists[0] = f.get_match_result("i5", "dist")
+        second_dists[0] = f.get_match_result("i5", "second_best_dist")
+        dists[1] = f.get_match_result("T7", "dist")
+        second_dists[1] = f.get_match_result("T7", "second_best_dist")
 
         pass_filter = (dists[0] < max_barcode_dist) & \
             (dists[1] < max_barcode_dist) & \
