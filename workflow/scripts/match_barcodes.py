@@ -192,7 +192,7 @@ try:
             "I1": snakemake.params["rc_I1"],
             "I2": snakemake.params["rc_I2"],
         }
-        match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
+        match_ren(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
 
 except NameError:
     pass
