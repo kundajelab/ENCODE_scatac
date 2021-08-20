@@ -1,4 +1,4 @@
-configfile: "config/test.yaml" # test
+configfile: "config/config.yaml"
 
 workdir: config['workdir']
 
@@ -85,8 +85,8 @@ use rule match_barcodes as match_barcodes_ren with:
         wl_I1 = lambda w: samples[w.sample]["bc_whitelist"]["I1"],
         wl_I2 = lambda w: samples[w.sample]["bc_whitelist"]["I2"]
     output: 
-        fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_ren.fastq"),
-        fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_ren.fastq"),
+        fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_ren.fastq"),
+        fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_ren.fastq"),
         qc_matching = "results/{sample}/qc/barcode_matching.tsv"
     params:
         rc_I1 = lambda w: samples[w.sample]["bc_revcomp"]["I1"],

@@ -15,8 +15,8 @@ def get_open_fn(path):
     return gzip.open if is_gzipped else open
 
 def read_barcodes(path, revcomp):
-    if path.endswith(".csv"):
-        bc = pd.read_csv(args.i5_barcodes, sep="\t")["sequence"]
+    if path.endswith(".tsv"):
+        bc = pd.read_csv(path, sep="\t")["sequence"]
     else:
         open_fn = get_open_fn(path)
         with open_fn(path) as file:

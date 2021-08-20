@@ -38,8 +38,8 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
         inputFiles = c(input_path),
         sampleNames = c(arrow_sample_name),
         outputNames = c(arrow_output_name),
-        minTSS = 1, ####
-        minFrags = 1, ####
+        # minTSS = 1, ####
+        # minFrags = 1, ####
         addTileMat = TRUE,
         addGeneScoreMat = TRUE,
         force = TRUE,
