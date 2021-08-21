@@ -19,20 +19,20 @@ samples:
     bc_revcomp: 
       R2: False
     max_barcode_dist: 1
-  ren-raw:
-    technology: ren
-    fastq:
-      R1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_R1_001.fastq.gz
-      R2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_R2_001.fastq.gz
-      I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_I1_001.fastq.gz
-      I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_I2_001.fastq.gz
-    bc_whitelist: 
-      I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_i5.tsv
-      I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_T7.tsv
-    bc_revcomp: 
-      I1: False
-      I2: False
-    max_barcode_dist: 1
+  # ren-raw:
+  #   technology: ren
+  #   fastq:
+  #     R1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_R1_001.fastq.gz
+  #     R2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_R2_001.fastq.gz
+  #     I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_I1_001.fastq.gz
+  #     I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_I2_001.fastq.gz
+  #   bc_whitelist: 
+  #     I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_i5.tsv
+  #     I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_T7.tsv
+  #   bc_revcomp: 
+  #     I1: False
+  #     I2: False
+  #   max_barcode_dist: 1
 
 mapping:
   index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
