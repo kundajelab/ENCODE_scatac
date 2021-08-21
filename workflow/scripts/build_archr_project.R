@@ -111,7 +111,7 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
         logFile = log_paths[["marker_genes"]]
     )
     marker_genes_list <- getMarkers(marker_genes, cutOff = "FDR <= 0.01 & Log2FC >= 1.25")
-    marker_genes_path <= file.path(markers_dir, "marker_genes.rds")
+    marker_genes_path <- file.path(markers_dir, "marker_genes.rds")
     saveRDS(marker_genes_list, marker_genes_path)
 
     # Generate pseudo-bulk replicates
