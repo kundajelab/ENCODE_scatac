@@ -12,7 +12,7 @@ dependencies:
   - conda-forge::r-shinythemes=1.2.0
   - bioconda::bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.3 
   - bioconda::r-harmony=0.1
-  - bioconda::presto=0.6.2
   - bioconda::macs2=2.2.7.1
   - austintwang::r-archr
   - austintwang::r-chromvarmotifs
+  - austintwang::r-presto
