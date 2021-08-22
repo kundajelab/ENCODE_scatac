@@ -8,17 +8,17 @@ seed: 8757647
 genome: hg38
 
 samples:
-  # reprog-D14:
-  #   technology: 10x
-  #   fastq:
-  #     R1: /oak/stanford/groups/akundaje/surag/projects/scATAC-reprog/fastq/D14/D14_S8_L001_R1_001.fastq.gz
-  #     R2: /oak/stanford/groups/akundaje/surag/projects/scATAC-reprog/fastq/D14/D14_S8_L001_R2_001.fastq.gz
-  #     R3: /oak/stanford/groups/akundaje/surag/projects/scATAC-reprog/fastq/D14/D14_S8_L001_R3_001.fastq.gz
-  #   bc_whitelist: 
-  #     R2: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
-  #   bc_revcomp: 
-  #     R2: False
-  #   max_barcode_dist: 1
+  reprog-D14:
+    technology: 10x
+    fastq:
+      R1: /oak/stanford/groups/akundaje/surag/projects/scATAC-reprog/fastq/D14/D14_S8_L001_R1_001.fastq.gz
+      R2: /oak/stanford/groups/akundaje/surag/projects/scATAC-reprog/fastq/D14/D14_S8_L001_R2_001.fastq.gz
+      R3: /oak/stanford/groups/akundaje/surag/projects/scATAC-reprog/fastq/D14/D14_S8_L001_R3_001.fastq.gz
+    bc_whitelist: 
+      R2: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
+    bc_revcomp: 
+      R2: False
+    max_barcode_dist: 1
   ren-raw:
     technology: ren
     fastq:
@@ -27,8 +27,8 @@ samples:
       I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_I1_001.fastq.gz
       I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_I2_001.fastq.gz
     bc_whitelist: 
-      I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_i5.tsv
-      I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_T7.tsv
+      I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_T7.tsv
+      I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_i5.tsv
     bc_revcomp: 
       I1: False
       I2: False
