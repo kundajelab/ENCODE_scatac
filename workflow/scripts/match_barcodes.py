@@ -1,14 +1,13 @@
 import gzip
-import string
 
 import numpy as np
 import pandas as pd
 
 import matcha
 
-REV_COMP = string.maketrans("ATGC", "TACG")
+REV_COMP = str.maketrans("ATGC", "TACG")
 def reverse_complement(seq):
-    return string.translate(seq, REV_COMP)[::-1]
+    return str.translate(seq, REV_COMP)[::-1]
 
 def get_open_fn(path):
     with open(path, "rb") as f:
