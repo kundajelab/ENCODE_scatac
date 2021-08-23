@@ -31,7 +31,7 @@ samples:
       I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_i5.tsv
     bc_revcomp: 
       I1: False
-      I2: False
+      I2: True
     max_barcode_dist: 1
 
 mapping:

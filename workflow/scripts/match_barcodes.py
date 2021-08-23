@@ -28,13 +28,6 @@ def read_barcodes(path, revcomp):
 
     return bc, bcrc
 
-def write_qc(qc_path, total_reads_in, total_reads, barcode_counts):
-    with open(qc_path, 'w') as qc:
-        qc.write(f"Total barcodes processed\t{total_reads_in}\n")
-        qc.write(f"Barcodes accepted\t{total_reads}\t{total_reads/total_reads_in*100:.2f}\n")
-        for val, i in enumerate(barcode_counts):
-            qc.write(f"Barcodes with edit distance {val}\t{i}\t{i/total_reads_in*100:.2f}\n")
-
 def match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads):
     f = matcha.FastqReader(threads = threads)
     f.add_sequence("R1", fastqs["R1"], output_path=fastq1_out_path)
