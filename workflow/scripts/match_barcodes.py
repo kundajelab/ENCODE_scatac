@@ -88,8 +88,8 @@ def match_ren(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fa
     f.add_sequence("I1", fastqs["I1"])
     f.add_sequence("I2", fastqs["I2"])
 
-    i5_sequences, i5_maybe_rc = read_barcodes(whitelists["I1"], revcomp["I1"])
-    T7_sequences, T7_maybe_rc = read_barcodes(whitelists["I2"], revcomp["I2"])
+    i5_sequences, i5_maybe_rc = read_barcodes(whitelists["I2"], revcomp["I2"])
+    T7_sequences, T7_maybe_rc = read_barcodes(whitelists["I1"], revcomp["I1"])
     
     i5_barcode = matcha.HashMatcher(
         sequences = i5_maybe_rc,
