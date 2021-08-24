@@ -75,6 +75,22 @@ use rule match_barcodes as match_barcodes_10x with:
         barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"],
         technology = "10x"
 
+use rule match_barcodes as match_barcodes_multiome with:
+    # config["technology"] == "multiome"
+    input: 
+        fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
+        fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
+        fq_R3 = "temp/{sample}/fastqs/stripped_R3.fastq",
+        wl_R2 = lambda w: samples[w.sample]["bc_whitelist"]["R2"]
+    output: 
+        fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_multiome.fastq"),
+        fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_multiome.fastq"),
+        qc_matching = "results/{sample}/qc/barcode_matching.tsv"
+    params:
+        rc_R2 = lambda w: samples[w.sample]["bc_revcomp"]["R2"],
+        barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"],
+        technology = "multiome"
+
 use rule match_barcodes as match_barcodes_ren with:
     # config["technology"] == "ren"
     input:
@@ -135,7 +151,7 @@ rule bowtie2:
         fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
     output:
-        bam_raw = temp("temp/{sample}/mapping/raw.bam"),
+        bam_raw = pipe("temp/{sample}/mapping/raw.bam"),
     params:
         k = 1 + config["mapping"]["multimapping"],
         bwt2_idx = config["mapping"]["index"]
@@ -148,7 +164,7 @@ rule bowtie2:
     group: 
         "mapping"
     shell:
-        "bowtie2 -X 2000 --threads {threads} --reorder -x {params.bwt2_idx} "
+        "bowtie2 -X 2000 --threads {threads} -x {params.bwt2_idx} "
         "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
         "samtools view -u -S - -o {output.bam_raw}"
 
@@ -159,8 +175,8 @@ rule filter_alignments:
     input:
         "temp/{sample}/mapping/raw.bam"
     output:
-        bam = temp("temp/{sample}/mapping/filtered.bam"),
-        read_count = temp("temp/{sample}/mapping/all_aligned.txt"),
+        bam = pipe("temp/{sample}/mapping/filtered.bam"),
+        read_count = pipe("temp/{sample}/mapping/all_aligned.txt"),
     params:
         multimapping = config["mapping"]["multimapping"],
         mmp_path = script_path("scripts/assign_multimappers.py")
@@ -212,7 +228,7 @@ rule bam_to_frag:
         bam = "results/{sample}/mapping/possorted.bam",
         bai = "results/{sample}/mapping/possorted.bam.bai"
     output:
-        temp("temp/{sample}/fragments/fragments_unsorted.tsv")
+        pipe("temp/{sample}/fragments/fragments_unsorted.tsv")
     log:
         "logs/{sample}/fragments/sinto.log"
     threads:
@@ -231,8 +247,8 @@ rule make_fragments:
     input: 
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
-        fragments = temp("temp/{sample}/fragments/fragments_unfiltered.tsv"),
-        dedup_count = temp("temp/{sample}/fragments/unique_aligned.txt")
+        fragments = pipe("temp/{sample}/fragments/fragments_unfiltered.tsv"),
+        dedup_count = pipe("temp/{sample}/fragments/unique_aligned.txt")
     threads: 
         max_threads
     conda:
@@ -250,8 +266,8 @@ rule remove_mito:
     input: 
         "temp/{sample}/fragments/fragments_unfiltered.tsv"
     output: 
-        fragments = temp("temp/{sample}/fragments/fragments_nomito.tsv"),
-        read_count = temp("temp/{sample}/fragments/aligned_no_mito.txt")
+        fragments = pipe("temp/{sample}/fragments/fragments_nomito.tsv"),
+        read_count = pipe("temp/{sample}/fragments/aligned_no_mito.txt")
     conda:
         "envs/fragments.yaml"
     group: 

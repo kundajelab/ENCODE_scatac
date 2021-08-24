@@ -28,22 +28,22 @@ def read_barcodes(path, revcomp):
 
     return bc, bcrc
 
-def match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads):
+def match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_out_path, fastq2_out_path, qc_path, threads):
     f = matcha.FastqReader(threads = threads)
     f.add_sequence("R1", fastqs["R1"], output_path=fastq1_out_path)
     f.add_sequence("R2", fastqs["R2"])
     f.add_sequence("R3", fastqs["R3"], output_path=fastq2_out_path)
 
-    valid_10x_barcodes = read_barcodes(whitelists["R2"], revcomp["R2"])
+    valid_barcodes = read_barcodes(whitelists["R2"], revcomp["R2"])
 
-    valid_10x_barcodes, barcode_sequences = read_barcodes(whitelists["R2"], revcomp["R2"])
+    valid_barcodes, barcode_sequences = read_barcodes(whitelists["R2"], revcomp["R2"])
     cell_barcode = matcha.HashMatcher(
         sequences = barcode_sequences,
-        labels = valid_10x_barcodes,
+        labels = valid_barcodes,
         max_mismatches=max_barcode_dist,
         subsequence_count=2
     )
-    f.add_barcode("cell", cell_barcode, "R2")
+    f.add_barcode("cell", cell_barcode, "R2", match_start=offsets["R2"])
     f.set_output_names("{read_name} CB:Z:{cell}")
 
     barcode_counts = np.zeros(max_barcode_dist + 2, int)
@@ -74,7 +74,8 @@ def match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fa
                 file=stats_output
             )
 
-def match_ren(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads):
+
+def match_two_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_out_path, fastq2_out_path, qc_path, threads):
     f = matcha.FastqReader(threads = threads)
     f.add_sequence("R1", fastqs["R1"], output_path=fastq1_out_path)
     f.add_sequence("R2", fastqs["R2"], output_path=fastq2_out_path)
@@ -98,8 +99,8 @@ def match_ren(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fa
         subsequence_count=2
     )
 
-    f.add_barcode("i5", i5_barcode, "I2")
-    f.add_barcode("T7", T7_barcode, "I1")
+    f.add_barcode("i5", i5_barcode, "I2", match_start=offsets["I2"])
+    f.add_barcode("T7", T7_barcode, "I1", match_start=offsets["I1"])
 
     f.set_output_names("{read_name} CB:Z:{i5}{T7}")
 
@@ -168,7 +169,27 @@ try:
         revcomp = {
             "R2": snakemake.params["rc_R2"],
         }
-        match_10x(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
+        offsets = {
+            "R2": 0,
+        }
+        match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_out_path, fastq2_out_path, qc_path, threads)
+
+    if technology == "multiome":
+        fastqs = {
+            "R1": snakemake.input["fq_R1"],
+            "R2": snakemake.input["fq_R2"],
+            "R3": snakemake.input["fq_R3"],
+        }
+        whitelists = {
+            "R2": snakemake.input["wl_R2"],
+        }
+        revcomp = {
+            "R2": snakemake.params["rc_R2"],
+        }
+        offsets = {
+            "R2": 8,
+        }
+        match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_out_path, fastq2_out_path, qc_path, threads)
 
     elif technology == "ren":
         fastqs = {
@@ -185,7 +206,11 @@ try:
             "I1": snakemake.params["rc_I1"],
             "I2": snakemake.params["rc_I2"],
         }
-        match_ren(fastqs, whitelists, revcomp, max_barcode_dist, fastq1_out_path, fastq2_out_path, qc_path, threads)
+        offsets = {
+            "I1": 0,
+            "I2": 0,
+        }
+        match_two_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_out_path, fastq2_out_path, qc_path, threads)
 
 except NameError:
     pass
