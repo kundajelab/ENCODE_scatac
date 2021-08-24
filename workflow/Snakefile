@@ -267,7 +267,7 @@ rule remove_mito:
         "temp/{sample}/fragments/fragments_unfiltered.tsv"
     output: 
         fragments = pipe("temp/{sample}/fragments/fragments_nomito.tsv"),
-        read_count = pipe("temp/{sample}/fragments/aligned_no_mito.txt")
+        read_count = temp("temp/{sample}/fragments/aligned_no_mito.txt")
     conda:
         "envs/fragments.yaml"
     group: 
