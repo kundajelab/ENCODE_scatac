@@ -287,8 +287,8 @@ rule filter_blacklist_and_compress:
         "temp/{sample}/fragments/fragments_nomito.tsv"
     output: 
         fragments = "results/{sample}/fragments/fragments.tsv.gz",
-        stats = "results/{sample}/qc/duplicate_stats.tsv",
-        index = "results/{sample}/fragments/fragments.tsv.gz.tbi"
+        index = "results/{sample}/fragments/fragments.tsv.gz.tbi",
+        stats = "results/{sample}/qc/duplicate_stats.tsv"
     params:
         blacklist_file = config["blacklist"],
         duplicate_stats = srcdir("scripts/duplicate_stats.awk")

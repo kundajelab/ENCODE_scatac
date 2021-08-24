@@ -29,7 +29,7 @@ samples:
     bc_whitelist: 
       R2: /srv/www/kundaje/surag/resources/737K-arc-v1.txt.gz
     bc_revcomp: 
-      R2: False
+      R2: True
     max_barcode_dist: 1
 
   ren-raw-SM-A8CPH:
