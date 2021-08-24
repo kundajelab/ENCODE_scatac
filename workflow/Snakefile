@@ -176,7 +176,7 @@ rule filter_alignments:
         "temp/{sample}/mapping/raw.bam"
     output:
         bam = pipe("temp/{sample}/mapping/filtered.bam"),
-        read_count = pipe("temp/{sample}/mapping/all_aligned.txt"),
+        read_count = temp("temp/{sample}/mapping/all_aligned.txt"),
     params:
         multimapping = config["mapping"]["multimapping"],
         mmp_path = script_path("scripts/assign_multimappers.py")
