@@ -19,7 +19,7 @@ def read_barcodes(path, revcomp):
         bc = pd.read_csv(path, sep="\t")["sequence"]
     else:
         open_fn = get_open_fn(path)
-        with open_fn(path, 'r') as file:
+        with open_fn(path, 'rt') as file:
             bc = [b.strip() for b in file]
     if revcomp:
         bcrc = [reverse_complement(b) for b in bc]
