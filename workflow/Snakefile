@@ -247,7 +247,7 @@ rule make_fragments:
     input: 
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
-        fragments = pipe("temp/{sample}/fragments/fragments_unfiltered.tsv"),
+        fragments = temp("temp/{sample}/fragments/fragments_unfiltered.tsv"),
         dedup_count = temp("temp/{sample}/fragments/unique_aligned.txt")
     threads: 
         max_threads
