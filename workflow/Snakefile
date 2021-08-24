@@ -248,7 +248,7 @@ rule make_fragments:
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
         fragments = pipe("temp/{sample}/fragments/fragments_unfiltered.tsv"),
-        dedup_count = pipe("temp/{sample}/fragments/unique_aligned.txt")
+        dedup_count = temp("temp/{sample}/fragments/unique_aligned.txt")
     threads: 
         max_threads
     conda:
