@@ -14,6 +14,8 @@ def get_input_fastq(wildcards):
 def script_path(script_name):
     return str(workflow.source_path(script_name))
 
+onsuccess:
+    shell("rm -r temp/")
 
 rule all:
     input: 
@@ -22,9 +24,6 @@ rule all:
         expand("results/{sample}/fragments/fragments.tar", sample=samples.keys()),
         expand("results/{sample}/qc/summary.txt", sample=samples.keys()),
         expand("results/{sample}/archr/indicator.txt", sample=samples.keys())
-    onsuccess:
-        shell("rm -r temp/")
-
 
 """
 ######################
