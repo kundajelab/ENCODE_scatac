@@ -40,7 +40,7 @@ samples:
       I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_I1_001.fastq.gz
       I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/fastq/Undetermined_S0_L002_I2_001.fastq.gz
     bc_whitelist: 
-      I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_T7_SM-A8CPH.tsv.tsv
+      I1: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_T7_SM-A8CPH.tsv
       I2: /oak/stanford/groups/akundaje/atwang/encode_scatac/ren/barcodes/ren_barcodes_i5.tsv
     bc_revcomp: 
       I1: True
