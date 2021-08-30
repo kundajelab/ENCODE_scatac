@@ -27,13 +27,13 @@ rule all:
 
 """
 ######################
-Process FASTQs
+FASTQ processing
 ######################
 """
 
 rule strip_fastq:
     """
-    Strip FASTQ header descriptions
+    Strip FASTQ read descriptions
     """
     input:
         get_input_fastq 
@@ -140,7 +140,7 @@ rule trim_adapter:
 
 """
 ######################
-Map and filter reads
+Read mapping and filtering
 ######################
 """
 
@@ -217,7 +217,7 @@ rule sort_alignments:
 
 """
 ######################
-Generate fragments
+Fragment file generation
 ######################
 """
 
@@ -303,7 +303,7 @@ rule filter_blacklist_and_compress:
 
 rule frag_tar: 
     """
-    Package fragments + index into tarball
+    Create fragments + index tarball
     """
     input:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
