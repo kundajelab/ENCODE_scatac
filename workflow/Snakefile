@@ -122,8 +122,6 @@ rule trim_adapter:
         fastq1_trim = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2_trim = "results/{sample}/fastqs/R2_trim.fastq.gz",
         stats = "results/{sample}/qc/trim_adapters.txt"
-    params:
-        max_barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"]
     log:
         html = "logs/{sample}/fastqs/fastp.html",
         json = "logs/{sample}/fastqs/fastp.json"
@@ -140,7 +138,7 @@ rule trim_adapter:
 
 """
 ######################
-Read mapping and filtering
+Read mapping
 ######################
 """
 
@@ -154,8 +152,8 @@ rule bowtie2:
     output:
         bam_raw = pipe("temp/{sample}/mapping/raw.bam"),
     params:
-        k = 1 + config["mapping"]["multimapping"],
-        bwt2_idx = config["mapping"]["index"]
+        k = 1 + config["multimapping"],
+        bwt2_idx = config["mapping_index"]
     log:
         "logs/{sample}/mapping/bwt2.log"
     threads:
@@ -169,34 +167,32 @@ rule bowtie2:
         "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
         "samtools view -u -S - -o {output.bam_raw}"
 
-rule filter_alignments:
+rule filter_multimappers:
     """
-    Post-alignment filtering
+    Remove multimapping reads above threshold
     """
     input:
         "temp/{sample}/mapping/raw.bam"
     output:
-        bam = pipe("temp/{sample}/mapping/filtered.bam"),
-        read_count = temp("temp/{sample}/mapping/all_aligned.txt"),
+        pipe("temp/{sample}/mapping/de-multimap.bam")
     params:
-        multimapping = config["mapping"]["multimapping"],
+        multimapping = config["multimapping"],
         mmp_path = script_path("scripts/assign_multimappers.py")
     conda:
-        "envs/mapping.yaml"
+        "envs/filtering.yaml"
     group: 
-        "mapping"
+        "filtering"
     shell:
         "samtools view -h -f 2 {input} | "
         "python {params.mmp_path} --paired-end -k {params.multimapping} | "
-        "samtools view -F 1804 -u - | tee {output.bam} | "
-        "samtools view -f 3 -F 4 --no-header - | wc -l > {output.read_count}"
+        "samtools view -u - {output} "
 
 rule sort_alignments:
     """
     Sort and index alignments
     """
     input: 
-        "temp/{sample}/mapping/filtered.bam"
+        "temp/{sample}/mapping/de-multimap.bam"
     output: 
         bam = "results/{sample}/mapping/possorted.bam",
         bai = "results/{sample}/mapping/possorted.bam.bai"
@@ -217,6 +213,108 @@ rule sort_alignments:
 
 """
 ######################
+Alignment filtering
+######################
+"""
+
+rule remove_mito:
+    """
+    Remove mitochondrial reads
+    """
+    input: 
+        bam = "results/{sample}/mapping/possorted.bam",
+        bai = "results/{sample}/mapping/possorted.bam.bai"
+    output: 
+        bam = pipe("temp/{sample}/filter/no_mito.bam"),
+        count_mito = temp("temp/{sample}/filter/count_mito.txt"),
+        count_no_mito = temp("temp/{sample}/filter/count_no_mito.txt")
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell: 
+        "samtools view -u {input.bam} "
+        "-o >(samtools view -F 264 | wc -l > {output.count_mito}) "
+        "-U >(tee {output.bam} | samtools view -F 264 | wc -l > {output.count_no_mito}) "
+        "chrM"
+
+rule frac_mito:
+    """
+    Calculate fraction of mitochondrial reads
+    """
+    input: 
+        count_mito = "temp/{sample}/filter/count_mito.txt",
+        count_no_mito = "temp/{sample}/filter/count_no_mito.txt"
+    output: 
+        "results/{sample}/qc/frac_mito.txt"
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell: 
+        "rm=$(<{input.count_mito); "
+        "rn=$(<{input.count_no_mito); "
+        "frac=$((rm / (rm + rn))); "
+        "printf \"%d\\t%d\\t%f\" \"$rn\" \"$rm\" \"$frac\" > {output}"
+
+rule assign_primary:
+    """
+    Assign multimapping reads to primary alignment
+    """
+    input:
+        "temp/{sample}/filter/no_mito.bam"
+    output:
+        temp("temp/{sample}/filter/primary_align.bam")
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell:
+        "samtools view -F 1804 -u {input} {output} "
+
+rule remove_duplicates_and_index:
+    """
+    Remove PCR duplicates, report stats, and index
+    """
+    input:
+        "temp/{sample}/filter/primary_align.bam""
+    output:
+        bam = "results/{sample}/filter/filtered.bam",
+        bai = "results/{sample}/filter/filtered.bam.bai",
+        markdup_stats = "results/{sample}/qc/markdup.txt",
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell:
+        "picard MarkDuplicates I={input} O=/dev/stdout METRICS_FILE={output.markdup_stats} QUIET=true "
+        "VALIDATION_STRINGENCY=LENIENT ASSUME_SORTED=true REMOVE_DUPLICATES=false BARCODE_TAG=CB | "
+        "samtools view -F 1804 -f 2 -b - {output.bam}; "
+        "samtools index {output.bam}"
+
+rule samstats_filtered:
+    """
+    Run SAMStats on filtered alignments
+    """
+    input:
+        "results/{sample}/filter/filtered.bam"
+    output:
+        "results/{sample}/qc/samstats_filtered.txt"
+    threads:
+        max_threads
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    shadow: 
+        "shallow"
+    shell:
+        "samtools sort -n -@ {threads} {input} -O SAM | " 
+        "SAMstats --sorted_sam_file -  --outf ${output}"
+
+
+"""
+######################
 Fragment file generation
 ######################
 """
@@ -226,8 +324,8 @@ rule bam_to_frag:
     Convert BAM to fragment file
     """
     input:
-        bam = "results/{sample}/mapping/possorted.bam",
-        bai = "results/{sample}/mapping/possorted.bam.bai"
+        bam = "results/{sample}/filter/filtered.bam",
+        bai = "results/{sample}/filter/filtered.bam.bai"
     output:
         pipe("temp/{sample}/fragments/fragments_unsorted.tsv")
     log:
@@ -239,17 +337,21 @@ rule bam_to_frag:
     group: 
         "fragments"
     shell:
-        "sinto fragments -b {input.bam} -f {output} --min_mapq 0 --max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads} > {log}"
+        "sinto fragments -b {input.bam} -f {output} " 
+        "--min_mapq 0 --max_distance 2000 --min_distance 10 --shift_plus 4 --shift_minus -4 --barcodetag CB --nproc {threads} > {log}"
 
-rule make_fragments:
+rule sort_compress_index_fragments:
     """
     Sort fragments and compute counts
     """
     input: 
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
-        fragments = temp("temp/{sample}/fragments/fragments_unfiltered.tsv"),
-        dedup_count = temp("temp/{sample}/fragments/unique_aligned.txt")
+        fragments = "results/{sample}/fragments/fragments.tsv.gz",
+        index = "results/{sample}/fragments/fragments.tsv.gz.tbi",
+        stats = "results/{sample}/qc/pbc_stats.tsv"
+    params:
+        pbc_stats = srcdir("scripts/pbc_stats.awk")
     threads: 
         max_threads
     conda:
@@ -258,48 +360,69 @@ rule make_fragments:
         "fragments"
     shell: 
         "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' --parallel={threads} {input} | " # Sort the file by chr, start, end, then barcode_id
-        "tee {output.fragments} | wc -l > {output.dedup_count}" # Save the count of total reads
-
-rule remove_mito:
-    """
-    Remove mitochondrial chromosomes
-    """
-    input: 
-        "temp/{sample}/fragments/fragments_unfiltered.tsv"
-    output: 
-        fragments = pipe("temp/{sample}/fragments/fragments_nomito.tsv"),
-        read_count = temp("temp/{sample}/fragments/aligned_no_mito.txt")
-    conda:
-        "envs/fragments.yaml"
-    group: 
-        "fragments"
-    shell: 
-        "grep -v '^chrM' {input} | "
-        "tee {output.fragments} | "
-        "wc -l > {output.read_count}"
-
-rule filter_blacklist_and_compress:
-    """
-    Filter blacklist, calculate duplicate stats, and make tabix
-    """
-    input: 
-        "temp/{sample}/fragments/fragments_nomito.tsv"
-    output: 
-        fragments = "results/{sample}/fragments/fragments.tsv.gz",
-        index = "results/{sample}/fragments/fragments.tsv.gz.tbi",
-        stats = "results/{sample}/qc/duplicate_stats.tsv"
-    params:
-        blacklist_file = config["blacklist"],
-        duplicate_stats = srcdir("scripts/duplicate_stats.awk")
-    conda:
-        "envs/fragments.yaml"
-    group: 
-        "fragments"
-    shell: 
-        "bedtools subtract -a {input} -b {params.blacklist_file} -A | " # Remove regions from blacklist
-        "tee >(awk -f {params.duplicate_stats} > {output.stats}) | "
+        "tee >(awk -f {params.pbc_stats} > {output.stats}) | "
         "bgzip > {output.fragments}; "
         "tabix --zero-based --preset bed {output.fragments}"
+
+# rule sort_fragments:
+#     """
+#     Sort fragments and compute counts
+#     """
+#     input: 
+#         "temp/{sample}/fragments/fragments_unsorted.tsv"
+#     output: 
+#         fragments = temp("temp/{sample}/fragments/fragments_unfiltered.tsv"),
+#         dedup_count = temp("temp/{sample}/fragments/unique_aligned.txt")
+#     threads: 
+#         max_threads
+#     conda:
+#         "envs/fragments.yaml"
+#     group: 
+#         "fragments"
+#     shell: 
+#         "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' --parallel={threads} {input} | " # Sort the file by chr, start, end, then barcode_id
+#         "tee {output.fragments} | wc -l > {output.dedup_count}" # Save the count of total reads
+
+# rule remove_mito:
+#     """
+#     Remove mitochondrial chromosomes
+#     """
+#     input: 
+#         "temp/{sample}/fragments/fragments_unfiltered.tsv"
+#     output: 
+#         fragments = pipe("temp/{sample}/fragments/fragments_nomito.tsv"),
+#         read_count = temp("temp/{sample}/fragments/aligned_no_mito.txt")
+#     conda:
+#         "envs/fragments.yaml"
+#     group: 
+#         "fragments"
+#     shell: 
+#         "grep -v '^chrM' {input} | "
+#         "tee {output.fragments} | "
+#         "wc -l > {output.read_count}"
+
+# rule filter_blacklist_and_compress:
+#     """
+#     Filter blacklist, calculate duplicate stats, and make tabix
+#     """
+#     input: 
+#         fragments = "temp/{sample}/fragments/fragments_nomito.tsv",
+#         blacklist = config["blacklist"]
+#     output: 
+#         fragments = "results/{sample}/fragments/fragments.tsv.gz",
+#         index = "results/{sample}/fragments/fragments.tsv.gz.tbi",
+#         stats = "results/{sample}/qc/duplicate_stats.tsv"
+#     params:
+#         duplicate_stats = srcdir("scripts/duplicate_stats.awk")
+#     conda:
+#         "envs/fragments.yaml"
+#     group: 
+#         "fragments"
+#     shell: 
+#         "bedtools subtract -a {input.fragments} -b {input.blacklist} -A | " # Remove regions from blacklist
+#         "tee >(awk -f {params.duplicate_stats} > {output.stats}) | "
+#         "bgzip > {output.fragments}; "
+#         "tabix --zero-based --preset bed {output.fragments}"
 
 rule frag_tar: 
     """
@@ -317,25 +440,25 @@ rule frag_tar:
     shell:
         "tar -cf {output} {input.frag} {input.frag_ind}"
 
-rule stats_summary:
-    """
-    Aggregate fragments QC
-    """
-    input:
-        barcode_matching = lambda w: f"results/{w.sample}/qc/barcode_matching_{samples[w.sample]['technology']}.tsv",
-        adapter_stats = "results/{sample}/qc/trim_adapters.txt",
-        total_align = "temp/{sample}/mapping/all_aligned.txt",
-        unique_align = "temp/{sample}/fragments/unique_aligned.txt",
-        no_mito = "temp/{sample}/fragments/aligned_no_mito.txt",
-        duplicate_stats = "results/{sample}/qc/duplicate_stats.tsv"
-    output: 
-        "results/{sample}/qc/summary.txt"
-    conda:
-        "envs/fragments.yaml"
-    group: 
-        "fragments"
-    script: 
-        "scripts/summarize_fragment_stats.py"
+# rule stats_summary:
+#     """
+#     Aggregate fragments QC
+#     """
+#     input:
+#         barcode_matching = lambda w: f"results/{w.sample}/qc/barcode_matching_{samples[w.sample]['technology']}.tsv",
+#         adapter_stats = "results/{sample}/qc/trim_adapters.txt",
+#         total_align = "temp/{sample}/mapping/all_aligned.txt",
+#         unique_align = "temp/{sample}/fragments/unique_aligned.txt",
+#         no_mito = "temp/{sample}/fragments/aligned_no_mito.txt",
+#         duplicate_stats = "results/{sample}/qc/duplicate_stats.tsv"
+#     output: 
+#         "results/{sample}/qc/summary.txt"
+#     conda:
+#         "envs/fragments.yaml"
+#     group: 
+#         "fragments"
+#     script: 
+#         "scripts/summarize_fragment_stats.py"
 
 
 """

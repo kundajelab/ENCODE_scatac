@@ -47,9 +47,6 @@ samples:
       I2: True
     max_barcode_dist: 1
 
-mapping:
-  index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
-  multimapping: 4
-
-blacklist: /oak/stanford/groups/akundaje/atwang/genomes/hg38/annotations/hg38.blacklist.bed
+mapping_index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
+multimapping: 4
 
