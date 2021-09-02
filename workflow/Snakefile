@@ -232,11 +232,11 @@ rule sort_alignments:
     conda:
         "envs/mapping.yaml"
     shadow: 
-        "shallow"
+        "minimal"
     group: 
         "mapping"
     shell: 
-        "samtools sort {input} -@ {threads} -o {output.bam} 2> {log}; "
+        "samtools sort -T . {input} -@ {threads} -o {output.bam} 2> {log}; "
         "samtools index {output.bam};"
 
 rule samstats_raw:
@@ -254,9 +254,9 @@ rule samstats_raw:
     group: 
         "mapping"
     shadow: 
-        "shallow"
+        "minimal"
     shell:
-        "samtools sort -n -@ {threads} {input} -O SAM | " 
+        "samtools sort -T . -n -@ {threads} {input} -O SAM | " 
         "SAMstats --sorted_sam_file -  --outf ${output}"
 
 
@@ -360,9 +360,9 @@ rule samstats_filtered:
     group: 
         "filtering"
     shadow: 
-        "shallow"
+        "minimal"
     shell:
-        "samtools sort -n -@ {threads} {input} -O SAM | " 
+        "samtools sort -T . -n -@ {threads} {input} -O SAM | " 
         "SAMstats --sorted_sam_file -  --outf ${output}"
 
 
@@ -486,6 +486,9 @@ rule archr_build:
         "scripts/build_archr_project.R"
 
 rule tar_archr_results:
+    """
+    Create ArchR results archive
+    """
     input:
         "temp/{sample}/archr/indicator.txt"
     params:
@@ -499,18 +502,17 @@ rule tar_archr_results:
     shell:
         "tar -zcf {output} {params.project_dir}"
 
-rule parse_archr_qc:
+rule write_archr_qc_pdf:
+    """
+    Move ArchR QC PDFs
+    """
     input:
         qc_ds_pdf = "temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.pdf",
-        qc_ds_data = "temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.rds",
         qc_frag = "temp/{sample}/archr/project/{sample}/{sample}-Fragment_Size_Distribution.pdf",
-        qc_meta = "temp/{sample}/archr/project/{sample}/{sample}-Pre-Filter-Metadata.rds",
         qc_tss = "temp/{sample}/archr/project/{sample}/{sample}-TSS_by_Unique_Frags.pdf"
     output:
         qc_ds_pdf = "results/{sample}/qc/archr_doublet_summary.pdf",
-        qc_ds_data = "results/{sample}/qc/archr_doublet_summary.tsv",
         qc_frag = "results/{sample}/qc/archr_fragment_size_distribution.pdf",
-        qc_meta = "results/{sample}/qc/archr_pre_filter_metadata.tsv",
         qc_tss = "results/{sample}/qc/archr_tss_by_unique_frags.pdf"
     conda:
         "envs/archr.yaml"
@@ -520,5 +522,20 @@ rule parse_archr_qc:
         "cp {input.qc_ds_pdf} {output.qc_ds_pdf}; "
         "cp {input.qc_frag} {output.qc_frag}; "
         "cp {input.qc_tss} {output.qc_tss}; "
-        "Rscript -e \"rio::convert('{input.qc_ds_data}', {output.qc_ds_data}')\"; "
-        "Rscript -e \"rio::convert('{input.qc_meta}', {output.qc_meta}')\"; "
+
+rule parse_archr_qc:
+    """
+    Parse ArchR QC RDSs
+    """
+    input:
+        qc_ds_data = "temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.rds",
+        qc_meta = "temp/{sample}/archr/project/{sample}/{sample}-Pre-Filter-Metadata.rds",
+    output:
+        qc_ds_data = "results/{sample}/qc/archr_doublet_summary.tsv",
+        qc_meta = "results/{sample}/qc/archr_pre_filter_metadata.tsv",
+    conda:
+        "envs/archr.yaml"
+    group:
+        "archr"
+    script:
+        "scripts/parse_archr_qc.R"
