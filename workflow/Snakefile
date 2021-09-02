@@ -33,14 +33,14 @@ rule all:
         expand("results/{sample}/qc/trim_adapters.txt", sample=samples.keys()),
         expand("results/{sample}/qc/samstats_raw.txt", sample=samples.keys()),
         expand("results/{sample}/qc/frac_mito.txt", sample=samples.keys()),
-        expand("results/{sample}/qc/markdup.txt" sample=samples.keys()),
-        expand("results/{sample}/qc/pbc_stats.tsv" sample=samples.keys()),
-        expand("results/{sample}/qc/samstats_filtered.txt" sample=samples.keys()),
-        expand("results/{sample}/qc/archr_doublet_summary.pdf" sample=samples.keys()),
-        expand("results/{sample}/qc/archr_doublet_summary.tsv" sample=samples.keys()),
-        expand("results/{sample}/qc/archr_fragment_size_distribution.pdf" sample=samples.keys()),
-        expand("results/{sample}/qc/archr_pre_filter_metadata.tsv" sample=samples.keys()),
-        expand("results/{sample}/qc/archr_tss_by_unique_frags.pdf" sample=samples.keys())
+        expand("results/{sample}/qc/markdup.txt", sample=samples.keys()),
+        expand("results/{sample}/qc/pbc_stats.tsv", sample=samples.keys()),
+        expand("results/{sample}/qc/samstats_filtered.txt", sample=samples.keys()),
+        expand("results/{sample}/qc/archr_doublet_summary.pdf", sample=samples.keys()),
+        expand("results/{sample}/qc/archr_doublet_summary.tsv", sample=samples.keys()),
+        expand("results/{sample}/qc/archr_fragment_size_distribution.pdf", sample=samples.keys()),
+        expand("results/{sample}/qc/archr_pre_filter_metadata.tsv", sample=samples.keys()),
+        expand("results/{sample}/qc/archr_tss_by_unique_frags.pdf", sample=samples.keys())
         
 """
 ######################
