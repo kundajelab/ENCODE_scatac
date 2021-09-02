@@ -17,7 +17,7 @@ samples:
     bc_whitelist: 
       R2: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
     bc_revcomp: 
-      R2: False
+      R2: True
     max_barcode_dist: 1
 
   # multiome-ENCSR332XEW:
