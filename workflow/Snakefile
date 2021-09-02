@@ -489,11 +489,11 @@ rule tar_archr_results:
 
 rule parse_archr_qc:
     input:
-        qc_ds_pdf = temp("temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.pdf"),
-        qc_ds_data = temp("temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.rds"),
-        qc_frag = temp("temp/{sample}/archr/project/{sample}/{sample}-Fragment_Size_Distribution.pdf"),
-        qc_meta = temp("temp/{sample}/archr/project/{sample}/{sample}-Pre-Filter-Metadata.rds"),
-        qc_tss = temp("temp/{sample}/archr/project/{sample}/{sample}-TSS_by_Unique_Frags.pdf")
+        qc_ds_pdf = "temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.pdf",
+        qc_ds_data = "temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.rds",
+        qc_frag = "temp/{sample}/archr/project/{sample}/{sample}-Fragment_Size_Distribution.pdf",
+        qc_meta = "temp/{sample}/archr/project/{sample}/{sample}-Pre-Filter-Metadata.rds",
+        qc_tss = "temp/{sample}/archr/project/{sample}/{sample}-TSS_by_Unique_Frags.pdf"
     output:
         qc_ds_pdf = "results/{sample}/qc/archr_doublet_summary.pdf",
         qc_ds_data = "results/{sample}/qc/archr_doublet_summary.tsv",

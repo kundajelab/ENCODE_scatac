@@ -11,9 +11,9 @@ samples:
   scATAC-ENCSR198TTU:
     technology: 10x
     fastq:
-      R1: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/R1_ENCSR198TTU.fastq.gz
-      R2: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/BC_ENCSR198TTU.fastq.gz
-      R3: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/R2_ENCSR198TTU.fastq.gz
+      R1: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/R1_ENCFF954JAI.fastq.gz
+      R2: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/BC_ENCFF995UIJ.fastq.gz
+      R3: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/R2_ENCFF357EYY.fastq.gz
     bc_whitelist: 
       R2: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
     bc_revcomp: 
