@@ -314,7 +314,7 @@ rule remove_duplicates_and_index:
     Remove PCR duplicates, report stats, and index
     """
     input:
-        "temp/{sample}/filter/primary_align.bam""
+        "temp/{sample}/filter/primary_align.bam"
     output:
         bam = "results/{sample}/filter/filtered.bam",
         bai = "results/{sample}/filter/filtered.bam.bai",
