@@ -10,6 +10,7 @@ dependencies:
   - conda-forge::r-shiny=1.6.0
   - conda-forge::r-rhandsontable=0.3.8
   - conda-forge::r-shinythemes=1.2.0
+  - conda-forge::r-rio=0.5.27
   - bioconda::bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.3 
   - bioconda::r-harmony=0.1
   - bioconda::macs2=2.2.7.1
