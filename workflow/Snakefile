@@ -87,7 +87,7 @@ use rule match_barcodes as match_barcodes_10x with:
     output: 
         fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_10x.fastq"),
         fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_10x.fastq"),
-        qc_matching = "results/{sample}/qc/barcode_matching.tsv"
+        qc_matching = temp("temp/{sample}/qc/barcode_matching_10x.tsv")
     params:
         rc_R2 = lambda w: samples[w.sample]["bc_revcomp"]["R2"],
         barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"],
@@ -103,7 +103,7 @@ use rule match_barcodes as match_barcodes_multiome with:
     output: 
         fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_multiome.fastq"),
         fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_multiome.fastq"),
-        qc_matching = "results/{sample}/qc/barcode_matching.tsv"
+        qc_matching = temp("temp/{sample}/qc/barcode_matching_multiome.tsv")
     params:
         rc_R2 = lambda w: samples[w.sample]["bc_revcomp"]["R2"],
         barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"],
@@ -121,12 +121,27 @@ use rule match_barcodes as match_barcodes_ren with:
     output: 
         fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_ren.fastq"),
         fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_ren.fastq"),
-        qc_matching = "results/{sample}/qc/barcode_matching.tsv"
+        qc_matching = temp("temp/{sample}/qc/barcode_matching_ren.tsv")
     params:
         rc_I1 = lambda w: samples[w.sample]["bc_revcomp"]["I1"],
         rc_I2 = lambda w: samples[w.sample]["bc_revcomp"]["I2"],
         barcode_dist = lambda w: samples[w.sample]["max_barcode_dist"],
         technology = "ren"
+
+rule output_matching_stats:
+    """
+    Write barcode matching stats
+    """
+    input:
+        lambda w: f"temp/{w.sample}/fastqs/barcode_matching_{samples[w.sample]['technology']}.tsv",
+    output:
+        "results/{sample}/qc/barcode_matching.tsv"
+    conda:
+        "envs/fastqs.yaml"
+    group: 
+        "fastqs"
+    shell:
+        "cp {input} {output}"
 
 rule trim_adapter:
     """
