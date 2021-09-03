@@ -286,7 +286,7 @@ rule remove_mito:
     shell: 
         "samtools view "
         "--unoutput {output.bam} "
-        "-o {output.count_mito}"
+        "-o {output.count_mito} "
         # "-o >(samtools view -F 264 -c -o {output.count_mito} -) "
         # "-U >(tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -) "
         "{input.bam} chrM"
