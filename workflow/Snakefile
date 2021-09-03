@@ -299,7 +299,7 @@ rule remove_mito:
     group: 
         "filtering"
     shell: 
-        "samtools idxstats input.bam | cut -f 1 | grep -v chrM |"
+        "samtools idxstats {input.bam} | cut -f 1 | grep -v chrM |"
         "xargs samtools view -u | "
         "tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -"
 
