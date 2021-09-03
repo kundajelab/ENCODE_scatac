@@ -306,8 +306,8 @@ rule frac_mito:
     group: 
         "filtering"
     shell: 
-        "rm=$(<{input.count_mito); "
-        "rn=$(<{input.count_no_mito); "
+        "rm=$(<{input.count_mito}); "
+        "rn=$(<{input.count_no_mito}); "
         "frac=$((rm / (rm + rn))); "
         "printf \"%d\\t%d\\t%f\" \"$rn\" \"$rm\" \"$frac\" > {output}"
 
