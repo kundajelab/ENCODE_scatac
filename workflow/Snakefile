@@ -284,11 +284,11 @@ rule remove_mito:
     group: 
         "filtering"
     shell: 
-        "samtools view "
-        "--unoutput {output.bam} "
-        "-o {output.count_mito} "
-        # "-o >(samtools view -F 264 -c -o {output.count_mito} -) "
-        # "-U >(tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -) "
+        "samtools view -u "
+        # "--unoutput {output.bam} "
+        # "-o {output.count_mito} "
+        "-o >(samtools view -F 264 -c -o {output.count_mito} -) "
+        "-U >(tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -) "
         "{input.bam} chrM"
         # "tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -"
 
@@ -324,7 +324,7 @@ rule assign_primary:
     group: 
         "filtering"
     shell:
-        "samtools view -F 1804 -u {input} {output} "
+        "samtools view -F 1804 -u -o {output} {input} "
 
 rule remove_duplicates_and_index:
     """
