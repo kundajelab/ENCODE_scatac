@@ -247,6 +247,8 @@ rule samstats_raw:
         "results/{sample}/mapping/raw.bam"
     output:
         "results/{sample}/qc/samstats_raw.txt"
+    log:
+        "logs/{sample}/mapping/samstats_raw.log"
     threads:
         max_threads
     conda:
@@ -353,6 +355,8 @@ rule samstats_filtered:
         "results/{sample}/filter/filtered.bam"
     output:
         "results/{sample}/qc/samstats_filtered.txt"
+    log:
+        "logs/{sample}/filter/samstats_filtered.log"
     threads:
         max_threads
     conda:
@@ -363,7 +367,7 @@ rule samstats_filtered:
         "minimal"
     shell:
         "samtools sort -T . -n -@ {threads} {input} -O SAM | " 
-        "SAMstats --sorted_sam_file -  --outf {output}"
+        "SAMstats --sorted_sam_file -  --outf {output} | "
 
 
 """
