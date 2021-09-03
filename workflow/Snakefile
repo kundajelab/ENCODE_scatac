@@ -287,7 +287,7 @@ rule remove_mito:
         "samtools view -u {input.bam} "
         # "-o >(samtools view -F 264 -c -o {output.count_mito} -) "
         # "-U >(tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -) "
-        "-U >(samtools view -F 264 -c -o {output.count_no_mito} -) "
+        "-U {output.bam} "
         "chrM"
 
 rule frac_mito:
