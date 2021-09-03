@@ -284,7 +284,7 @@ rule remove_mito:
     group: 
         "filtering"
     shell: 
-        "samtools view -u"
+        "samtools view -u "
         "--unoutput {output.bam} "
         "-o >(samtools view -F 264 -c -o {output.count_mito} -) "
         # "-U >(tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -) "
