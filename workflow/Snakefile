@@ -257,7 +257,7 @@ rule samstats_raw:
         "minimal"
     shell:
         "samtools sort -T . -n -@ {threads} {input} -O SAM | " 
-        "SAMstats --sorted_sam_file -  --outf ${output}"
+        "SAMstats --sorted_sam_file -  --outf {output}"
 
 
 """
@@ -363,7 +363,7 @@ rule samstats_filtered:
         "minimal"
     shell:
         "samtools sort -T . -n -@ {threads} {input} -O SAM | " 
-        "SAMstats --sorted_sam_file -  --outf ${output}"
+        "SAMstats --sorted_sam_file -  --outf {output}"
 
 
 """
