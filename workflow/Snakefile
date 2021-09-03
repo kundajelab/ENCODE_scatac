@@ -268,29 +268,40 @@ Alignment filtering
 ######################
 """
 
+rule count_mito:
+    """
+    Count mitochondrial reads
+    """
+    input: 
+        bam = "results/{sample}/mapping/raw.bam",
+        bai = "results/{sample}/mapping/raw.bam.bai"
+    output: 
+        temp("temp/{sample}/filter/count_mito.txt"),
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell: 
+        "samtools view -F 264 -c -u -o {output} {input.bam} chrM "
+
 rule remove_mito:
     """
-    Remove mitochondrial reads
+    Keep and count non-mitochondrial reads
     """
     input: 
         bam = "results/{sample}/mapping/raw.bam",
         bai = "results/{sample}/mapping/raw.bam.bai"
     output: 
         bam = pipe("temp/{sample}/filter/no_mito.bam"),
-        count_mito = temp("temp/{sample}/filter/count_mito.txt"),
         count_no_mito = temp("temp/{sample}/filter/count_no_mito.txt")
     conda:
         "envs/filtering.yaml"
     group: 
         "filtering"
     shell: 
-        "samtools view -u "
-        # "--unoutput {output.bam} "
-        # "-o {output.count_mito} "
-        "-U >(tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -) "
-        "-o >(samtools view -F 264 -c -o {output.count_mito} -) "
-        "{input.bam} chrM"
-        # "tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -"
+        "samtools idxstats input.bam | cut -f 1 | grep -v chrM |"
+        "xargs samtools view -u | "
+        "tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -"
 
 rule frac_mito:
     """
