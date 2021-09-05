@@ -376,7 +376,7 @@ rule remove_duplicates:
     group: 
         "filtering"
     shell:
-        "picard MarkDuplicates -INPUT {input} -OUTPUT /dev/stdout -METRICS_FILE {output.markdup_stats} "
+        "picard MarkDuplicates -INPUT {input} -OUTPUT /dev/stdout -METRICS_FILE {output.markdup_stats} -VERBOSITY WARNING"
         "-VALIDATION_STRINGENCY LENIENT -ASSUME_SORTED true -REMOVE_DUPLICATES false -BARCODE_TAG CB | "
         "tee {output.bam_markdup} | "
         "samtools view -F 1804 -f 2 -b - -o {output.bam_nodup}"
