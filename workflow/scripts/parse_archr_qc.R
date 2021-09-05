@@ -1,3 +1,7 @@
+console_log <- file(snakemake@log[[0]], open = "wt")
+sink(console_log)
+sink(console_log, type = "message")
+
 in_path_doublets <- snakemake@input[["qc_ds_data"]]
 in_path_meta <- snakemake@input[["qc_meta"]]
 out_path_doublets <- snakemake@output[["qc_ds_data"]]
@@ -7,15 +11,13 @@ r <- readRDS(in_path_meta)
 write.table(r, out_path_meta, sep = '\t', row.names = FALSE, quote = FALSE)
 
 r <- readRDS(in_path_doublets)
-print(names(r[['originalDataUMAP']])) ####
-print(names(r[['simulatedDoubletUMAP']])) ####
 res <- r[['doubletResults']]
-print(names(res)) ####
-print(names(res[['doubletEnrichLSI']])) ####
-# print(res[['doubletUMAP']]) ####
 d <- data.frame(
-    barcode = as.vector(names(res[['doubletEnrichLSI']])), 
+    # barcode = as.vector(names(res[['doubletEnrichLSI']])), 
     doubletEnrichLSI = res[['doubletEnrichLSI']], 
     doubletScoreLSI = res[['doubletScoreLSI']]
 )
 write.table(d, out_path_doublets, sep = '\t', row.names = FALSE, quote = FALSE)
+
+sink(type = "message")
+sink()

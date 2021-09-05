@@ -608,6 +608,8 @@ rule parse_archr_qc:
     output:
         qc_ds_data = "results/{sample}/qc/archr_doublet_summary.tsv",
         qc_meta = "results/{sample}/qc/archr_pre_filter_metadata.tsv",
+    log:
+        "logs/{sample}/archr/qc_parse.log",
     conda:
         "envs/archr.yaml"
     group:
