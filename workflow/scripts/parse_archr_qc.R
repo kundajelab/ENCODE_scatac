@@ -9,8 +9,8 @@ write.table(r, out_path_meta, sep = '\t', row.names = FALSE, quote = FALSE)
 r <- readRDS(in_path_doublets)
 res <- r[['doubletResults']]
 print(res) ####
-print(res[['doubletEnrichLSI']]) ####
-print(res[['doubletScoreLSI']]) ####
+print(names(res[['doubletEnrichLSI']])) ####
+# print(res[['doubletScoreLSI']]) ####
 d <- data.frame(
     barcode = as.vector(names(res[['doubletEnrichLSI']])), 
     doubletEnrichLSI = res[['doubletEnrichLSI']], 
