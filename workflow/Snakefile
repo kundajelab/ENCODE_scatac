@@ -337,29 +337,29 @@ rule assign_primary:
     shell:
         "samtools view -F 1804 -u -o {output} {input} "
 
-rule remove_duplicates_and_index:
-    """
-    Remove PCR duplicates, report stats, and index
-    """
-    input:
-        "temp/{sample}/filter/primary_align.bam"
-    output:
-        bam = "results/{sample}/filter/filtered.bam",
-        bai = "results/{sample}/filter/filtered.bam.bai",
-        markdup_stats = "results/{sample}/qc/markdup.txt",
-        pbc_stats = "results/{sample}/qc/pbc_stats.tsv",
-    params:
-        pbc_script = srcdir("scripts/pbc_stats.py")
-    conda:
-        "envs/filtering.yaml"
-    group: 
-        "filtering"
-    shell:
-        "picard MarkDuplicates INPUT={input} OUTPUT=/dev/stdout METRICS_FILE={output.markdup_stats} QUIET=true "
-        "VALIDATION_STRINGENCY=LENIENT ASSUME_SORTED=true REMOVE_DUPLICATES=false BARCODE_TAG=CB | "
-        "tee >(samtools view -F 1804 -f 2 -b - -o {output.bam}) | "
-        "samtools view - | python {params.pbc_script} {output.pbc_stats}; "
-        "samtools index {output.bam}"
+# rule remove_duplicates_and_index:
+#     """
+#     Remove PCR duplicates, report stats, and index
+#     """
+#     input:
+#         "temp/{sample}/filter/primary_align.bam"
+#     output:
+#         bam = "results/{sample}/filter/filtered.bam",
+#         bai = "results/{sample}/filter/filtered.bam.bai",
+#         markdup_stats = "results/{sample}/qc/markdup.txt",
+#         pbc_stats = "results/{sample}/qc/pbc_stats.tsv",
+#     params:
+#         pbc_script = srcdir("scripts/pbc_stats.py")
+#     conda:
+#         "envs/filtering.yaml"
+#     group: 
+#         "filtering"
+#     shell:
+#         "picard MarkDuplicates INPUT={input} OUTPUT=/dev/stdout METRICS_FILE={output.markdup_stats} QUIET=true "
+#         "VALIDATION_STRINGENCY=LENIENT ASSUME_SORTED=true REMOVE_DUPLICATES=false BARCODE_TAG=CB | "
+#         "tee >(samtools view -F 1804 -f 2 -b - -o {output.bam}) | "
+#         "samtools view - | python {params.pbc_script} {output.pbc_stats}; "
+#         "samtools index {output.bam}"
 
 rule remove_duplicates:
     """
