@@ -223,8 +223,7 @@ rule sort_alignments:
     input: 
         "temp/{sample}/mapping/de-multimap.bam"
     output: 
-        bam = "results/{sample}/mapping/raw.bam",
-        bai = "results/{sample}/mapping/raw.bam.bai"
+        "results/{sample}/mapping/raw.bam"
     log:
         "logs/{sample}/mapping/sort.log"
     threads:
@@ -236,8 +235,23 @@ rule sort_alignments:
     group: 
         "mapping"
     shell: 
-        "samtools sort -T . -@ {threads} -o {output.bam} {input} 2> {log}; "
+        "samtools sort -T . -@ {threads} -o {output} {input} 2> {log}; "
         "samtools index {output.bam};"
+
+rule index_bam_raw:
+    """
+    Index raw BAM
+    """
+    input: 
+        "results/{sample}/mapping/raw.bam"
+    output: 
+        "results/{sample}/mapping/raw.bam.bai"
+    conda:
+        "envs/mapping.yaml"
+    group: 
+        "mapping"
+    shell: 
+        "samtools index {input}"
 
 rule samstats_raw:
     """
@@ -389,7 +403,7 @@ rule index_bam_filtered:
     group: 
         "filtering"
     shell: 
-        "samtools index {input};"
+        "samtools index {input}"
 
 rule samstats_filtered:
     """
@@ -420,7 +434,7 @@ Fragment file generation
 ######################
 """
 
-rule bam_to_frag: 
+rule bam_to_fragments: 
     """
     Convert BAM to fragment file
     """
@@ -441,15 +455,14 @@ rule bam_to_frag:
         "sinto fragments -b {input.bam} -f {output} " 
         "--min_mapq 0 --max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads} > {log}"
 
-rule sort_compress_index_fragments:
+rule sort_fragments:
     """
     Sort fragments and compute counts
     """
     input: 
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
-        fragments = "results/{sample}/fragments/fragments.tsv.gz",
-        index = "results/{sample}/fragments/fragments.tsv.gz.tbi",
+        "results/{sample}/fragments/fragments.tsv.gz",
     params:
         pbc_stats = srcdir("scripts/pbc_stats.awk")
     threads: 
@@ -460,8 +473,22 @@ rule sort_compress_index_fragments:
         "fragments"
     shell: 
         "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' --parallel={threads} {input} | " # Sort the file by chr, start, end, then barcode_id
-        "bgzip > {output.fragments}; "
-        "tabix --zero-based --preset bed {output.fragments}"
+        "bgzip > {output}"
+
+rule index_fragments:
+    """
+    Index fragments file
+    """
+    input: 
+        "results/{sample}/fragments/fragments.tsv.gz"
+    output: 
+        "results/{sample}/fragments/fragments.tsv.gz.tbi"
+    conda:
+        "envs/fragments.yaml"
+    group: 
+        "fragments"
+    shell: 
+        "tabix --zero-based --preset bed {input}"
 
 rule tarball_fragments: 
     """
@@ -494,14 +521,14 @@ rule archr_build:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output:
-        qc_dir =temp(directory("temp/{sample}/qc/archr")),
+        qc_dir =temp(directory("temp/{sample}/archr/qc")),
         project_dir = temp(directory("temp/{sample}/archr/project")),
         indicator = touch("temp/{sample}/archr/indicator.txt"),
-        qc_ds_pdf = temp("temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.pdf"),
-        qc_ds_rds = temp("temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.rds"),
-        qc_frag = temp("temp/{sample}/archr/project/{sample}/{sample}-Fragment_Size_Distribution.pdf"),
-        qc_meta = temp("temp/{sample}/archr/project/{sample}/{sample}-Pre-Filter-Metadata.rds"),
-        qc_tss = temp("temp/{sample}/archr/project/{sample}/{sample}-TSS_by_Unique_Frags.pdf")
+        qc_ds_pdf = temp("temp/{sample}/archr/qc/{sample}/{sample}-Doublet-Summary.pdf"),
+        qc_ds_rds = temp("temp/{sample}/archr/qc/{sample}/{sample}-Doublet-Summary.rds"),
+        qc_frag = temp("temp/{sample}/archr/qc/{sample}/{sample}-Fragment_Size_Distribution.pdf"),
+        qc_meta = temp("temp/{sample}/archr/qc/{sample}/{sample}-Pre-Filter-Metadata.rds"),
+        qc_tss = temp("temp/{sample}/archr/qc/{sample}/{sample}-TSS_by_Unique_Frags.pdf")
     params:
         sample_name = lambda w: w.sample,
         seed = config["seed"],
@@ -555,9 +582,9 @@ rule write_archr_qc_pdf:
     Move ArchR QC PDFs
     """
     input:
-        qc_ds_pdf = "temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.pdf",
-        qc_frag = "temp/{sample}/archr/project/{sample}/{sample}-Fragment_Size_Distribution.pdf",
-        qc_tss = "temp/{sample}/archr/project/{sample}/{sample}-TSS_by_Unique_Frags.pdf"
+        qc_ds_pdf = "temp/{sample}/archr/qc/{sample}/{sample}-Doublet-Summary.pdf",
+        qc_frag = "temp/{sample}/archr/qc/{sample}/{sample}-Fragment_Size_Distribution.pdf",
+        qc_tss = "temp/{sample}/archr/qc/{sample}/{sample}-TSS_by_Unique_Frags.pdf"
     output:
         qc_ds_pdf = "results/{sample}/qc/archr_doublet_summary.pdf",
         qc_frag = "results/{sample}/qc/archr_fragment_size_distribution.pdf",
@@ -576,8 +603,8 @@ rule parse_archr_qc:
     Parse ArchR QC RDSs
     """
     input:
-        qc_ds_data = "temp/{sample}/archr/project/{sample}/{sample}-Doublet-Summary.rds",
-        qc_meta = "temp/{sample}/archr/project/{sample}/{sample}-Pre-Filter-Metadata.rds",
+        qc_ds_data = "temp/{sample}/archr/qc/{sample}/{sample}-Doublet-Summary.rds",
+        qc_meta = "temp/{sample}/archr/qc/{sample}/{sample}-Pre-Filter-Metadata.rds",
     output:
         qc_ds_data = "results/{sample}/qc/archr_doublet_summary.tsv",
         qc_meta = "results/{sample}/qc/archr_pre_filter_metadata.tsv",
