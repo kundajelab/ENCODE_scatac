@@ -45,7 +45,7 @@ def calc_pbc(in_sam, out_path):
     pbc1 = one_read_pairs / distinct_pairs
     pbc2 = one_read_pairs / two_read_pairs
 
-    stats_str = "\t".join([
+    stats_str = "\t".join(str(i) for i in [
         total_pairs, 
         distinct_pairs,
         one_read_pairs,

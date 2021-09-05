@@ -368,7 +368,7 @@ rule remove_duplicates:
     input:
         "temp/{sample}/filter/primary_align.bam"
     output:
-        bam_markdup = temp("temp/{sample}/filter/markdup.bam"),
+        bam_markdup = pipe("temp/{sample}/filter/markdup.bam"),
         bam_nodup = "results/{sample}/filter/filtered.bam",
         markdup_stats = "results/{sample}/qc/markdup.txt"
     log:
@@ -378,7 +378,7 @@ rule remove_duplicates:
     group: 
         "filtering"
     shell:
-        "picard MarkDuplicates -INPUT {input} -OUTPUT /dev/stdout -METRICS_FILE {output.markdup_stats} "
+        "picard MarkDuplicates -INPUT {input} -OUTPUT /dev/stdout -METRICS_FILE {output.markdup_stats} -COMPRESSION_LEVEL 0"
         "-VALIDATION_STRINGENCY LENIENT -ASSUME_SORTED true -REMOVE_DUPLICATES false -BARCODE_TAG CB 2> {log} | "
         "tee {output.bam_markdup} | "
         "samtools view -F 1804 -f 2 -b -o {output.bam_nodup} -"
