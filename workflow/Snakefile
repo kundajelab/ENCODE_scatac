@@ -194,7 +194,7 @@ rule bowtie2:
     shell:
         "bowtie2 -X 2000 --threads {threads} -x {params.bwt2_idx} "
         "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
-        "samtools view -u -S - -o {output.bam_raw}"
+        "samtools view -u -S -o {output.bam_raw} -"
 
 rule filter_multimappers:
     """
@@ -236,7 +236,7 @@ rule sort_alignments:
     group: 
         "mapping"
     shell: 
-        "samtools sort -T . {input} -@ {threads} -o {output.bam} 2> {log}; "
+        "samtools sort -T . -@ {threads} -o {output.bam} {input} 2> {log}; "
         "samtools index {output.bam};"
 
 rule samstats_raw:
@@ -258,7 +258,7 @@ rule samstats_raw:
     shadow: 
         "minimal"
     shell:
-        "samtools sort -T . -n -@ {threads} {input} -O SAM | " 
+        "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
 
@@ -335,7 +335,7 @@ rule assign_primary:
     group: 
         "filtering"
     shell:
-        "samtools view -F 1804 -u -o {output} {input} "
+        "samtools view -F 1804 -b -o {output} {input} "
 
 # rule remove_duplicates_and_index:
 #     """
@@ -378,14 +378,14 @@ rule remove_duplicates:
     group: 
         "filtering"
     shell:
-        "picard MarkDuplicates -INPUT {input} -OUTPUT /dev/stdout -METRICS_FILE {output.markdup_stats} -VERBOSITY WARNING "
+        "picard MarkDuplicates -INPUT {input} -OUTPUT /dev/stdout -METRICS_FILE {output.markdup_stats} "
         "-VALIDATION_STRINGENCY LENIENT -ASSUME_SORTED true -REMOVE_DUPLICATES false -BARCODE_TAG CB 2> {log} | "
         "tee {output.bam_markdup} | "
-        "samtools view -F 1804 -f 2 -b - -o {output.bam_nodup}"
+        "samtools view -F 1804 -f 2 -b -o {output.bam_nodup} -"
 
 rule library_complexity:
     """
-    Remove PBC library complexity stats
+    Calculate PBC library complexity stats
     """
     input:
         "temp/{sample}/filter/markdup.bam"
@@ -413,7 +413,7 @@ rule index_bam_filtered:
     group: 
         "filtering"
     shell: 
-        "samtools index {output.bam};"
+        "samtools index {output};"
 
 rule samstats_filtered:
     """
@@ -434,7 +434,7 @@ rule samstats_filtered:
     shadow: 
         "minimal"
     shell:
-        "samtools sort -T . -n -@ {threads} {input} -O SAM | " 
+        "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
 
