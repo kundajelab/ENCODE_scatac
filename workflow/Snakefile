@@ -259,7 +259,7 @@ rule samstats_raw:
         "minimal"
     shell:
         "samtools sort -T . -n -@ {threads} {input} -O SAM | " 
-        "SAMstats --sorted_sam_file -  --outf {output}"
+        "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
 
 """
@@ -355,11 +355,63 @@ rule remove_duplicates_and_index:
     group: 
         "filtering"
     shell:
-        "picard MarkDuplicates I={input} O=/dev/stdout METRICS_FILE={output.markdup_stats} QUIET=true "
+        "picard MarkDuplicates INPUT={input} OUTPUT=/dev/stdout METRICS_FILE={output.markdup_stats} QUIET=true "
         "VALIDATION_STRINGENCY=LENIENT ASSUME_SORTED=true REMOVE_DUPLICATES=false BARCODE_TAG=CB | "
         "tee >(samtools view -F 1804 -f 2 -b - -o {output.bam}) | "
         "samtools view - | python {params.pbc_script} {output.pbc_stats}; "
         "samtools index {output.bam}"
+
+rule remove_duplicates:
+    """
+    Mark and remove PCR duplicates
+    """
+    input:
+        "temp/{sample}/filter/primary_align.bam"
+    output:
+        bam_markdup = temp("temp/{sample}/filter/markdup.bam"),
+        bam_nodup = "results/{sample}/filter/filtered.bam",
+        markdup_stats = "results/{sample}/qc/markdup.txt"
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell:
+        "picard MarkDuplicates INPUT={input} OUTPUT=/dev/stdout METRICS_FILE={output.markdup_stats} QUIET=true "
+        "VALIDATION_STRINGENCY=LENIENT ASSUME_SORTED=true REMOVE_DUPLICATES=false BARCODE_TAG=CB | "
+        "tee {output.bam_markdup} | "
+        "samtools view -F 1804 -f 2 -b - -o {output.bam_nodup}"
+
+rule library_complexity:
+    """
+    Remove PBC library complexity stats
+    """
+    input:
+        "temp/{sample}/filter/markdup.bam"
+    output:
+        "results/{sample}/qc/pbc_stats.tsv",
+    params:
+        pbc_script = srcdir("scripts/pbc_stats.py")
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell:
+        "samtools view {input} | python {params.pbc_script} {output}"
+
+rule index_bam_filtered:
+    """
+    Index filtered BAM
+    """
+    input: 
+        "results/{sample}/filter/filtered.bam"
+    output: 
+        "results/{sample}/filter/filtered.bam.bai"
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell: 
+        "samtools index {output.bam};"
 
 rule samstats_filtered:
     """
@@ -381,7 +433,7 @@ rule samstats_filtered:
         "minimal"
     shell:
         "samtools sort -T . -n -@ {threads} {input} -O SAM | " 
-        "SAMstats --sorted_sam_file -  --outf {output} | "
+        "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
 
 """

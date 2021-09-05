@@ -11,10 +11,10 @@ def calc_pbc(in_sam, out_path):
 
     for al in in_sam:
         fields = al.strip().split('\t')
-        flag = fields[1]
+        flag = int(fields[1])
         rname = fields[2]
-        pos = fields[3]
-        pnext = fields[7]
+        pos = int(fields[3])
+        pnext = int(fields[7])
 
         if not ((flag & 99 == 99) or (flag & 147 == 147)):
             continue
