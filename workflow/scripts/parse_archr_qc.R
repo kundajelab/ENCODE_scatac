@@ -1,4 +1,4 @@
-console_log <- file(snakemake@log[[0]], open = "wt")
+console_log <- file(snakemake@log[[1]], open = "wt")
 sink(console_log)
 sink(console_log, type = "message")
 
