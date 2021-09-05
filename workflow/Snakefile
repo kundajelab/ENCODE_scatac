@@ -300,7 +300,7 @@ rule remove_mito:
         "filtering"
     shell: 
         "samtools idxstats {input.bam} | cut -f 1 | grep -v chrM | "
-        "xargs samtools view -u | "
+        "xargs samtools view -u - | "
         "tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -"
 
 rule frac_mito:
