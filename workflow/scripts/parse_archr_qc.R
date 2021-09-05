@@ -7,6 +7,7 @@ r <- readRDS(in_path_meta)
 write.table(r, out_path_meta, sep = '\t', row.names = FALSE, quote = FALSE)
 
 r <- readRDS(in_path_doublets)
+print(names(r)) ####
 res <- r[['doubletResults']]
 print(names(res)) ####
 print(names(res[['doubletEnrichLSI']])) ####
