@@ -413,7 +413,7 @@ rule index_bam_filtered:
     group: 
         "filtering"
     shell: 
-        "samtools index {output};"
+        "samtools index {input};"
 
 rule samstats_filtered:
     """
