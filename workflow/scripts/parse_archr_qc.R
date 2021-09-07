@@ -1,6 +1,6 @@
 console_log <- file(snakemake@log[[1]], open = "wt")
-sink(console_log)
-sink(console_log, type = "message")
+# sink(console_log)
+# sink(console_log, type = "message")
 
 in_path_doublets <- snakemake@input[["qc_ds_data"]]
 in_path_meta <- snakemake@input[["qc_meta"]]
@@ -21,5 +21,5 @@ d <- data.frame(
 )
 # write.table(d, out_path_doublets, sep = '\t', row.names = FALSE, quote = FALSE)
 
-sink(type = "message")
-sink()
+# sink(type = "message")
+# sink()
