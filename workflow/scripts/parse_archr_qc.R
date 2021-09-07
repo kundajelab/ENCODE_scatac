@@ -20,6 +20,7 @@ r <- readRDS(in_path_doublets)
 # print(length(r$doubletResults$doubletScoreLSI)) ####
 print(names(r$originalDataUMAP)) ####
 print(head(r$originalDataUMAP)) ####
+print(row.names(r$originalDataUMAP)) ####
 
 res <- r[['doubletResults']]
 d <- data.frame(
