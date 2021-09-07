@@ -22,7 +22,7 @@ r <- readRDS(in_path_doublets)
 # print(head(r$originalDataUMAP)) ####
 # print(row.names(r$originalDataUMAP)) ####
 
-res <- r[['doubletResults']]
+res <- r$doubletResults
 d <- data.frame(
     barcode = row.names(r$originalDataUMAP), 
     doubletScoreUMAP = res$doubletScoreUMAP,
