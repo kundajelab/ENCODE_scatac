@@ -25,8 +25,8 @@ r <- readRDS(in_path_doublets)
 res <- r$doubletResults
 d <- data.frame(
     barcode = row.names(r$originalDataUMAP), 
-    doubletScoreUMAP = res$doubletScoreUMAP,
-    doubletEnrichUMAP = res$doubletEnrichUMAP,
+    doubletScoreUMAP = r$originalDataUMAP$score,
+    doubletEnrichUMAP = r$originalDataUMAP$enrichment,
     doubletEnrichLSI = res$doubletEnrichLSI, 
     doubletScoreLSI = res$doubletScoreLSI
 )
