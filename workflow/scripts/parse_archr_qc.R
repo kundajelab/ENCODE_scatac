@@ -18,7 +18,7 @@ r <- readRDS(in_path_doublets)
 # print(length(r$doubletResults$doubletEnrichUMAP)) ####
 # print(length(r$doubletResults$doubletEnrichLSI)) ####
 # print(length(r$doubletResults$doubletScoreLSI)) ####
-print(names(r$originalDataUMAP))
+print(names(r$originalDataUMAP)) ####
 
 res <- r[['doubletResults']]
 d <- data.frame(
@@ -28,7 +28,7 @@ d <- data.frame(
     doubletEnrichLSI = res$doubletEnrichLSI, 
     doubletScoreLSI = res$doubletScoreLSI
 )
-print(d) ####
+# print(d) ####
 # write.table(d, out_path_doublets, sep = '\t', row.names = FALSE, quote = FALSE)
 
 # sink(type = "message")
