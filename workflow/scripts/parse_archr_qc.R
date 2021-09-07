@@ -18,7 +18,7 @@ r <- readRDS(in_path_doublets)
 # print(length(r$doubletResults$doubletEnrichUMAP)) ####
 # print(length(r$doubletResults$doubletEnrichLSI)) ####
 # print(length(r$doubletResults$doubletScoreLSI)) ####
-print(r$originalDataUMAP$X1) ####
+print(names(r$originalDataUMAP)) ####
 
 res <- r[['doubletResults']]
 d <- data.frame(
