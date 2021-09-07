@@ -18,10 +18,11 @@ r <- readRDS(in_path_doublets)
 # print(length(r$doubletResults$doubletEnrichUMAP)) ####
 # print(length(r$doubletResults$doubletEnrichLSI)) ####
 # print(length(r$doubletResults$doubletScoreLSI)) ####
+print(names(r$originalDataUMAP))
 
 res <- r[['doubletResults']]
 d <- data.frame(
-    barcode = as.vector(names(r$originalDataUMAP)), 
+    # barcode = as.vector(names(r$originalDataUMAP)), 
     doubletScoreUMAP = res$doubletScoreUMAP,
     doubletEnrichUMAP = res$doubletEnrichUMAP,
     doubletEnrichLSI = res$doubletEnrichLSI, 
