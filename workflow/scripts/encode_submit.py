@@ -19,7 +19,7 @@ with open(metadata_file) as f:
 eu.connection.LOG_DIR = log_dir
 
 metadata[Connection.PROFILE_KEY] = schema
-conn = Connection(dcc_mode)
+conn = Connection(dcc_mode, submission=True)
 conn.post(metadata)
 
 
