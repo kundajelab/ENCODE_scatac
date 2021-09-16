@@ -62,7 +62,7 @@ rule submit:
         expand("results/{sample}/submit/R2_trim_submit.done", sample=samples.keys()),
         expand("results/{sample}/submit/raw_bam_submit.done", sample=samples.keys()),
         expand("results/{sample}/submit/filtered_bam_submit.done", sample=samples.keys()),
-        expand("results/{sample}/submit/fragments_metadata.done", sample=samples.keys())
+        expand("results/{sample}/submit/fragments_submit.done", sample=samples.keys())
 
 
 """
@@ -735,6 +735,7 @@ rule submit_fastq_1:
     output: 
         touch("results/{sample}/submit/R1_trim_submit.done")
     params:
+        schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
@@ -756,6 +757,7 @@ rule submit_fastq_2:
     output: 
         touch("results/{sample}/submit/R2_trim_submit.done")
     params:
+        schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
@@ -778,6 +780,7 @@ rule submit_bam_raw:
     output: 
         touch("results/{sample}/submit/raw_bam_submit.done")
     params:
+        schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
@@ -800,6 +803,7 @@ rule submit_bam_filtered:
     output: 
         touch("results/{sample}/submit/filtered_bam_submit.done")
     params:
+        schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
@@ -819,8 +823,9 @@ rule submit_fragments:
         json = "results/{sample}/fragments/fragments_metadata.json",
         bam = "results/{sample}/submit/filtered_bam_submit.done"
     output: 
-        touch("results/{sample}/submit/fragments_metadata.done")
+        touch("results/{sample}/submit/fragments_submit.done")
     params:
+        schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
