@@ -744,7 +744,7 @@ rule submit_fastq_1:
     group: 
         "submit"
     script: 
-        "scripts/write_file_metadata.py"
+        "scripts/encode_submit.py"
 
 rule submit_fastq_2:
     """
@@ -765,7 +765,7 @@ rule submit_fastq_2:
     group: 
         "submit"
     script: 
-        "scripts/write_file_metadata.py"
+        "scripts/encode_submit.py"
 
 rule submit_bam_raw:
     """
@@ -787,7 +787,7 @@ rule submit_bam_raw:
     group: 
         "submit"
     script: 
-        "scripts/write_file_metadata.py"
+        "scripts/encode_submit.py"
 
 rule submit_bam_filtered:
     """
@@ -809,7 +809,7 @@ rule submit_bam_filtered:
     group: 
         "submit"
     script: 
-        "scripts/write_file_metadata.py"
+        "scripts/encode_submit.py"
 
 rule submit_fragments:
     """
@@ -830,5 +830,5 @@ rule submit_fragments:
     group: 
         "submit"
     script: 
-        "scripts/write_file_metadata.py"
+        "scripts/encode_submit.py"
 
