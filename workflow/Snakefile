@@ -49,7 +49,18 @@ rule all:
         expand("results/{sample}/analyses/archr_fragment_size_distribution.pdf", sample=samples.keys()),
         expand("results/{sample}/analyses/archr_pre_filter_metadata.tsv", sample=samples.keys()),
         expand("results/{sample}/analyses/archr_tss_by_unique_frags.pdf", sample=samples.keys())
-        
+
+rule submit:
+    """
+    Submit outputs to ENCODE portal
+    """
+    input: 
+        expand("results/{sample}/mapping/raw_bam_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/fastqs/R2_trim_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/mapping/raw_bam_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/filtering/filtered_bam_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/fragments/fragments_metadata.json", sample=samples.keys())
+
 
 """
 ######################
@@ -818,13 +829,3 @@ rule submit_fragments:
     script: 
         "scripts/write_file_metadata.py"
 
-rule submit:
-    """
-    Submit outputs to ENCODE portal
-    """
-    input: 
-        expand("results/{sample}/mapping/raw_bam_metadata.json", sample=samples.keys()),
-        expand("results/{sample}/fastqs/R2_trim_metadata.json", sample=samples.keys()),
-        expand("results/{sample}/mapping/raw_bam_metadata.json", sample=samples.keys()),
-        expand("results/{sample}/filtering/filtered_bam_metadata.json", sample=samples.keys()),
-        expand("results/{sample}/fragments/fragments_metadata.json", sample=samples.keys())
