@@ -8,7 +8,7 @@ seed: 8757647
 dcc_lab: anshul-kundaje
 dcc_award: XXXXXXX
 
-genome: hg38
+dcc_mode: dev
 
 samples:
   scATAC-ENCSR198TTU:
