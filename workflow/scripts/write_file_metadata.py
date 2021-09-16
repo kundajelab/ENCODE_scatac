@@ -96,10 +96,11 @@ try:
 
     elif out_group == "filtering":
         bam = snakemake.input['bam']
-        pred = snakemake.input['bam_raw']
+        r1_pred = snakemake.input['fq_R1']
+        r2_pred = snakemake.input['fq_R2']
         out, = snakemake.output
 
-        h = file_header(sample, config, bam, [pred])
+        h = file_header(sample, config, bam, [r1_pred, r2_pred])
         d = bam_metadata(sample_data)
         s = h | d
 
