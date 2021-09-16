@@ -21,6 +21,9 @@ def script_path(script_name):
 
 
 rule all:
+    """
+    Generate all outputs (default)
+    """
     input: 
         expand("results/{sample}/fastqs/R1_trim.fastq.gz", sample=samples.keys()),
         expand("results/{sample}/fastqs/R2_trim.fastq.gz", sample=samples.keys()),
@@ -55,11 +58,11 @@ rule submit:
     Submit outputs to ENCODE portal
     """
     input: 
-        expand("results/{sample}/mapping/raw_bam_metadata.json", sample=samples.keys()),
-        expand("results/{sample}/fastqs/R2_trim_metadata.json", sample=samples.keys()),
-        expand("results/{sample}/mapping/raw_bam_metadata.json", sample=samples.keys()),
-        expand("results/{sample}/filtering/filtered_bam_metadata.json", sample=samples.keys()),
-        expand("results/{sample}/fragments/fragments_metadata.json", sample=samples.keys())
+        expand("results/{sample}/submit/R1_trim_submit.done", sample=samples.keys()),
+        expand("results/{sample}/submit/R2_trim_submit.done", sample=samples.keys()),
+        expand("results/{sample}/submit/raw_bam_submit.done", sample=samples.keys()),
+        expand("results/{sample}/submit/filtered_bam_submit.done", sample=samples.keys()),
+        expand("results/{sample}/submit/fragments_metadata.done", sample=samples.keys())
 
 
 """
