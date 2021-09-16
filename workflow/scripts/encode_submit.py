@@ -5,7 +5,7 @@ import json
 import encode_utils as eu
 from encode_utils.connection import Connection
 
-metadata_file = snakemake.input["metadata"]
+metadata_file = snakemake.input["json"]
 dcc_mode = snakemake.config["dcc_mode"]
 schema = snakemake.params["schema"]
 log_dir, = snakemake.log
