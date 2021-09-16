@@ -13,7 +13,7 @@ def file_header(sample, config, out_path, preds, parse_preds=True):
     h = OrderedDict({
         "lab": lab,
         "award": config["dcc_award"],
-        "dataset": sample,
+        "dataset": sample["dataset"],
         "aliases": [alias],
         "submitted_file_name": os.path.abspath(out_path),
         "derived_from": pred_ids
@@ -30,7 +30,7 @@ def fastq_metadata(sample_data, pair, other):
         "replicate": sample_data["replicate"],
         "paired_end": pair,
     })
-    if pair == "1":
+    if pair == "2":
         d["paired_with"] = other
     return d
 
