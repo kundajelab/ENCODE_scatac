@@ -13,7 +13,7 @@ def file_header(sample, config, out_path, preds, parse_preds=True):
     h = OrderedDict({
         "lab": lab,
         "award": config["dcc_award"],
-        "dataset": sample["dataset"],
+        "dataset": sample,
         "aliases": [alias],
         "submitted_file_name": os.path.abspath(out_path),
         "derived_from": pred_ids
@@ -58,9 +58,9 @@ def write_json(data, out_path):
 
 try:
     out_group = snakemake.params['output_group']
-    sample = snakemake.params['sample']
     sample_data = snakemake.params['sample_data']
     config = snakemake.config
+    sample = sample_data["dataset"]
 
     if out_group == "fastqs":
         r1 = snakemake.input['r1']

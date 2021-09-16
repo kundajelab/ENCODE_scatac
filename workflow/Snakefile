@@ -180,7 +180,6 @@ rule metadata_fastq:
         r2 = "results/{sample}/fastqs/R2_trim_metadata.json"
     params:
         output_group = "fastqs",
-        sample = lambda w: w.sample,
         sample_data = lambda w: samples[w.sample]
     conda:
         "envs/fastqs.yaml"
@@ -312,7 +311,6 @@ rule metadata_bam_raw:
         "results/{sample}/mapping/raw_bam_metadata.json",
     params:
         output_group = "mapping",
-        sample = lambda w: w.sample,
         sample_data = lambda w: samples[w.sample]
     conda:
         "envs/mapping.yaml"
@@ -484,7 +482,6 @@ rule metadata_bam_filtered:
         "results/{sample}/filtering/filtered_bam_metadata.json",
     params:
         output_group = "filtering",
-        sample = lambda w: w.sample,
         sample_data = lambda w: samples[w.sample]
     conda:
         "envs/filtering.yaml"
@@ -581,7 +578,6 @@ rule metadata_fragments:
         "results/{sample}/fragments/fragments_metadata.json"
     params:
         output_group = "fragments",
-        sample = lambda w: w.sample,
         sample_data = lambda w: samples[w.sample]
     conda:
         "envs/fragments.yaml"
