@@ -823,8 +823,8 @@ rule submit:
     Submit outputs to ENCODE portal
     """
     input: 
-        "results/{sample}/mapping/raw_bam_metadata.json",
-        "results/{sample}/fastqs/R2_trim_metadata.json",
-        "results/{sample}/mapping/raw_bam_metadata.json",
-        "results/{sample}/filtering/filtered_bam_metadata.json",
-        "results/{sample}/fragments/fragments_metadata.json"
+        expand("results/{sample}/mapping/raw_bam_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/fastqs/R2_trim_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/mapping/raw_bam_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/filtering/filtered_bam_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/fragments/fragments_metadata.json", sample=samples.keys())
