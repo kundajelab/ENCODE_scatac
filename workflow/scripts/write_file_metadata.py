@@ -57,7 +57,7 @@ def write_json(data, out_path):
         json.dump(data, f, indent=4)
 
 try:
-    out_group = snakemake.params['out_group']
+    out_group = snakemake.params['output_group']
     sample = snakemake.params['sample']
     sample_data = snakemake.params['sample_data']
     config = snakemake.config
