@@ -14,7 +14,7 @@ os.environ["DCC_API_KEY"] = snakemake.params["dcc_api_key"]
 os.environ["DCC_SECRET_KEY"] = snakemake.params["dcc_secret_key"]
 
 with open(metadata_file) as f:
-    metadata = json.load(metadata_file)
+    metadata = json.load(f)
 
 eu.connection.LOG_DIR = log_dir
 
