@@ -11,34 +11,38 @@ def get_input_fastq(wildcards):
 def script_path(script_name):
     return str(workflow.source_path(script_name))
 
-# onsuccess:
-#     shell("rm -r temp/")
 
 rule all:
     input: 
         expand("results/{sample}/fastqs/R1_trim.fastq.gz", sample=samples.keys()),
         expand("results/{sample}/fastqs/R2_trim.fastq.gz", sample=samples.keys()),
+        expand("results/{sample}/fastqs/barcode_matching.tsv", sample=samples.keys()),
+        expand("results/{sample}/fastqs/trim_adapters.txt", sample=samples.keys()),
+        expand("results/{sample}/fastqs/R1_trim_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/fastqs/R2_trim_metadata.json", sample=samples.keys()),
         expand("results/{sample}/mapping/raw.bam", sample=samples.keys()),
         expand("results/{sample}/mapping/raw.bam.bai", sample=samples.keys()),
-        expand("results/{sample}/filter/filtered.bam", sample=samples.keys()),
-        expand("results/{sample}/filter/filtered.bam.bai", sample=samples.keys()),
+        expand("results/{sample}/mapping/samstats_raw.txt", sample=samples.keys()),
+        expand("results/{sample}/mapping/raw_bam_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/filtering/filtered.bam", sample=samples.keys()),
+        expand("results/{sample}/filtering/filtered.bam.bai", sample=samples.keys()),
+        expand("results/{sample}/filtering/frac_mito.txt", sample=samples.keys()),
+        expand("results/{sample}/filtering/markdup.txt", sample=samples.keys()),
+        expand("results/{sample}/filtering/pbc_stats.tsv", sample=samples.keys()),
+        expand("results/{sample}/filtering/samstats_filtered.txt", sample=samples.keys()),
+        expand("results/{sample}/filtering/filtered_bam_metadata.json", sample=samples.keys()),
         expand("results/{sample}/fragments/fragments.tsv.gz", sample=samples.keys()),
         expand("results/{sample}/fragments/fragments.tsv.gz.tbi", sample=samples.keys()),
         expand("results/{sample}/fragments/fragments.tar", sample=samples.keys()),
-        expand("results/{sample}/archr/archr_project.tar.gz", sample=samples.keys()),
-        expand("results/{sample}/qc/barcode_matching.tsv", sample=samples.keys()),
-        expand("results/{sample}/qc/trim_adapters.txt", sample=samples.keys()),
-        expand("results/{sample}/qc/samstats_raw.txt", sample=samples.keys()),
-        expand("results/{sample}/qc/frac_mito.txt", sample=samples.keys()),
-        expand("results/{sample}/qc/markdup.txt", sample=samples.keys()),
-        expand("results/{sample}/qc/pbc_stats.tsv", sample=samples.keys()),
-        expand("results/{sample}/qc/samstats_filtered.txt", sample=samples.keys()),
-        expand("results/{sample}/qc/archr_doublet_summary.pdf", sample=samples.keys()),
-        expand("results/{sample}/qc/archr_doublet_summary.tsv", sample=samples.keys()),
-        expand("results/{sample}/qc/archr_fragment_size_distribution.pdf", sample=samples.keys()),
-        expand("results/{sample}/qc/archr_pre_filter_metadata.tsv", sample=samples.keys()),
-        expand("results/{sample}/qc/archr_tss_by_unique_frags.pdf", sample=samples.keys())
+        expand("results/{sample}/fragments/fragments_metadata.json", sample=samples.keys()),
+        expand("results/{sample}/analyses/archr_project.tar.gz", sample=samples.keys()),
+        expand("results/{sample}/analyses/archr_doublet_summary.pdf", sample=samples.keys()),
+        expand("results/{sample}/analyses/archr_doublet_summary.tsv", sample=samples.keys()),
+        expand("results/{sample}/analyses/archr_fragment_size_distribution.pdf", sample=samples.keys()),
+        expand("results/{sample}/analyses/archr_pre_filter_metadata.tsv", sample=samples.keys()),
+        expand("results/{sample}/analyses/archr_tss_by_unique_frags.pdf", sample=samples.keys())
         
+
 """
 ######################
 FASTQ processing
@@ -132,7 +136,7 @@ rule output_matching_stats:
     input:
         lambda w: f"temp/{w.sample}/fastqs/barcode_matching_{samples[w.sample]['technology']}.tsv",
     output:
-        "results/{sample}/qc/barcode_matching.tsv"
+        "results/{sample}/fastqs/barcode_matching.tsv"
     conda:
         "envs/fastqs.yaml"
     group: 
@@ -150,7 +154,7 @@ rule trim_adapter:
     output:
         fastq1_trim = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2_trim = "results/{sample}/fastqs/R2_trim.fastq.gz",
-        stats = "results/{sample}/qc/trim_adapters.txt"
+        stats = "results/{sample}/fastqs/trim_adapters.txt"
     log:
         html = "logs/{sample}/fastqs/fastp.html",
         json = "logs/{sample}/fastqs/fastp.json"
@@ -163,6 +167,27 @@ rule trim_adapter:
     shell:
         "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim}"
         " -h {log.html} -j {log.json} -G -Q -L -w {threads} 2> {output.stats}"
+
+rule metadata_fastq:
+    """
+    Write FASTQ metadata
+    """
+    input: 
+        r1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
+        r2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
+    output: 
+        r1 = "results/{sample}/fastqs/R1_trim_metadata.json",
+        r2 = "results/{sample}/fastqs/R2_trim_metadata.json"
+    params:
+        output_group = "fastqs",
+        sample = lambda w: w.sample,
+        sample_data = lambda w: samples[w.sample]
+    conda:
+        "envs/fastqs.yaml"
+    group: 
+        "fastqs"
+    script: 
+        "scripts/write_file_metadata.py"
 
 
 """
@@ -208,9 +233,9 @@ rule filter_multimappers:
         multimapping = config["multimapping"],
         mmp_path = script_path("scripts/assign_multimappers.py")
     conda:
-        "envs/filtering.yaml"
+        "envs/mapping.yaml"
     group: 
-        "filtering"
+        "mapping"
     shell:
         "samtools view -h -f 2 {input} | "
         "python {params.mmp_path} --paired-end -k {params.multimapping} | "
@@ -260,7 +285,7 @@ rule samstats_raw:
     input:
         "results/{sample}/mapping/raw.bam"
     output:
-        "results/{sample}/qc/samstats_raw.txt"
+        "results/{sample}/mapping/samstats_raw.txt"
     log:
         "logs/{sample}/mapping/samstats_raw.log"
     threads:
@@ -275,6 +300,26 @@ rule samstats_raw:
         "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
+rule metadata_bam_raw:
+    """
+    Write raw BAM metadata
+    """
+    input: 
+        bam = "results/{sample}/mapping/raw.bam",
+        fq_r1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
+        fq_r2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+    output: 
+        "results/{sample}/mapping/raw_bam_metadata.json",
+    params:
+        output_group = "mapping",
+        sample = lambda w: w.sample,
+        sample_data = lambda w: samples[w.sample]
+    conda:
+        "envs/mapping.yaml"
+    group: 
+        "mapping"
+    script: 
+        "scripts/write_file_metadata.py"
 
 """
 ######################
@@ -290,7 +335,7 @@ rule count_mito:
         bam = "results/{sample}/mapping/raw.bam",
         bai = "results/{sample}/mapping/raw.bam.bai"
     output: 
-        temp("temp/{sample}/filter/count_mito.txt"),
+        temp("temp/{sample}/filtering/count_mito.txt"),
     conda:
         "envs/filtering.yaml"
     group: 
@@ -306,8 +351,8 @@ rule remove_mito:
         bam = "results/{sample}/mapping/raw.bam",
         bai = "results/{sample}/mapping/raw.bam.bai"
     output: 
-        bam = pipe("temp/{sample}/filter/no_mito.bam"),
-        count_no_mito = temp("temp/{sample}/filter/count_no_mito.txt")
+        bam = pipe("temp/{sample}/filtering/no_mito.bam"),
+        count_no_mito = temp("temp/{sample}/filtering/count_no_mito.txt")
     conda:
         "envs/filtering.yaml"
     group: 
@@ -322,10 +367,10 @@ rule frac_mito:
     Calculate fraction of mitochondrial reads
     """
     input: 
-        count_mito = "temp/{sample}/filter/count_mito.txt",
-        count_no_mito = "temp/{sample}/filter/count_no_mito.txt"
+        count_mito = "temp/{sample}/filtering/count_mito.txt",
+        count_no_mito = "temp/{sample}/filtering/count_no_mito.txt"
     output: 
-        "results/{sample}/qc/frac_mito.txt"
+        "results/{sample}/filtering/frac_mito.txt"
     conda:
         "envs/filtering.yaml"
     group: 
@@ -333,7 +378,7 @@ rule frac_mito:
     shell: 
         "rm=$(<{input.count_mito}); "
         "rn=$(<{input.count_no_mito}); "
-        "frac=$((rm / (rm + rn))); "
+        "frac=$(($rm / ($rm + $rn))); "
         "printf \"%d\\t%d\\t%f\" \"$rn\" \"$rm\" \"$frac\" > {output}"
 
 rule assign_primary:
@@ -341,9 +386,9 @@ rule assign_primary:
     Assign multimapping reads to primary alignment
     """
     input:
-        "temp/{sample}/filter/no_mito.bam"
+        "temp/{sample}/filtering/no_mito.bam"
     output:
-        temp("temp/{sample}/filter/primary_align.bam")
+        temp("temp/{sample}/filtering/primary_align.bam")
     conda:
         "envs/filtering.yaml"
     group: 
@@ -356,13 +401,13 @@ rule remove_duplicates:
     Mark and remove PCR duplicates
     """
     input:
-        "temp/{sample}/filter/primary_align.bam"
+        "temp/{sample}/filtering/primary_align.bam"
     output:
-        bam_markdup = pipe("temp/{sample}/filter/markdup.bam"),
-        bam_nodup = "results/{sample}/filter/filtered.bam",
-        markdup_stats = "results/{sample}/qc/markdup.txt"
+        bam_markdup = pipe("temp/{sample}/filtering/markdup.bam"),
+        bam_nodup = "results/{sample}/filtering/filtered.bam",
+        markdup_stats = "results/{sample}/filtering/markdup.txt"
     log:
-        "logs/{sample}/filter/picard.log"
+        "logs/{sample}/filtering/picard.log"
     conda:
         "envs/filtering.yaml"
     group: 
@@ -378,9 +423,9 @@ rule library_complexity:
     Calculate PBC library complexity stats
     """
     input:
-        "temp/{sample}/filter/markdup.bam"
+        "temp/{sample}/filtering/markdup.bam"
     output:
-        "results/{sample}/qc/pbc_stats.tsv",
+        "results/{sample}/filtering/pbc_stats.tsv",
     params:
         pbc_script = srcdir("scripts/pbc_stats.py")
     conda:
@@ -395,9 +440,9 @@ rule index_bam_filtered:
     Index filtered BAM
     """
     input: 
-        "results/{sample}/filter/filtered.bam"
+        "results/{sample}/filtering/filtered.bam"
     output: 
-        "results/{sample}/filter/filtered.bam.bai"
+        "results/{sample}/filtering/filtered.bam.bai"
     conda:
         "envs/filtering.yaml"
     group: 
@@ -407,14 +452,14 @@ rule index_bam_filtered:
 
 rule samstats_filtered:
     """
-    Run SAMStats on filtered alignments
+    SAMstats on filtered alignments
     """
     input:
-        "results/{sample}/filter/filtered.bam"
+        "results/{sample}/filtering/filtered.bam"
     output:
-        "results/{sample}/qc/samstats_filtered.txt"
+        "results/{sample}/filtering/samstats_filtered.txt"
     log:
-        "logs/{sample}/filter/samstats_filtered.log"
+        "logs/{sample}/filtering/samstats_filtered.log"
     threads:
         max_threads
     conda:
@@ -426,6 +471,26 @@ rule samstats_filtered:
     shell:
         "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
+
+rule metadata_bam_filtered:
+    """
+    Write filtered BAM metadata
+    """
+    input: 
+        bam = "results/{sample}/filtering/filtered.bam",
+        bam_raw = "results/{sample}/mapping/raw.bam"
+    output: 
+        "results/{sample}/filtering/filtered_bam_metadata.json",
+    params:
+        output_group = "filtering",
+        sample = lambda w: w.sample,
+        sample_data = lambda w: samples[w.sample]
+    conda:
+        "envs/filtering.yaml"
+    group: 
+        "filtering"
+    script: 
+        "scripts/write_file_metadata.py"
 
 
 """
@@ -439,8 +504,8 @@ rule bam_to_fragments:
     Convert BAM to fragment file
     """
     input:
-        bam = "results/{sample}/filter/filtered.bam",
-        bai = "results/{sample}/filter/filtered.bam.bai"
+        bam = "results/{sample}/filtering/filtered.bam",
+        bai = "results/{sample}/filtering/filtered.bam.bai"
     output:
         pipe("temp/{sample}/fragments/fragments_unsorted.tsv")
     log:
@@ -457,14 +522,12 @@ rule bam_to_fragments:
 
 rule sort_fragments:
     """
-    Sort fragments and compute counts
+    Sort and compress fragments
     """
     input: 
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
         "results/{sample}/fragments/fragments.tsv.gz",
-    params:
-        pbc_stats = srcdir("scripts/pbc_stats.awk")
     threads: 
         max_threads
     conda:
@@ -498,63 +561,82 @@ rule tarball_fragments:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output:
-        "results/{sample}/fragments/fragments.tar",
+        "results/{sample}/fragments/fragments.tar.gz"
     conda:
         "envs/fragments.yaml"
     group: 
         "fragments"
     shell:
-        "tar -cf {output} {input.frag} {input.frag_ind}"
+        "tar -zcf {output} {input.frag} {input.frag_ind}"
+
+rule metadata_bam_filtered:
+    """
+    Write filtered BAM metadata
+    """
+    input: 
+        fragments = "results/{sample}/fragments/fragments.tar.gz",
+        bam = "results/{sample}/filtering/filtered.bam"
+    output: 
+        "results/{sample}/fragments/fragments_metadata.json"
+    params:
+        output_group = "fragments",
+        sample = lambda w: w.sample,
+        sample_data = lambda w: samples[w.sample]
+    conda:
+        "envs/fragments.yaml"
+    group: 
+        "fragments"
+    script: 
+        "scripts/write_file_metadata.py"
 
 
 """
 ######################
-ArchR analyses
+First-pass analyses
 ######################
 """
 
 rule archr_build:
     """
-    Preliminary ArchR analyses
+    ArchR analyses
     """
     input:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output:
-        qc_dir =temp(directory("temp/{sample}/archr/qc")),
-        project_dir = temp(directory("temp/{sample}/archr/project")),
-        indicator = touch("temp/{sample}/archr/indicator.txt"),
-        qc_ds_pdf = temp("temp/{sample}/archr/qc/{sample}/{sample}-Doublet-Summary.pdf"),
-        qc_ds_rds = temp("temp/{sample}/archr/qc/{sample}/{sample}-Doublet-Summary.rds"),
-        qc_frag = temp("temp/{sample}/archr/qc/{sample}/{sample}-Fragment_Size_Distribution.pdf"),
-        qc_meta = temp("temp/{sample}/archr/qc/{sample}/{sample}-Pre-Filter-Metadata.rds"),
-        qc_tss = temp("temp/{sample}/archr/qc/{sample}/{sample}-TSS_by_Unique_Frags.pdf")
+        qc_dir =temp(directory("temp/{sample}/analyses/qc")),
+        project_dir = temp(directory("temp/{sample}/analyses/archr_project")),
+        flag = touch("temp/{sample}/analyses/archr_flag.txt"),
+        qc_ds_pdf = temp("temp/{sample}/analyses/qc/{sample}/{sample}-Doublet-Summary.pdf"),
+        qc_ds_rds = temp("temp/{sample}/analyses/qc/{sample}/{sample}-Doublet-Summary.rds"),
+        qc_frag = temp("temp/{sample}/analyses/qc/{sample}/{sample}-Fragment_Size_Distribution.pdf"),
+        qc_meta = temp("temp/{sample}/analyses/qc/{sample}/{sample}-Pre-Filter-Metadata.rds"),
+        qc_tss = temp("temp/{sample}/analyses/qc/{sample}/{sample}-TSS_by_Unique_Frags.pdf")
     params:
         sample_name = lambda w: w.sample,
         seed = config["seed"],
-        genome = config["genome"]
     log:
-        console = "logs/{sample}/archr/console.log",
-        arrow_create = "logs/{sample}/archr/arrow_create.log",
-        doublets = "logs/{sample}/archr/doublets.log",
-        lsi = "logs/{sample}/archr/lsi.log",
-        cluster = "logs/{sample}/archr/cluster.log",
-        marker_genes = "logs/{sample}/archr/marker_genes.log",
-        pseudobulk_rep = "logs/{sample}/archr/pseudobulk_rep.log",
-        peak_call = "logs/{sample}/archr/peak_call.log",
-        peak_matrix = "logs/{sample}/archr/peak_matrix.log",
-        marker_peaks = "logs/{sample}/archr/marker_peaks.log",
-        fetch_motif = "logs/{sample}/archr/fetch_motif.log",
-        enr_motif = "logs/{sample}/archr/enr_motif.log",
-        fetch_tf = "logs/{sample}/archr/fetch_tf.log",
-        enr_tf = "logs/{sample}/archr/enr_tf.log",
-        save = "logs/{sample}/archr/save.log"
+        console = "logs/{sample}/analyses/archr/console.log",
+        arrow_create = "logs/{sample}/analyses/archr/arrow_create.log",
+        doublets = "logs/{sample}/analyses/archr/doublets.log",
+        lsi = "logs/{sample}/analyses/archr/lsi.log",
+        cluster = "logs/{sample}/analyses/archr/cluster.log",
+        marker_genes = "logs/{sample}/analyses/archr/marker_genes.log",
+        pseudobulk_rep = "logs/{sample}/analyses/archr/pseudobulk_rep.log",
+        peak_call = "logs/{sample}/analyses/archr/peak_call.log",
+        peak_matrix = "logs/{sample}/analyses/archr/peak_matrix.log",
+        marker_peaks = "logs/{sample}/analyses/archr/marker_peaks.log",
+        fetch_motif = "logs/{sample}/analyses/archr/fetch_motif.log",
+        enr_motif = "logs/{sample}/analyses/archr/enr_motif.log",
+        fetch_tf = "logs/{sample}/analyses/archr/fetch_tf.log",
+        enr_tf = "logs/{sample}/analyses/archr/enr_tf.log",
+        save = "logs/{sample}/analyses/archr/save.log"
     threads:
         max_threads
     conda:
-        "envs/archr.yaml"
+        "envs/analyses.yaml"
     group:
-        "archr"
+        "analyses"
     shadow: 
         "shallow"
     script:
@@ -565,15 +647,15 @@ rule tar_archr_results:
     Create ArchR results archive
     """
     input:
-        "temp/{sample}/archr/indicator.txt"
+        "temp/{sample}/analyses/archr_flag.txt"
     params:
-        project_dir = lambda w: f"temp/{w.sample}/archr/project",
+        project_dir = lambda w: f"temp/{w.sample}/analyses/archr_project",
     output:
         "results/{sample}/archr/archr_project.tar.gz"
     conda:
-        "envs/archr.yaml"
+        "envs/analyses.yaml"
     group:
-        "archr"
+        "analyses"
     shell:
         "tar -zcf {output} {params.project_dir}"
 
@@ -582,17 +664,17 @@ rule write_archr_qc_pdf:
     Move ArchR QC PDFs
     """
     input:
-        qc_ds_pdf = "temp/{sample}/archr/qc/{sample}/{sample}-Doublet-Summary.pdf",
-        qc_frag = "temp/{sample}/archr/qc/{sample}/{sample}-Fragment_Size_Distribution.pdf",
-        qc_tss = "temp/{sample}/archr/qc/{sample}/{sample}-TSS_by_Unique_Frags.pdf"
+        qc_ds_pdf = "temp/{sample}/analyses/qc/{sample}/{sample}-Doublet-Summary.pdf",
+        qc_frag = "temp/{sample}/analyses/qc/{sample}/{sample}-Fragment_Size_Distribution.pdf",
+        qc_tss = "temp/{sample}/analyses/qc/{sample}/{sample}-TSS_by_Unique_Frags.pdf"
     output:
-        qc_ds_pdf = "results/{sample}/qc/archr_doublet_summary.pdf",
-        qc_frag = "results/{sample}/qc/archr_fragment_size_distribution.pdf",
-        qc_tss = "results/{sample}/qc/archr_tss_by_unique_frags.pdf"
+        qc_ds_pdf = "results/{sample}/analyses/archr_doublet_summary.pdf",
+        qc_frag = "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
+        qc_tss = "results/{sample}/analyses/archr_tss_by_unique_frags.pdf"
     conda:
-        "envs/archr.yaml"
+        "envs/analyses.yaml"
     group:
-        "archr"
+        "analyses"
     shell:
         "cp {input.qc_ds_pdf} {output.qc_ds_pdf}; "
         "cp {input.qc_frag} {output.qc_frag}; "
@@ -603,16 +685,16 @@ rule parse_archr_qc:
     Parse ArchR QC RDSs
     """
     input:
-        qc_ds_data = "temp/{sample}/archr/qc/{sample}/{sample}-Doublet-Summary.rds",
-        qc_meta = "temp/{sample}/archr/qc/{sample}/{sample}-Pre-Filter-Metadata.rds",
+        qc_ds_data = "temp/{sample}/analyses/qc/{sample}/{sample}-Doublet-Summary.rds",
+        qc_meta = "temp/{sample}/analyses/qc/{sample}/{sample}-Pre-Filter-Metadata.rds",
     output:
-        qc_ds_data = "results/{sample}/qc/archr_doublet_summary.tsv",
-        qc_meta = "results/{sample}/qc/archr_pre_filter_metadata.tsv",
+        qc_ds_data = "results/{sample}/analyses/archr_doublet_summary.tsv",
+        qc_meta = "results/{sample}/analyses/archr_pre_filter_metadata.tsv",
     log:
-        "logs/{sample}/archr/qc_parse.log",
+        "logs/{sample}/analyses/archr_qc_parse.log",
     conda:
-        "envs/archr.yaml"
+        "envs/analyses.yaml"
     group:
-        "archr"
+        "analyses"
     script:
         "scripts/parse_archr_qc.R"

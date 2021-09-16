@@ -1,14 +1,21 @@
-workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_5/
+workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_6/
 
 max_threads_per_rule: 16
 seed: 8757647
 
 ### END-TO-END FULL RUN ###
 
+dcc_lab: anshul-kundaje
+dcc_award: XXXXXXX
+
 genome: hg38
 
 samples:
   scATAC-ENCSR198TTU:
+    dataset: ENCSR198TTU
+    replicate: michael-snyder:mL-ENCBS300DUB-ENCLB660SYP
+    platform: encode:NovaSeq6000
+    read_length: 99
     technology: 10x
     fastq:
       R1: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/R1_ENCFF954JAI.fastq.gz
