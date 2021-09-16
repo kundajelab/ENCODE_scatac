@@ -569,9 +569,9 @@ rule tarball_fragments:
     shell:
         "tar -zcf {output} {input.frag} {input.frag_ind}"
 
-rule metadata_bam_filtered:
+rule metadata_fragments:
     """
-    Write filtered BAM metadata
+    Write fragment file metadata
     """
     input: 
         fragments = "results/{sample}/fragments/fragments.tar.gz",
