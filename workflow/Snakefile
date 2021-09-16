@@ -33,7 +33,7 @@ rule all:
         expand("results/{sample}/filtering/filtered_bam_metadata.json", sample=samples.keys()),
         expand("results/{sample}/fragments/fragments.tsv.gz", sample=samples.keys()),
         expand("results/{sample}/fragments/fragments.tsv.gz.tbi", sample=samples.keys()),
-        expand("results/{sample}/fragments/fragments.tar", sample=samples.keys()),
+        expand("results/{sample}/fragments/fragments.tar.gz", sample=samples.keys()),
         expand("results/{sample}/fragments/fragments_metadata.json", sample=samples.keys()),
         expand("results/{sample}/analyses/archr_project.tar.gz", sample=samples.keys()),
         expand("results/{sample}/analyses/archr_doublet_summary.pdf", sample=samples.keys()),
@@ -651,7 +651,7 @@ rule tar_archr_results:
     params:
         project_dir = lambda w: f"temp/{w.sample}/analyses/archr_project",
     output:
-        "results/{sample}/archr/archr_project.tar.gz"
+        "results/{sample}/analyses/archr_project.tar.gz"
     conda:
         "envs/analyses.yaml"
     group:
