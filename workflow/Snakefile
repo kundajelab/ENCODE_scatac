@@ -739,7 +739,7 @@ rule submit_fastq_1:
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
-        directory("logs/{sample}/analyses/R1_trim_submit")
+        directory("logs/{sample}/submit/R1_trim_submit")
     conda:
         "envs/submit.yaml"
     group: 
@@ -761,7 +761,7 @@ rule submit_fastq_2:
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
-        directory("logs/{sample}/analyses/R2_trim_submit")
+        directory("logs/{sample}/submit/R2_trim_submit")
     conda:
         "envs/submit.yaml"
     group: 
@@ -784,7 +784,7 @@ rule submit_bam_raw:
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
-        directory("logs/{sample}/analyses/raw_bam_submit")
+        directory("logs/{sample}/submit/raw_bam_submit")
     conda:
         "envs/submit.yaml"
     group: 
@@ -807,7 +807,7 @@ rule submit_bam_filtered:
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
-        directory("logs/{sample}/analyses/filtered_bam_submit")
+        directory("logs/{sample}/submit/filtered_bam_submit")
     conda:
         "envs/submit.yaml"
     group: 
@@ -829,7 +829,7 @@ rule submit_fragments:
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
-        directory("logs/{sample}/analyses/filtered_bam_submit")
+        directory("logs/{sample}/submit/filtered_bam_submit")
     conda:
         "envs/submit.yaml"
     group: 
