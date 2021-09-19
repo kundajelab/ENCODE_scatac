@@ -93,15 +93,23 @@ checkpoint query_portal:
     script:
         "scripts/encode_query.py"
 
-def get_input_data(sample):
+class SampleDataFetcher:
     """
-    Function for reading queried input data
+    Data structure for caching queried input data
     """
-    with checkpoints.query_portal.get(sample=sample).output[0].open() as f:
-        data = json.read(f)
-    return data
+    def __init__(self, rule):
+        self.rule = rule
+        self.cache = {}
 
-sample_data = defaultdict(get_input_data) # Structure for caching input data
+    def __getitem__(self, sample):
+        if sample in self.cache:
+            return self.cache[sample]
+        with self.rule.get(sample=sample).output[0].open() as f:
+            data = json.read(f)
+        self.cache[sample] = data
+        return data
+
+sample_data = SampleDataFetcher(checkpoints.query_portal) 
 
 # rule all:
 #     """

@@ -58,6 +58,7 @@ out_data = {
     "experiment": experiment,
     "replicate_num": replicate_num,
     "replicate_id": replicate_id,
+    "modality": modality,
     "platform": platform,
     "read_length": read_length,
     "fastq": {"R1": [], "R2": [], "BC": []},

@@ -91,8 +91,8 @@ rule move_fastq_qc:
     Move QC files to final location
     """
     input:
-        revcomp = lambda w: f"results/{w.sample}/fastqs/barcode_revcomp_{'ren' if sample_data[w.sample]['technology'] == 'ren' else 'full'}.txt",
-        qc_matching = lambda w: f"results/{w.sample}/fastqs/barcode_matching_{'ren' if sample_data[w.sample]['technology'] == 'ren' else 'full'}.tsv"
+        revcomp = lambda w: f"results/{w.sample}/fastqs/barcode_revcomp_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.txt",
+        qc_matching = lambda w: f"results/{w.sample}/fastqs/barcode_matching_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.tsv"
     output:
         revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
         qc_matching = "results/{sample}/fastqs/barcode_matching.tsv"
@@ -109,8 +109,8 @@ rule trim_adapter:
     Read adapter trimming
     """
     input:
-        fastq1_bc = lambda w: f"temp/{w.sample}/fastqs/R1_bc_{'ren' if sample_data[w.sample]['technology'] == 'ren' else 'full'}.fastq",
-        fastq2_bc = lambda w: f"temp/{w.sample}/fastqs/R2_bc_{'ren' if sample_data[w.sample]['technology'] == 'ren' else 'full'}.fastq"
+        fastq1_bc = lambda w: f"temp/{w.sample}/fastqs/R1_bc_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.fastq",
+        fastq2_bc = lambda w: f"temp/{w.sample}/fastqs/R2_bc_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.fastq"
     output:
         fastq1_trim = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2_trim = "results/{sample}/fastqs/R2_trim.fastq.gz",
