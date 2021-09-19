@@ -12,6 +12,7 @@ dcc_mode: dev
 
 bwt2_idx: genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
 bwt2_idx_name: GRCh38_noalt_as
+bwt2_idx_prefix: GRCh38_noalt_as
 multimapping: 4
 
 max_barcode_dist: 1

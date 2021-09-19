@@ -10,7 +10,7 @@ rule fetch_index:
         HTTP.remote(os.path.join(config["bwt2_idx"], config["bwt2_idx_name"]), keep_local=True)
     output:
         idx = directory("bwt2_idx"),
-        flag = touch(os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_name"]))
+        flag = touch(os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_prefix"]))
     conda:
         "../envs/mapping.yaml"
     group: 
@@ -25,7 +25,7 @@ rule bowtie2:
     input:
         fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
-        idx = os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_name"])
+        idx = os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_prefix"])
     output:
         bam_raw = pipe("temp/{sample}/mapping/raw.bam"),
     params:
