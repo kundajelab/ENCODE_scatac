@@ -94,11 +94,6 @@ for f in bc.values():
     else:
         raise ValueError("Index FASTQ does not properly match with reads")
 
-    bc_fq = bc["s3_uri"]
-    bc_acc = bc["accession"]
-    out_data["fastq"]["BC"].append(bc_fq)
-    out_data["accessions"]["R2"].append(r2_acc)
-
 with open(sample_data_file) as f:
     metadata = json.dump(out_data, f, indent=4)
 
