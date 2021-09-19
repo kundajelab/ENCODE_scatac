@@ -88,7 +88,6 @@ checkpoint query_portal:
     output:
         "results/{sample}/input_data.json"
     params:
-        sample = lambda w: w.sample,
         experiment = lambda w: sample_config[w.sample]["experiment"],
         replicate = lambda w: sample_config[w.sample]["replicate"],
         modality = lambda w: sample_config[w.sample]["modality"],
