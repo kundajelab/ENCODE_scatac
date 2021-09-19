@@ -92,7 +92,7 @@ checkpoint query_portal:
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
-        directory("logs/query")
+        directory("logs/{sample}/query")
     conda:
         "envs/portal.yaml"
     script:
