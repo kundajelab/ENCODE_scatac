@@ -10,13 +10,17 @@ dcc_award: UM1HG009442
 
 dcc_mode: dev
 
-mapping_index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
+bwt2_idx: genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
+bwt2_idx_name: GRCh38_noalt_as
 multimapping: 4
 
 max_barcode_dist: 1
 bc_whitelist:
   10x: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
   multiome: /srv/www/kundaje/surag/resources/737K-arc-v1.txt.gz
+
+
+# mapping_index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
 
 # samples:
 #   scATAC-ENCSR198TTU:

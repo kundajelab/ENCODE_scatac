@@ -2,6 +2,7 @@ import os
 import json
 from collections import defaultdict
 from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
+from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 
 configfile: 
     "config/config.yaml"
@@ -39,6 +40,8 @@ envvars:
     "AWS_SECRET_ACCESS_KEY"
 
 S3 = S3RemoteProvider(access_key_id=os.environ["AWS_ACCESS_KEY_ID"], secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"])
+HTTP = HTTPRemoteProvider()
+
 max_threads = config["max_threads_per_rule"]
 
 def script_path(script_name):
@@ -88,6 +91,8 @@ checkpoint query_portal:
         modality = lambda w: sample_config[w.sample]["modality"],
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
+    log:
+        directory("logs/query")
     conda:
         "envs/portal.yaml"
     script:

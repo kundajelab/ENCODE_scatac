@@ -2,18 +2,34 @@
 Read mapping
 """
 
+rule fetch_index:
+    """
+    Fetch Bowtie2 hg38 index
+    """
+    input:
+        HTTP.remote(config["bwt2_idx"], keep_local=True)
+    output:
+        idx = directory("bwt2_idx"),
+        flag = touch(os.path.join("bwt2_idx", config["bwt2_idx_prefix"]))
+    conda:
+        "../envs/mapping.yaml"
+    group: 
+        "mapping"
+    shell:
+        "unzip {input} -d {output.idx}"
+
 rule bowtie2:
     """
     Read mapping (Bowtie2 aligner)
     """
     input:
         fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
-        fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
+        fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        idx = os.path.join("bwt2_idx", config["bwt2_idx_prefix"])
     output:
         bam_raw = pipe("temp/{sample}/mapping/raw.bam"),
     params:
         k = 1 + config["multimapping"],
-        bwt2_idx = config["mapping_index"]
     log:
         "logs/{sample}/mapping/bwt2.log"
     threads:
@@ -23,7 +39,7 @@ rule bowtie2:
     group: 
         "mapping"
     shell:
-        "bowtie2 -X 2000 --threads {threads} -x {params.bwt2_idx} "
+        "bowtie2 -X 2000 --threads {threads} -x {input.idx} "
         "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
         "samtools view -u -S -o {output.bam_raw} -"
 
