@@ -4,6 +4,7 @@ import encode_utils as eu
 from encode_utils.connection import Connection
 
 sample_data_file, = snakemake.output
+dcc_mode = snakemake.config["dcc_mode"]
 sample = snakemake.params["sample"]
 experiment = snakemake.params["experiment"]
 replicate_num = snakemake.params["replicate"]
@@ -15,7 +16,7 @@ os.environ["DCC_SECRET_KEY"] = snakemake.params["dcc_secret_key"]
 
 eu.connection.LOG_DIR = log_dir
 
-conn = Connection("prod")
+conn = Connection(dcc_mode)
 data = conn.get(sample)
 
 r1 = {}
