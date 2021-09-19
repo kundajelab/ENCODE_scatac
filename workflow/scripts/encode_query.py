@@ -94,7 +94,7 @@ for f in bc.values():
     else:
         raise ValueError("Index FASTQ does not properly match with reads")
 
-with open(sample_data_file) as f:
+with open(sample_data_file, 'w') as f:
     metadata = json.dump(out_data, f, indent=4)
 
 
