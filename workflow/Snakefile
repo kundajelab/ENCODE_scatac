@@ -1,8 +1,11 @@
 import os
 import json
 from collections import defaultdict
+from snakemake.utils import min_version
 from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+
+min_version("6.8.0")
 
 configfile: 
     "config/config.yaml"
