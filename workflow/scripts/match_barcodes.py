@@ -158,35 +158,25 @@ try:
 
     threads = snakemake.threads
 
+    fastqs = {
+        "R1": snakemake.input["fq_R1"],
+        "R2": snakemake.input["fq_BC"],
+        "R3": snakemake.input["fq_R2"],
+    }
+    whitelists = {
+        "R2": snakemake.input["whitelist"],
+    }
+    revcomp = {
+        "R2": snakemake.input["revcomp"],
+    }
+
     if modality == "10x":
-        fastqs = {
-            "R1": snakemake.input["fq_R1"],
-            "R2": snakemake.input["fq_BC"],
-            "R3": snakemake.input["fq_R2"],
-        }
-        whitelists = {
-            "R2": snakemake.input["whitelist"],
-        }
-        revcomp = {
-            "R2": snakemake.input["revcomp"],
-        }
         offsets = {
             "R2": 0,
         }
         match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_out_path, fastq2_out_path, qc_path, threads)
 
     elif modality == "multiome":
-        fastqs = {
-            "R1": snakemake.input["fq_R1"],
-            "R2": snakemake.input["fq_BC"],
-            "R3": snakemake.input["fq_R2"],
-        }
-        whitelists = {
-            "R2": snakemake.input["whitelist"],
-        }
-        revcomp = {
-            "R2": snakemake.input["revcomp"],
-        }
         offsets = {
             "R2": 8,
         }
