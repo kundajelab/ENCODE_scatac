@@ -7,7 +7,7 @@ configfile:
     "config/config.yaml"
 
 with open("config/samples.tsv") as sample_file:
-    h = f.readline().rstrip('\n').split('\t')
+    h = sample_file.readline().rstrip('\n').split('\t')
     exp_ind = index("Experiment")
     rep_ind = index("Replicate")
     mod_ind = index("Modality")
