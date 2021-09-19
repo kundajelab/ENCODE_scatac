@@ -91,8 +91,8 @@ rule move_fastq_qc:
     Move QC files to final location
     """
     input:
-        revcomp = lambda w: f"results/{w.sample}/fastqs/barcode_revcomp_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.txt",
-        qc_matching = lambda w: f"results/{w.sample}/fastqs/barcode_matching_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.tsv"
+        revcomp = lambda w: f"temp/{w.sample}/fastqs/barcode_revcomp_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.txt",
+        qc_matching = lambda w: f"temp/{w.sample}/fastqs/barcode_matching_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.tsv"
     output:
         revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
         qc_matching = "results/{sample}/fastqs/barcode_matching.tsv"
