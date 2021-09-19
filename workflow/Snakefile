@@ -8,9 +8,9 @@ configfile:
 
 with open("config/samples.tsv") as sample_file:
     h = sample_file.readline().rstrip('\n').split('\t')
-    exp_ind = index("Experiment")
-    rep_ind = index("Replicate")
-    mod_ind = index("Modality")
+    exp_ind = h.index("Experiment")
+    rep_ind = h.index("Replicate")
+    mod_ind = h.index("Modality")
     sample_config = {}
     samples = []
     for line in sample_file:
