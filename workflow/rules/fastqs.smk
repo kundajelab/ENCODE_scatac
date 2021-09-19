@@ -24,8 +24,8 @@ rule detect_revcomp:
     input:
         lambda w: S3.remote(sample_data[w.sample]["fastq"]["BC"], keep_local=config["keep_inputs"]) 
     output:
-        out = temp("temp/{sample}/fastqs/bc_revcomp.txt"),
-        qc = "results/{sample}/fastqs/barcode_revcomp.txt"
+        out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
+        qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
     conda:
         "envs/fastqs.yaml"
     group: 
@@ -42,11 +42,11 @@ rule match_barcodes:
         fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
         fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq",
         whitelist = lambda w: config[w.modality]["bc_whitelist"],
-        revcomp = "temp/{sample}/fastqs/bc_revcomp.txt"
+        revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt"
     output: 
         fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_full.fastq"),
         fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_full.fastq"),
-        qc_matching = "results/{sample}/fastqs/barcode_matching.tsv"
+        qc_matching = temp("temp/{sample}/fastqs/barcode_matching_full.tsv")
     params:
         barcode_dist = lambda w: config["max_barcode_dist"],
         modality = lambda w: sample_data[w.sample]["modality"]
@@ -67,14 +67,32 @@ rule fetch_ren:
         lambda w: S3.remote(sample_data[w.sample]["fastq"][w.read], keep_local=config["keep_inputs"]) 
     output:
         fastq = pipe("temp/{sample}/fastqs/{read}_bc_ren.fastq"),
-        revcomp = touch("results/{sample}/fastqs/barcode_revcomp.txt"),
-        qc_matching = touch("results/{sample}/fastqs/barcode_matching.tsv")
+        revcomp = touch("temp/{sample}/fastqs/barcode_revcomp_ren.txt"),
+        qc_matching = touch("temp/{sample}/fastqs/barcode_matching_ren.tsv")
     conda:
         "envs/fastqs.yaml"
     group: 
         "fastqs"
     shell:
         "zcat {input} | sed 's/ .*//' > {output.fastq}"
+
+rule move_fastq_qc:
+    """
+    Move QC files to final location
+    """
+    input:
+        revcomp = lambda w: f"results/{w.sample}/fastqs/barcode_revcomp_{'ren' if sample_data[w.sample]['technology'] == 'ren' else 'full'}.txt",
+        qc_matching = lambda w: f"results/{w.sample}/fastqs/barcode_matching_{'ren' if sample_data[w.sample]['technology'] == 'ren' else 'full'}.tsv"
+    output:
+        revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
+        qc_matching = "results/{sample}/fastqs/barcode_matching.tsv"
+    conda:
+        "envs/fastqs.yaml"
+    group: 
+        "fastqs"
+    shell:
+        "cp {input.revcomp} {output.revcomp}; "
+        "cp {input.qc_matching} {output.qc_matching}"
 
 rule trim_adapter:
     """
