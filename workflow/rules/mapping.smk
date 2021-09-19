@@ -19,7 +19,7 @@ rule bowtie2:
     threads:
         max_threads
     conda:
-        "envs/mapping.yaml"
+        "../envs/mapping.yaml"
     group: 
         "mapping"
     shell:
@@ -39,7 +39,7 @@ rule filter_multimappers:
         multimapping = config["multimapping"],
         mmp_path = script_path("scripts/assign_multimappers.py")
     conda:
-        "envs/mapping.yaml"
+        "../envs/mapping.yaml"
     group: 
         "mapping"
     shell:
@@ -60,7 +60,7 @@ rule sort_alignments:
     threads:
         max_threads
     conda:
-        "envs/mapping.yaml"
+        "../envs/mapping.yaml"
     shadow: 
         "minimal"
     group: 
@@ -78,7 +78,7 @@ rule index_bam_raw:
     output: 
         "results/{sample}/mapping/raw.bam.bai"
     conda:
-        "envs/mapping.yaml"
+        "../envs/mapping.yaml"
     group: 
         "mapping"
     shell: 
@@ -97,7 +97,7 @@ rule samstats_raw:
     threads:
         max_threads
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "mapping"
     shadow: 
@@ -120,11 +120,11 @@ rule metadata_bam_raw:
         output_group = "mapping",
         sample_data = lambda w: samples[w.sample]
     conda:
-        "envs/mapping.yaml"
+        "../envs/mapping.yaml"
     group: 
         "mapping"
     script: 
-        "scripts/write_file_metadata.py"
+        "../scripts/write_file_metadata.py"
 
 rule mapping_done:
     """

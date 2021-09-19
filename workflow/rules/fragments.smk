@@ -1,4 +1,3 @@
-
 """
 Fragment file generation
 """
@@ -17,7 +16,7 @@ rule bam_to_fragments:
     threads:
         max_threads
     conda:
-        "envs/fragments.yaml"
+        "../envs/fragments.yaml"
     group: 
         "fragments"
     shell:
@@ -36,7 +35,7 @@ rule sort_fragments:
     threads: 
         max_threads
     conda:
-        "envs/fragments.yaml"
+        "../envs/fragments.yaml"
     group: 
         "fragments"
     shell: 
@@ -52,7 +51,7 @@ rule index_fragments:
     output: 
         "results/{sample}/fragments/fragments.tsv.gz.tbi"
     conda:
-        "envs/fragments.yaml"
+        "../envs/fragments.yaml"
     group: 
         "fragments"
     shell: 
@@ -68,7 +67,7 @@ rule tarball_fragments:
     output:
         "results/{sample}/fragments/fragments.tar.gz"
     conda:
-        "envs/fragments.yaml"
+        "../envs/fragments.yaml"
     group: 
         "fragments"
     shell:
@@ -87,11 +86,11 @@ rule metadata_fragments:
         output_group = "fragments",
         sample_data = lambda w: samples[w.sample]
     conda:
-        "envs/fragments.yaml"
+        "../envs/fragments.yaml"
     group: 
         "fragments"
     script: 
-        "scripts/write_file_metadata.py"
+        "../scripts/write_file_metadata.py"
 
 rule fragments_done:
     """

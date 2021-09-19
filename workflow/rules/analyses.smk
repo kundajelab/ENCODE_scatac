@@ -40,13 +40,13 @@ rule archr_build:
     threads:
         max_threads
     conda:
-        "envs/analyses.yaml"
+        "../envs/analyses.yaml"
     group:
         "analyses"
     shadow: 
         "shallow"
     script:
-        "scripts/build_archr_project.R"
+        "../scripts/build_archr_project.R"
 
 rule tar_archr_results:
     """
@@ -59,7 +59,7 @@ rule tar_archr_results:
     output:
         "results/{sample}/analyses/archr_project.tar.gz"
     conda:
-        "envs/analyses.yaml"
+        "../envs/analyses.yaml"
     group:
         "analyses"
     shell:
@@ -78,7 +78,7 @@ rule write_archr_qc_pdf:
         qc_frag = "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
         qc_tss = "results/{sample}/analyses/archr_tss_by_unique_frags.pdf"
     conda:
-        "envs/analyses.yaml"
+        "../envs/analyses.yaml"
     group:
         "analyses"
     shell:
@@ -99,11 +99,11 @@ rule parse_archr_qc:
     log:
         "logs/{sample}/analyses/archr_qc_parse.log"
     conda:
-        "envs/analyses.yaml"
+        "../envs/analyses.yaml"
     group:
         "analyses"
     script:
-        "scripts/parse_archr_qc.R"
+        "../scripts/parse_archr_qc.R"
 
 rule analyses_done:
     """

@@ -11,7 +11,7 @@ rule strip_fastq:
     output:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
     conda:
-        "envs/fastqs.yaml"
+        "../envs/fastqs.yaml"
     group: 
         "fastqs"
     shell:
@@ -27,7 +27,7 @@ rule detect_revcomp:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
         qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
     conda:
-        "envs/fastqs.yaml"
+        "../envs/fastqs.yaml"
     group: 
         "fastqs"
     script:
@@ -53,7 +53,7 @@ rule match_barcodes:
     threads:
         max_threads
     conda:
-        "envs/fastqs.yaml"
+        "../envs/fastqs.yaml"
     group: 
         "fastqs"
     script:
@@ -68,7 +68,7 @@ rule fetch_ren:
     output:
         pipe("temp/{sample}/fastqs/{read}_bc_ren.fastq"),
     conda:
-        "envs/fastqs.yaml"
+        "../envs/fastqs.yaml"
     group: 
         "fastqs"
     shell:
@@ -97,7 +97,7 @@ rule move_fastq_qc:
         revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
         qc_matching = "results/{sample}/fastqs/barcode_matching.tsv"
     conda:
-        "envs/fastqs.yaml"
+        "../envs/fastqs.yaml"
     group: 
         "fastqs"
     shell:
@@ -121,7 +121,7 @@ rule trim_adapter:
     threads:
         max_threads
     conda:
-        "envs/fastqs.yaml"
+        "../envs/fastqs.yaml"
     group: 
         "fastqs"
     shell:
@@ -142,11 +142,11 @@ rule metadata_fastq:
         output_group = "fastqs",
         sample_data = lambda w: sample_data[w.sample]
     conda:
-        "envs/fastqs.yaml"
+        "../envs/fastqs.yaml"
     group: 
         "fastqs"
     script: 
-        "scripts/write_file_metadata.py"
+        "../scripts/write_file_metadata.py"
 
 rule fastqs_done:
     """

@@ -13,7 +13,7 @@ rule count_mito:
     output: 
         temp("temp/{sample}/filtering/count_mito.txt"),
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "filtering"
     shell: 
@@ -30,7 +30,7 @@ rule remove_mito:
         bam = pipe("temp/{sample}/filtering/no_mito.bam"),
         count_no_mito = temp("temp/{sample}/filtering/count_no_mito.txt")
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "filtering"
     shell: 
@@ -48,7 +48,7 @@ rule frac_mito:
     output: 
         "results/{sample}/filtering/frac_mito.txt"
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "filtering"
     shell: 
@@ -66,7 +66,7 @@ rule assign_primary:
     output:
         temp("temp/{sample}/filtering/primary_align.bam")
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "filtering"
     shell:
@@ -85,7 +85,7 @@ rule remove_duplicates:
     log:
         "logs/{sample}/filtering/picard.log"
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "filtering"
     shell:
@@ -105,7 +105,7 @@ rule library_complexity:
     params:
         pbc_script = srcdir("scripts/pbc_stats.py")
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "filtering"
     shell:
@@ -120,7 +120,7 @@ rule index_bam_filtered:
     output: 
         "results/{sample}/filtering/filtered.bam.bai"
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "filtering"
     shell: 
@@ -139,7 +139,7 @@ rule samstats_filtered:
     threads:
         max_threads
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "filtering"
     shadow: 
@@ -162,11 +162,11 @@ rule metadata_bam_filtered:
         output_group = "filtering",
         sample_data = lambda w: samples[w.sample]
     conda:
-        "envs/filtering.yaml"
+        "../envs/filtering.yaml"
     group: 
         "filtering"
     script: 
-        "scripts/write_file_metadata.py"
+        "../scripts/write_file_metadata.py"
 
 rule filtering_done:
     """
