@@ -3,17 +3,19 @@ import json
 import os
 
 
-def file_header(sample, config, out_path, preds, parse_preds=True):
+def file_header(sample_data, config, out_path, preds, parse_preds=True):
     lab = config["dcc_lab"]
-    alias = f"{lab}:{sample}${os.path.basename(out_path)}"
+    experiment = sample_data["experiment"]
+    replicate = sample_data["replicate_num"]
+    alias = f"{lab}:{experiment}${replicate}${os.path.basename(out_path)}"
     if parse_preds:
-        pred_ids = [f"{lab}:{sample}${os.path.basename(p)}" for p in preds]
+        pred_ids = [f"{lab}:{experiment}${replicate}${os.path.basename(p)}" for p in preds]
     else:
         pred_ids = preds
     h = OrderedDict({
         "lab": lab,
         "award": config["dcc_award"],
-        "dataset": sample,
+        "dataset": experiment,
         "aliases": [alias],
         "submitted_file_name": os.path.abspath(out_path),
         "derived_from": pred_ids
@@ -27,7 +29,7 @@ def fastq_metadata(sample_data, pair, other):
         "output_type": "reads",
         "platform": sample_data["platform"],
         "read_length": sample_data["read_length"],
-        "replicate": sample_data["replicate"],
+        "replicate": sample_data["replicate_id"],
         "paired_end": pair,
     })
     if pair == "2":
@@ -60,7 +62,6 @@ try:
     out_group = snakemake.params['output_group']
     sample_data = snakemake.params['sample_data']
     config = snakemake.config
-    sample = sample_data["dataset"]
 
     if out_group == "fastqs":
         r1 = snakemake.input['r1']
@@ -70,8 +71,8 @@ try:
 
         preds = list(sample_data["accessions"].values())
         
-        h1 = file_header(sample, config, r1, preds, parse_preds=False)
-        h2 = file_header(sample, config, r2, preds, parse_preds=False)
+        h1 = file_header(sample_data, config, r1, preds, parse_preds=False)
+        h2 = file_header(sample_data, config, r2, preds, parse_preds=False)
 
         d1 = fastq_metadata(sample_data, "1", h2["aliases"][0])
         d2 = fastq_metadata(sample_data, "2", h1["aliases"][0])
@@ -88,7 +89,7 @@ try:
         r2_pred = snakemake.input['fq_R2']
         out, = snakemake.output
 
-        h = file_header(sample, config, bam, [r1_pred, r2_pred])
+        h = file_header(sample_data, config, bam, [r1_pred, r2_pred])
         d = bam_metadata(sample_data)
         s = h | d
 
@@ -100,7 +101,7 @@ try:
         r2_pred = snakemake.input['fq_R2']
         out, = snakemake.output
 
-        h = file_header(sample, config, bam, [r1_pred, r2_pred])
+        h = file_header(sample_data, config, bam, [r1_pred, r2_pred])
         d = bam_metadata(sample_data)
         s = h | d
 
@@ -111,7 +112,7 @@ try:
         pred = snakemake.input['bam']
         out, = snakemake.output
 
-        h = file_header(sample, config, fragments, [pred])
+        h = file_header(sample_data, config, fragments, [pred])
         d = fragments_metadata(sample_data)
         s = h | d
 

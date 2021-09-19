@@ -323,10 +323,12 @@ def parse_picard_est_lib_size_qc(txt):
     return result
 
 
-def build_quality_metric_header(sample, config, data_path, out_path):
+def build_quality_metric_header(sample_data, config, data_path, out_path):
     lab = config["dcc_lab"]
-    data_alias = f"{lab}:{sample}${os.path.basename(data_path)}"
-    alias = f"{lab}:{sample}${os.path.basename(out_path)}"
+    experiment = sample_data["experiment"]
+    replicate = sample_data["replicate_num"]
+    data_alias = f"{lab}:{experiment}${replicate}${os.path.basename(data_path)}"
+    alias = f"{lab}:{experiment}${replicate}${os.path.basename(out_path)}"
     h = OrderedDict({
         "lab": lab,
         "award": config["dcc_award"],
@@ -343,7 +345,7 @@ def write_json(data, out_path):
 
 try:
     out_group = snakemake.params['out_group']
-    sample = snakemake.params['sample']
+    sample_data = snakemake.params['sample_data']
     data_path = snakemake.input['data_file']
     config = snakemake.config
 
@@ -355,7 +357,7 @@ try:
         samstats_raw = snakemake.input['samstats_raw']
 
         a = parse_flagstat_qc(samstats_raw)
-        h = build_quality_metric_header(sample, config, data_path)
+        h = build_quality_metric_header(sample_data, config, data_path)
         alignment_stats = h | a
 
         write_json(alignment_stats, alignment_stats_out)
@@ -372,7 +374,7 @@ try:
         p = parse_picard_est_lib_size_qc(picard_markdup)
         l = parse_lib_complexity_qc(pbc_stats)
         m = parse_frac_mito_qc(frac_mito)
-        h = build_quality_metric_header(sample, config, data_path)
+        h = build_quality_metric_header(sample_data, config, data_path)
         alignment_stats = h | s | m
         lib_comp_stats = h | p | l
 

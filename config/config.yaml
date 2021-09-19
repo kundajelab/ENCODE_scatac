@@ -1,35 +1,41 @@
 workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_6/
 
 max_threads_per_rule: 16
-seed: 8757647
-
-### END-TO-END FULL RUN ###
+archr_seed: 8757647
 
 dcc_lab: anshul-kundaje
-dcc_award: XXXXXXX
+dcc_award: UM1HG009442
 
 dcc_mode: dev
 
-samples:
-  scATAC-ENCSR198TTU:
-    dataset: ENCSR198TTU
-    replicate: michael-snyder:mL-ENCBS300DUB-ENCLB660SYP
-    platform: encode:NovaSeq6000
-    read_length: 99
-    technology: 10x
-    fastq:
-      R1: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/R1_ENCFF954JAI.fastq.gz
-      R2: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/BC_ENCFF995UIJ.fastq.gz
-      R3: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/R2_ENCFF357EYY.fastq.gz
-    accessions:
-      R1: ENCFF954JAI
-      R2: ENCFF995UIJ
-      R3: ENCFF357EYY
-    bc_whitelist: 
-      R2: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
-    bc_revcomp: 
-      R2: True
-    max_barcode_dist: 1
+mapping_index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
+multimapping: 4
+
+max_barcode_dist: 1
+bc_whitelist:
+  10x: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
+  multiome: /srv/www/kundaje/surag/resources/737K-arc-v1.txt.gz
+
+# samples:
+#   scATAC-ENCSR198TTU:
+#     dataset: ENCSR198TTU
+#     replicate: michael-snyder:mL-ENCBS300DUB-ENCLB660SYP
+#     platform: encode:NovaSeq6000
+#     read_length: 99
+#     technology: 10x
+#     fastq:
+#       R1: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/R1_ENCFF954JAI.fastq.gz
+#       R2: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/BC_ENCFF995UIJ.fastq.gz
+#       R3: /srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/R2_ENCFF357EYY.fastq.gz
+#     accessions:
+#       R1: ENCFF954JAI
+#       R2: ENCFF995UIJ
+#       R3: ENCFF357EYY
+#     bc_whitelist: 
+#       R2: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
+#     bc_revcomp: 
+#       R2: True
+#     max_barcode_dist: 1
 
   # multiome-ENCSR332XEW:
   #   technology: multiome
@@ -58,6 +64,5 @@ samples:
   #     I2: True
   #   max_barcode_dist: 1
 
-mapping_index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
-multimapping: 4
+
 

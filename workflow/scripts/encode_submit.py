@@ -1,5 +1,3 @@
-import json
-
 import os
 import json
 import encode_utils as eu
@@ -19,7 +17,7 @@ with open(metadata_file) as f:
 eu.connection.LOG_DIR = log_dir
 
 metadata[Connection.PROFILE_KEY] = schema
-conn = Connection(dcc_mode, dry_run=True, submission=True)
+conn = Connection(dcc_mode, submission=True)
 conn.post(metadata)
 
 
