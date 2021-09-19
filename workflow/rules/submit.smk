@@ -19,7 +19,7 @@ rule submit_fastq_1:
     log:
         directory("logs/{sample}/submit/R1_trim_submit")
     conda:
-        "envs/submit.yaml"
+        "envs/portal.yaml"
     group: 
         "submit"
     script: 
@@ -41,7 +41,7 @@ rule submit_fastq_2:
     log:
         directory("logs/{sample}/submit/R2_trim_submit")
     conda:
-        "envs/submit.yaml"
+        "envs/portal.yaml"
     group: 
         "submit"
     script: 
@@ -64,7 +64,7 @@ rule submit_bam_raw:
     log:
         directory("logs/{sample}/submit/raw_bam_submit")
     conda:
-        "envs/submit.yaml"
+        "envs/portal.yaml"
     group: 
         "submit"
     script: 
@@ -87,7 +87,7 @@ rule submit_bam_filtered:
     log:
         directory("logs/{sample}/submit/filtered_bam_submit")
     conda:
-        "envs/submit.yaml"
+        "envs/portal.yaml"
     group: 
         "submit"
     script: 
@@ -109,7 +109,7 @@ rule submit_fragments:
     log:
         directory("logs/{sample}/submit/filtered_bam_submit")
     conda:
-        "envs/submit.yaml"
+        "envs/portal.yaml"
     group: 
         "submit"
     script: 
