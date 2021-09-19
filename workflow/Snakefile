@@ -112,7 +112,7 @@ class SampleDataFetcher:
         if sample in self.cache:
             return self.cache[sample]
         with self.rule.get(sample=sample).output[0].open() as f:
-            data = json.read(f)
+            data = json.load(f)
         self.cache[sample] = data
         return data
 

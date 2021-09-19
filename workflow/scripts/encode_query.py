@@ -40,6 +40,7 @@ for f in files:
     p = f["platform"]["uuid"]
     if platform is not None and p != platform:
         raise ValueError("Multiple sequencing platforms detected in input")
+    platform = p
 
     if f["output_type"] == "index reads":
         bc[id] = f
@@ -48,6 +49,7 @@ for f in files:
     l = f["read_length"]
     if read_length is not None and l != read_length:
         raise ValueError("Multiple read lengths detected in input")
+    read_length = l
 
     if f["paired_end"] == "1":
         r1[id] = f
@@ -66,7 +68,6 @@ out_data = {
 }
 
 for f in bc.values():
-    acc_bc = f["accession"]
     m0, m1 = f["index_of"]
 
     if m0 in r1 and m1 in r2:
@@ -90,6 +91,11 @@ for f in bc.values():
         out_data["fastq"]["R2"].append(r2_fq)
         out_data["accessions"]["R1"].append(r1_acc)
         out_data["accessions"]["R2"].append(r2_acc)
+    
+    bc_fq = f["s3_uri"]
+    bc_acc = f["accession"]
+    out_data["fastq"]["BC"].append(bc_fq)
+    out_data["accessions"]["BC"].append(bc_acc)
 
     else:
         raise ValueError("Index FASTQ does not properly match with reads")
