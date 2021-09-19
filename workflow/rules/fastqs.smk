@@ -41,7 +41,7 @@ rule match_barcodes:
         fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
         fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
         fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq",
-        whitelist = lambda w: config[w.modality]["bc_whitelist"],
+        whitelist = lambda w: config[sample_config[w.sample]['modality']]["bc_whitelist"],
         revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt"
     output: 
         fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_full.fastq"),
