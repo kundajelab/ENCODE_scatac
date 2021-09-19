@@ -64,17 +64,27 @@ rule fetch_ren:
     Entry point for Bing Ren data
     """
     input:
-        lambda w: S3.remote(sample_data[w.sample]["fastq"][w.read], keep_local=config["keep_inputs"]) 
+        "temp/{sample}/fastqs/stripped_{read}.fastq"
     output:
-        fastq = pipe("temp/{sample}/fastqs/{read}_bc_ren.fastq"),
-        revcomp = touch("temp/{sample}/fastqs/barcode_revcomp_ren.txt"),
-        qc_matching = touch("temp/{sample}/fastqs/barcode_matching_ren.tsv")
+        pipe("temp/{sample}/fastqs/{read}_bc_ren.fastq"),
     conda:
         "envs/fastqs.yaml"
     group: 
         "fastqs"
     shell:
-        "zcat {input} | sed 's/ .*//' > {output.fastq}"
+        "awk -v FS=':' "
+        "'{if (NR%4==1) {s=\"@\"$2; for (i=3 ; i<=NF ; i++) {s = s \":\" $i } ; s = s \"\\tCB:Z:\" substr($1,2) ; print s} else {print $0}}' "
+        "{input} > {output}"
+
+rule dummy_qc_ren:
+    """
+    Create empty dummy QC files for Bing Ren data
+    """
+    output:
+        touch("temp/{sample}/fastqs/barcode_revcomp_ren.txt"),
+        touch("temp/{sample}/fastqs/barcode_matching_ren.tsv")
+    group: 
+        "fastqs"
 
 rule move_fastq_qc:
     """
