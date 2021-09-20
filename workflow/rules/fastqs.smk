@@ -3,7 +3,7 @@ FASTQ processing
 """
 
 def get_fastq_inputs(w):
-    return HTTP.remote(sample_data[w.sample]["fastq"][w.read][0], keep_local=config["keep_inputs"], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"]) 
+    return HTTP.remote(sample_data[w.sample]["fastq"][w.read], keep_local=config["keep_inputs"], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"]) 
 
 rule strip_fastq:
     """
