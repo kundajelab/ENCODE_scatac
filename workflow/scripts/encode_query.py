@@ -4,9 +4,9 @@ from urllib.parse import urljoin, urlparse, ParseResult
 import encode_utils as eu
 from encode_utils.connection import Connection
 
-def strip_scheme(url):
-    parsed_result = urlparse(url)
-    return ParseResult('', *parsed_result[1:]).geturl().lstrip('/')
+# def strip_scheme(url):
+#     parsed_result = urlparse(url)
+#     return ParseResult('', *parsed_result[1:]).geturl().lstrip('/')
 
 sample_data_file, = snakemake.output
 dcc_mode = snakemake.config["dcc_mode"]
@@ -21,8 +21,7 @@ os.environ["DCC_SECRET_KEY"] = snakemake.params["dcc_secret_key"]
 eu.connection.LOG_DIR = log_dir
 
 conn = Connection(dcc_mode)
-print(conn.dcc_modes) ####
-server = conn.dcc_mode.url
+server = conn.dcc_host
 data = conn.get(experiment)
 
 r1 = {}
@@ -78,8 +77,8 @@ for f in bc.values():
     m0, m1 = f["index_of"]
 
     if m0 in r1 and m1 in r2:
-        r1_fq = strip_scheme(urljoin(server, r1[m0]["href"]))
-        r2_fq = strip_scheme(urljoin(server, r2[m1]["href"]))
+        r1_fq = urljoin(server, r1[m0]["href"])
+        r2_fq = urljoin(server, r2[m1]["href"])
         r1_acc = r1[m0]["accession"]
         r2_acc = r2[m1]["accession"]
 
@@ -89,8 +88,8 @@ for f in bc.values():
         out_data["accessions"]["R2"].append(r2_acc)
 
     elif m1 in r1 and m0 in r2:
-        r1_fq = strip_scheme(urljoin(server, r1[m1]["href"]))
-        r2_fq = strip_scheme(urljoin(server, r2[m0]["href"]))
+        r1_fq = urljoin(server, r1[m1]["href"])
+        r2_fq = urljoin(server, r2[m0]["href"])
         r1_acc = r1[m1]["accession"]
         r2_acc = r2[m0]["accession"]
 
@@ -102,7 +101,7 @@ for f in bc.values():
     else:
         raise ValueError("Index FASTQ does not properly match with reads")
     
-    bc_fq = strip_scheme(urljoin(server, f["href"]))
+    bc_fq = urljoin(server, f["href"])
     bc_acc = f["accession"]
     out_data["fastq"]["BC"].append(bc_fq)
     out_data["accessions"]["BC"].append(bc_acc)
