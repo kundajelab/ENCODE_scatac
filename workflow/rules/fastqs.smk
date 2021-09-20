@@ -28,7 +28,7 @@ rule detect_revcomp:
         lambda w: HTTP.remote(sample_data[w.sample]["fastq"]["BC"][0], keep_local=config["keep_inputs"], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"]) 
     output:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
-        qc = "results/{sample}/fastqs/barcode_revcomp_stats.txt"
+        qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
     conda:
         "../envs/fastqs.yaml"
     group: 
@@ -159,7 +159,7 @@ rule metadata_qc_reads:
         data_file = "results/{sample}/fastqs/R1_trim.fastq.gz",
         barcode_matching = "results/{sample}/fastqs/barcode_matching.tsv",
         adapter_trimming = "results/{sample}/fastqs/trim_adapters.txt",
-        barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp_stats.txt"
+        barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp.txt"
     output: 
         read_stats = "results/{sample}/fastqs/reads_qc_metadata.json",
     params:
