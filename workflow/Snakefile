@@ -2,7 +2,7 @@ import os
 import json
 from collections import defaultdict
 from snakemake.utils import min_version
-from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
+# from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 
 min_version("6.6.1")
@@ -39,10 +39,10 @@ workdir:
 envvars:
     "DCC_API_KEY",
     "DCC_SECRET_KEY",
-    "AWS_ACCESS_KEY_ID",
-    "AWS_SECRET_ACCESS_KEY"
+    # "AWS_ACCESS_KEY_ID",
+    # "AWS_SECRET_ACCESS_KEY"
 
-S3 = S3RemoteProvider(access_key_id=os.environ["AWS_ACCESS_KEY_ID"], secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"])
+# S3 = S3RemoteProvider(access_key_id=os.environ["AWS_ACCESS_KEY_ID"], secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"])
 HTTP = HTTPRemoteProvider()
 
 max_threads = config["max_threads_per_rule"]

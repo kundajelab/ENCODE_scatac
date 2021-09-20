@@ -7,7 +7,10 @@ rule strip_fastq:
     Strip FASTQ read descriptions
     """
     input:
-        lambda w: [S3.remote(i, keep_local=config["keep_inputs"]) for i in sample_data[w.sample]["fastq"][w.read]] 
+        lambda w: [
+            HTTP.remote(i, keep_local=config["keep_inputs"], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"]) 
+            for i in sample_data[w.sample]["fastq"][w.read]
+        ] 
     output:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
     conda:
@@ -22,10 +25,10 @@ rule detect_revcomp:
     Detect whether to reverse complement barcodes
     """
     input:
-        lambda w: S3.remote(sample_data[w.sample]["fastq"]["BC"][0], keep_local=config["keep_inputs"]) 
+        lambda w: HTTP.remote(sample_data[w.sample]["fastq"]["BC"][0], keep_local=config["keep_inputs"], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"]) 
     output:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
-        qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
+        qc = "results/{sample}/fastqs/barcode_revcomp_stats.txt"
     conda:
         "../envs/fastqs.yaml"
     group: 
@@ -148,6 +151,27 @@ rule metadata_fastq:
     script: 
         "../scripts/write_file_metadata.py"
 
+rule metadata_qc_reads:
+    """
+    Write reads QC metadata
+    """
+    input: 
+        data_file = "results/{sample}/fastqs/R1_trim.fastq.gz",
+        barcode_matching = "results/{sample}/fastqs/barcode_matching.tsv",
+        adapter_trimming = "results/{sample}/fastqs/trim_adapters.txt",
+        barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp_stats.txt"
+    output: 
+        read_stats = "results/{sample}/fastqs/reads_qc_metadata.json",
+    params:
+        output_group = "fastqs",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/fastqs.yaml"
+    group: 
+        "fastqs"
+    script: 
+        "../scripts/write_qc_metadata.py"
+
 rule fastqs_done:
     """
     Touch flag file upon group completion
@@ -155,6 +179,7 @@ rule fastqs_done:
     input: 
         "results/{sample}/fastqs/R1_trim.fastq.gz",
         "results/{sample}/fastqs/R2_trim.fastq.gz", 
+        "results/{sample}/fastqs/barcode_revcomp_stats.txt",
         "results/{sample}/fastqs/barcode_matching.tsv", 
         "results/{sample}/fastqs/trim_adapters.txt",
         "results/{sample}/fastqs/R1_trim_metadata.json", 

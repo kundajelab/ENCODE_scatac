@@ -38,20 +38,21 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=1000, thresh=0.8):
 
     bc_match_prop = bc_match / num_reads
     bcrc_match_prop = bcrc_match / num_reads
+    valid = (bc_match_prop >= thresh) and (bcrc_match_prop >= thresh)
+    rc_chosen = (bc_match_prop >= bcrc_match_prop)
 
     with open(qc, 'w') as f:
         f.write(f"Direct match proportion: {bc_match_prop}\n")
         f.write(f"Reverse-complement match proportion: {bcrc_match_prop}\n")
+        f.write(f"Reverse-complement chosen: {rc_chosen}\n")
 
-    if bc_match_prop >= thresh:
-        with open(out, 'w') as f:
-            f.write(f"{0}")
-    elif bcrc_match_prop >= thresh:
-        with open(out, 'w') as f:
-            f.write(f"{1}")
-    else:
+    if not valid:
         raise ValueError("Insufficient barcode match rate")
-
+    with open(out, 'w') as f:
+        if rc_chosen:
+            f.write(f"{0}")
+        else:
+            f.write(f"{1}")
 
 try:
     modality = snakemake.params['modality']

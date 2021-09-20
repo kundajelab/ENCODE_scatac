@@ -3,6 +3,7 @@ Adapted from https://github.com/ENCODE-DCC/atac-seq-pipeline/blob/master/src/enc
 """
 
 from collections import OrderedDict
+from statistics import median
 import json
 import os
 
@@ -23,8 +24,64 @@ def to_float(var):
 def to_bool(var):
     return var.lower() in set(['true', 't', 'ok', 'yes', '1'])
 
+
+def parse_barcode_matching_qc(txt):
+    result = OrderedDict()
+    if os.path.getsize(txt) == 0:
+        return result
+    result["barcode_matching_stats"] = {"path": os.path.abspath(txt)}
+
+    with open(txt, 'r') as f:
+        words = f.readline().rstrip('\n').split(' ')
+        passing, total = words[0].split('/')
+        result['num_reads_passing'] = to_int(passing)
+        result['num_reads_total'] = to_int(total)
+        result['prop_reads_passing'] = result['num_reads_passing'] / result['num_reads_total']
+        next(f)
+        next(f)
+        for line in f:
+            k, v = line.rstrip('\n').split()
+            if k == "0":
+                result['num_match_dist_0'] = to_int(v)
+            if k == "1":
+                result['num_match_dist_1'] = to_int(v)
+    return result
+
+
+def parse_adapter_trimming_qc(txt):
+    result = OrderedDict()
+    if os.path.getsize(txt) == 0:
+        return result
+    result["adapter_trimming_stats"] = {"path": os.path.abspath(txt)}
+
+    with open(txt, 'r') as f:
+        for line in f:
+            k, v = line.rstrip('\n').split(':')
+            if k == 'reads with adapter trimmed':
+                result['num_reads_trimmed'] = to_int(v.strip())
+    return result
+
+
+def parse_barcode_revcomp_qc(txt):
+    result = OrderedDict()
+    if os.path.getsize(txt) == 0:
+        return result
+    result["barcode_revcomp_stats"] = {"path": os.path.abspath(txt)}
+
+    with open(txt, 'r') as f:
+        for line in f:
+            k, v = line.rstrip('\n').split(':')
+            if k == 'Reverse-complement chosen':
+                result['barcode_reverse_complement'] = to_bool(v.strip())
+    return result
+
+
 def parse_frac_mito_qc(txt):
     result = OrderedDict()
+    if os.path.getsize(txt) == 0:
+        return result
+    result["mito_stats"] = {"path": os.path.abspath(txt)}
+
     with open(txt, 'r') as fp:
         for line in fp.read().strip('\n').split('\n'):
             k, v = line.split('\t')
@@ -37,8 +94,10 @@ def parse_frac_mito_qc(txt):
 
 def parse_flagstat_qc(txt):
     result = OrderedDict()
-    if not txt:
+    if os.path.getsize(txt) == 0:
         return result
+    result["samstats"] = {"path": os.path.abspath(txt)}
+
     total = ''
     total_qc_failed = ''
     duplicates = ''
@@ -217,8 +276,10 @@ def parse_flagstat_qc(txt):
 
 def parse_dup_qc(txt):
     result = OrderedDict()
-    if not txt:
+    if os.path.getsize(txt) == 0:
         return result
+    result["picard_markdup_stats"] = {"path": os.path.abspath(txt)}
+    
     paired_reads = ''
     unpaired_reads = ''
     unmapped_reads = ''
@@ -297,8 +358,10 @@ def parse_dup_qc(txt):
 
 def parse_lib_complexity_qc(txt):
     result = OrderedDict()
-    if not txt:
+    if os.path.getsize(txt) == 0:
         return result
+    result["pbc_stats"] = {"path": os.path.abspath(txt)}
+
     with open(txt, 'r') as f:
         for line in f:
             arr = line.strip().split('\t')
@@ -313,17 +376,40 @@ def parse_lib_complexity_qc(txt):
     return result
 
 
-def parse_picard_est_lib_size_qc(txt):
+def parse_archr_qc(dt, df, fs, pf, tu):
     result = OrderedDict()
-    if not txt:
-        return result
-    with open(txt, 'r') as f:
-        val = f.readlines()[0].strip()
-    result['picard_est_lib_size'] = float(val)
+
+    if os.path.getsize(dt) > 0:
+        result["archr_doublet_summary_text"] = {"path": os.path.abspath(dt)}
+
+    if os.path.getsize(df) > 0:
+        result["archr_doublet_summary_figure"] = {"path": os.path.abspath(df)}
+
+    if os.path.getsize(fs) > 0:
+        result["archr_fragment_size_distribution"] = {"path": os.path.abspath(fs)}
+
+    if os.path.getsize(pf) > 0:
+        result["archr_pre_filter_metadata"] = {"path": os.path.abspath(pf)}
+        with open(pf, 'r') as f:
+            cols = f.readline().rstrip('\n').split('\t')
+            len_ind = cols.index('nFrags')
+            enr_ind = cols.index('TSSEnrichment')
+            lens = []
+            enrs = []
+            for line in f:
+                entries = line.rstrip('\n').split('\t')
+                lens.append(to_int(entries[len_ind]))
+                enrs.append(to_float(entries[enr_ind]))
+        result["median_fragment_count"] = median(lens)
+        result["median_tss_enrichment"] = median(enrs)
+
+    if os.path.getsize(tu) > 0:
+        result["archr_tss_by_unique_frags"] = {"path": os.path.abspath(tu)}
+
     return result
 
 
-def build_quality_metric_header(sample_data, config, data_path, out_path):
+def build_quality_metric_header(sample_data, config, data_path, out_path, step_run):
     lab = config["dcc_lab"]
     experiment = sample_data["experiment"]
     replicate = sample_data["replicate_num"]
@@ -334,6 +420,7 @@ def build_quality_metric_header(sample_data, config, data_path, out_path):
         "award": config["dcc_award"],
         "quality_metric_of": data_alias,
         "aliases": [alias],
+        "step_run": step_run
     })
     return h
 
@@ -350,19 +437,37 @@ try:
     config = snakemake.config
 
     if out_group == "fastqs":
-        pass
+        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
+
+        read_stats_out = snakemake.output['read_stats']
+        barcode_matching = snakemake.input['barcode_matching']
+        adapter_trimming = snakemake.input['adapter_trimming']
+        barcode_revcomp = snakemake.input['barcode_revcomp']
+
+        m = parse_barcode_matching_qc(barcode_matching)
+        a = parse_adapter_trimming_qc(adapter_trimming)
+        r = parse_barcode_revcomp_qc(barcode_revcomp)
+        h = build_quality_metric_header(sample_data, config, data_path, step_run)
+        read_stats = h | m | a | r
+
+        write_json(read_stats, read_stats_out)
+
 
     elif out_group == "mapping":
+        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
+
         alignment_stats_out = snakemake.output['alignment_stats']
         samstats_raw = snakemake.input['samstats_raw']
 
         a = parse_flagstat_qc(samstats_raw)
-        h = build_quality_metric_header(sample_data, config, data_path)
+        h = build_quality_metric_header(sample_data, config, data_path, step_run)
         alignment_stats = h | a
 
         write_json(alignment_stats, alignment_stats_out)
 
     elif out_group == "filtering":
+        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
+
         alignment_stats_out = snakemake.output['alignment_stats']
         lib_comp_stats_out = snakemake.output['lib_comp_stats']
         samstats_filtered = snakemake.input['samstats_filtered']
@@ -371,21 +476,43 @@ try:
         frac_mito = snakemake.input['frac_mito']
 
         s = parse_flagstat_qc(samstats_filtered)
-        p = parse_picard_est_lib_size_qc(picard_markdup)
+        p = parse_dup_qc(picard_markdup)
         l = parse_lib_complexity_qc(pbc_stats)
         m = parse_frac_mito_qc(frac_mito)
-        h = build_quality_metric_header(sample_data, config, data_path)
+        h = build_quality_metric_header(sample_data, config, data_path, step_run)
         alignment_stats = h | s | m
         lib_comp_stats = h | p | l
 
         write_json(alignment_stats, alignment_stats_out)
         write_json(lib_comp_stats, lib_comp_stats_out)
 
-    elif out_group == "fragments":
-        pass
+    elif out_group == "fragments": #TODO
+        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
 
-    elif out_group == "archr":
-        pass
+        fragments_stats_out = snakemake.output['fragments_stats']
+        multiplet_stats = snakemake.input['multiplets']
+
+    elif out_group == "analyses":
+        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
+
+        analyses_stats_out = snakemake.output['analyses_stats']
+        archr_doublet_summary_text = snakemake.input['archr_doublet_summary_text']
+        archr_doublet_summary_figure = snakemake.input['archr_doublet_summary_figure']
+        archr_fragment_size_distribution = snakemake.input['archr_fragment_size_distribution']
+        archr_pre_filter_metadata = snakemake.input['archr_pre_filter_metadata']
+        archr_tss_by_unique_frags = snakemake.input['archr_tss_by_unique_frags']
+
+        f = parse_archr_qc(
+            archr_doublet_summary_text, 
+            archr_doublet_summary_figure, 
+            archr_fragment_size_distribution, 
+            archr_pre_filter_metadata, 
+            archr_tss_by_unique_frags
+        )
+        h = build_quality_metric_header(sample_data, config, data_path, step_run)
+        analyses_stats = h | f
+
+        write_json(analyses_stats, analyses_stats_out)
 
 
 except NameError:

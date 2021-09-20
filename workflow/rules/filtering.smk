@@ -154,10 +154,33 @@ rule metadata_bam_filtered:
     """
     input: 
         bam = "results/{sample}/filtering/filtered.bam",
-        fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
+        fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz", # attach to fastqs
         fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
     output: 
         "results/{sample}/filtering/filtered_bam_metadata.json",
+    params:
+        output_group = "filtering",
+        sample_data = lambda w: samples[w.sample]
+    conda:
+        "../envs/filtering.yaml"
+    group: 
+        "filtering"
+    script: 
+        "../scripts/write_file_metadata.py"
+
+rule metadata_qc_alignments_filtered:
+    """
+    Write filtered alignments qc metadata
+    """
+    input: 
+        data_file = "results/{sample}/filtering/filtered.bam",
+        samstats_filtered = "results/{sample}/filtering/samstats_filtered.txt",
+        picard_markdup = "results/{sample}/filtering/markdup.txt",
+        pbc_stats = "results/{sample}/filtering/pbc_stats.tsv",
+        frac_mito = "results/{sample}/filtering/frac_mito.txt"
+    output: 
+        alignment_stats = "results/{sample}/filtering/alignments_filtered_qc_metadata.json",
+        lib_comp_stats = "results/{sample}/filtering/alignments_lib_comp_qc_metadata.json"
     params:
         output_group = "filtering",
         sample_data = lambda w: samples[w.sample]
@@ -179,7 +202,9 @@ rule filtering_done:
         "results/{sample}/filtering/markdup.txt",
         "results/{sample}/filtering/pbc_stats.tsv",
         "results/{sample}/filtering/samstats_filtered.txt",
-        "results/{sample}/filtering/filtered_bam_metadata.json"
+        "results/{sample}/filtering/filtered_bam_metadata.json",
+        "results/{sample}/filtering/alignments_filtered_qc_metadata.json",
+        "results/{sample}/filtering/alignments_lib_comp_qc_metadata.json"
     output:
         touch("results/{sample}/filtering/filtering.done")
     group: 

@@ -142,6 +142,25 @@ rule metadata_bam_raw:
     script: 
         "../scripts/write_file_metadata.py"
 
+rule metadata_qc_alignments_raw:
+    """
+    Write raw alignments qc metadata
+    """
+    input: 
+        data_file = "results/{sample}/mapping/raw.bam",
+        samstats_raw = "results/{sample}/mapping/samstats_raw.txt"
+    output: 
+        alignment_stats = "results/{sample}/mapping/alignments_raw_qc_metadata.json"
+    params:
+        output_group = "mapping",
+        sample_data = lambda w: samples[w.sample]
+    conda:
+        "../envs/mapping.yaml"
+    group: 
+        "mapping"
+    script: 
+        "../scripts/write_file_metadata.py"
+
 rule mapping_done:
     """
     Touch flag file upon group completion
@@ -150,7 +169,8 @@ rule mapping_done:
         "results/{sample}/mapping/raw.bam",
         "results/{sample}/mapping/raw.bam.bai", 
         "results/{sample}/mapping/samstats_raw.txt", 
-        "results/{sample}/mapping/raw_bam_metadata.json"
+        "results/{sample}/mapping/raw_bam_metadata.json",
+        "results/{sample}/mapping/alignments_raw_qc_metadata.json"
     output:
         touch("results/{sample}/mapping/mapping.done")
     group: 

@@ -105,6 +105,48 @@ rule parse_archr_qc:
     script:
         "../scripts/parse_archr_qc.R"
 
+rule metadata_analyses:
+    """
+    Write analyses metadata
+    """
+    input: 
+        archr = "results/{sample}/analyses/archr_project.tar.gz",
+        fragments = "results/{sample}/fragments/fragments.tar.gz"
+    output: 
+        "results/{sample}/analyses/analyses_metadata.json",
+    params:
+        output_group = "analyses",
+        sample_data = lambda w: samples[w.sample]
+    conda:
+        "../envs/analyses.yaml"
+    group: 
+        "analyses"
+    script: 
+        "../scripts/write_file_metadata.py"
+
+rule metadata_qc_analyses:
+    """
+    Write filtered alignments qc metadata
+    """
+    input: 
+        data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
+        archr_doublet_summary_text = "results/{sample}/analyses/archr_doublet_summary.tsv",
+        archr_doublet_summary_figure =  "results/{sample}/analyses/archr_doublet_summary.pdf",
+        archr_fragment_size_distribution = "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
+        archr_pre_filter_metadata = "results/{sample}/analyses/archr_pre_filter_metadata.tsv",
+        archr_tss_by_unique_frags = "results/{sample}/analyses/archr_tss_by_unique_frags.pdf"
+    output: 
+        analyses_stats = "results/{sample}/analyses/analyses_qc_metadata.json",
+    params:
+        output_group = "analyses",
+        sample_data = lambda w: samples[w.sample]
+    conda:
+        "../envs/analyses.yaml"
+    group: 
+        "analyses"
+    script: 
+        "../scripts/write_file_metadata.py"
+
 rule analyses_done:
     """
     Touch flag file upon group completion
@@ -115,7 +157,9 @@ rule analyses_done:
         "results/{sample}/analyses/archr_doublet_summary.tsv", 
         "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
         "results/{sample}/analyses/archr_pre_filter_metadata.tsv",
-        "results/{sample}/analyses/archr_tss_by_unique_frags.pdf"
+        "results/{sample}/analyses/archr_tss_by_unique_frags.pdf",
+        "results/{sample}/analyses/analyses_metadata.json",
+        "results/{sample}/analyses/analyses_qc_metadata.json"
     output:
         touch("results/{sample}/analyses/analyses.done")
     group: 
