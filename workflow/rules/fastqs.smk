@@ -179,7 +179,7 @@ rule fastqs_done:
     input: 
         "results/{sample}/fastqs/R1_trim.fastq.gz",
         "results/{sample}/fastqs/R2_trim.fastq.gz", 
-        "results/{sample}/fastqs/barcode_revcomp_stats.txt",
+        "results/{sample}/fastqs/barcode_revcomp.txt",
         "results/{sample}/fastqs/barcode_matching.tsv", 
         "results/{sample}/fastqs/trim_adapters.txt",
         "results/{sample}/fastqs/R1_trim_metadata.json", 
