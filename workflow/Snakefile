@@ -30,9 +30,6 @@ with open("config/samples.tsv") as sample_file:
         }
         samples.append(sample_id)
 
-container: 
-    "docker://continuumio/miniconda3"
-
 workdir: 
     config['workdir']
 
@@ -49,6 +46,9 @@ max_threads = config["max_threads_per_rule"]
 
 def script_path(script_name):
     return str(workflow.source_path(script_name))
+
+container: 
+    "docker://continuumio/miniconda3"
 
 include:
     "rules/fastqs.smk"
