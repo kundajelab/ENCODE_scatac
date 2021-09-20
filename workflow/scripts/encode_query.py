@@ -1,6 +1,5 @@
 import os
 import json
-from urllib.parse import urljoin, urlparse, ParseResult
 import encode_utils as eu
 from encode_utils.connection import Connection
 
@@ -77,8 +76,8 @@ for f in bc.values():
     m0, m1 = f["index_of"]
 
     if m0 in r1 and m1 in r2:
-        r1_fq = urljoin(server, r1[m0]["href"])
-        r2_fq = urljoin(server, r2[m1]["href"])
+        r1_fq = server + r1[m0]["href"]
+        r2_fq = server + r2[m1]["href"]
         r1_acc = r1[m0]["accession"]
         r2_acc = r2[m1]["accession"]
 
@@ -88,8 +87,8 @@ for f in bc.values():
         out_data["accessions"]["R2"].append(r2_acc)
 
     elif m1 in r1 and m0 in r2:
-        r1_fq = urljoin(server, r1[m1]["href"])
-        r2_fq = urljoin(server, r2[m0]["href"])
+        r1_fq = server + r1[m1]["href"]
+        r2_fq = server + r2[m0]["href"]
         r1_acc = r1[m1]["accession"]
         r2_acc = r2[m0]["accession"]
 
@@ -101,7 +100,7 @@ for f in bc.values():
     else:
         raise ValueError("Index FASTQ does not properly match with reads")
     
-    bc_fq = urljoin(server, f["href"])
+    bc_fq = server + f["href"]
     bc_acc = f["accession"]
     out_data["fastq"]["BC"].append(bc_fq)
     out_data["accessions"]["BC"].append(bc_acc)
