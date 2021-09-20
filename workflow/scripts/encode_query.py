@@ -21,6 +21,7 @@ os.environ["DCC_SECRET_KEY"] = snakemake.params["dcc_secret_key"]
 eu.connection.LOG_DIR = log_dir
 
 conn = Connection(dcc_mode)
+print(conn.dcc_mode) ####
 server = conn.dcc_mode.url
 data = conn.get(experiment)
 
