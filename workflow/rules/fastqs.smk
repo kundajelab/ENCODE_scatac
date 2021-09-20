@@ -7,7 +7,7 @@ rule strip_fastq:
     Strip FASTQ read descriptions
     """
     input:
-        lambda w: S3.remote(sample_data[w.sample]["fastq"][w.read], keep_local=config["keep_inputs"]) 
+        lambda w: [S3.remote(i, keep_local=config["keep_inputs"]) for i in sample_data[w.sample]["fastq"][w.read]] 
     output:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
     conda:
@@ -22,7 +22,7 @@ rule detect_revcomp:
     Detect whether to reverse complement barcodes
     """
     input:
-        lambda w: S3.remote(sample_data[w.sample]["fastq"]["BC"], keep_local=config["keep_inputs"]) 
+        lambda w: S3.remote(sample_data[w.sample]["fastq"]["BC"][0], keep_local=config["keep_inputs"]) 
     output:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
         qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
