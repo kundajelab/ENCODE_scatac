@@ -21,6 +21,7 @@ eu.connection.LOG_DIR = log_dir
 
 conn = Connection(dcc_mode)
 server = conn.dcc_host
+print(server) ####
 data = conn.get(experiment)
 
 r1 = {}
