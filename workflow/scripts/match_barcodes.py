@@ -52,6 +52,7 @@ def match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_
     total_reads = 0
     total_pass = 0
 
+    print("start read") ####
     chunk_size = 10000
     while f.read_chunk(chunk_size):
         pass_filter = (f.get_match_result("cell", "dist") <=max_barcode_dist) & \
@@ -62,6 +63,7 @@ def match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_
         values, counts = np.unique(f.get_match_result("cell", "dist"), return_counts=True)
         barcode_counts[np.minimum(values, max_barcode_dist + 1)] += counts
         
+        print("start write") ####
         f.write_chunk(pass_filter)
         print(f"written {total_pass}") ####
         
