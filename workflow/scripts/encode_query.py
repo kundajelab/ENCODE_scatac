@@ -4,10 +4,6 @@ from urllib.parse import urljoin
 import encode_utils as eu
 from encode_utils.connection import Connection
 
-# def strip_scheme(url):
-#     parsed_result = urlparse(url)
-#     return ParseResult('', *parsed_result[1:]).geturl().lstrip('/')
-
 sample_data_file, = snakemake.output
 dcc_mode = snakemake.config["dcc_mode"]
 experiment = snakemake.params["experiment"]
