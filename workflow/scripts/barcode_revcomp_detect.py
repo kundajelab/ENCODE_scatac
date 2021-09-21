@@ -26,6 +26,7 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=1000, thresh=0.8):
     print("iwheogihwoeghiwe") ####
     with open(fastq, 'rt') as f: ####
         for lnum, line in enumerate(f):
+            print("wogy9384yt93") ####
             print(lnum, line) ####
             if lnum >= num_lines:
                 break
