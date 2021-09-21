@@ -2,15 +2,12 @@
 FASTQ processing
 """
 
-def get_fastq_inputs(w):
-    return HTTP.remote(sample_data[w.sample]["fastq"][w.read], keep_local=config["keep_inputs"], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"]) 
-
 rule strip_fastq:
     """
     Strip FASTQ read descriptions
     """
-    input:
-        get_fastq_inputs 
+    # input:
+    #     lambda w: HTTP.remote(sample_data[w.sample]["fastq"][w.read], keep_local=config["keep_inputs"], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"]) 
     output:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
     conda:
