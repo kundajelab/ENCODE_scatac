@@ -34,8 +34,8 @@ def match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_
     f.add_sequence("R2", fastqs["R2"])
     f.add_sequence("R3", fastqs["R3"], output_path=fastq2_out_path)
 
-    with open(revcomp["R2"]) as f:
-        rc = (int(f.read().strip()) == 1)
+    with open(revcomp["R2"]) as rf:
+        rc = (int(rf.read().strip()) == 1)
 
     valid_barcodes, barcode_sequences = read_barcodes(whitelists["R2"], rc)
     cell_barcode = matcha.HashMatcher(
