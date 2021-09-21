@@ -30,6 +30,7 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=1000, thresh=0.8):
             if lnum % 4 != 1:
                 continue
             seq = line.strip()[offset:]
+            print(seq) ####
             if seq in bc:
                 bc_match += 1
             if seq in bcrc:
