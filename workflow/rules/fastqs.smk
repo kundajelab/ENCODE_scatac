@@ -38,7 +38,7 @@ rule fetch_fastq_bc:
     group: 
         "fastqs"
     shell:
-        "curl -L -u {params.username}:{params.password} {params.url} | zcat | tee /dev/stdout | > {output} || true"
+        "curl -L -u {params.username}:{params.password} {params.url} | zcat | > {output} || true"
 
 rule detect_revcomp:
     """
@@ -51,6 +51,8 @@ rule detect_revcomp:
     output:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
         qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
+    params:
+        modality = lambda w: sample_data[w.sample]["modality"]
     conda:
         "../envs/fastqs.yaml"
     group: 
