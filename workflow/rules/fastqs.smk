@@ -9,7 +9,7 @@ rule strip_fastq:
     output:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
     params:
-        url = sample_data[w.sample]["fastq"][w.read],
+        url = lambda w: sample_data[w.sample]["fastq"][w.read],
         username = os.environ["DCC_API_KEY"],
         password = os.environ["DCC_SECRET_KEY"]
     conda:
@@ -26,7 +26,7 @@ rule fetch_fastq_bc:
     output:
         pipe("temp/{sample}/fastqs/fastq_barcode.fastq")
     params:
-        url = sample_data[w.sample]["fastq"][w.read][0],
+        url = lambda w: sample_data[w.sample]["fastq"][w.read][0],
         username = os.environ["DCC_API_KEY"],
         password = os.environ["DCC_SECRET_KEY"]
     conda:
