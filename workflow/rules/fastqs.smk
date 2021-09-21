@@ -9,7 +9,7 @@ rule strip_fastq:
     input:
         "results/{sample}/input_data.json"
     output:
-        pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
+        pipe("temp/{sample}/fastqs/stripped_{read}.fastq.gz")
     params:
         url = lambda w: sample_data[w.sample]["fastq"][w.read],
         usr = os.environ["DCC_API_KEY"],
@@ -20,7 +20,7 @@ rule strip_fastq:
         "fastqs"
     shell:
         "curl --no-progress-meter -L -u {params.usr}:{params.pwd} {params.url} | "
-        "zcat | sed 's/ .*//' > {output}"
+        "zcat | sed 's/ .*//' | gzip -c -1 > {output}"
 
 rule fetch_fastq_bc:
     """
@@ -66,9 +66,9 @@ rule match_barcodes:
     Barcode correction and filtering
     """
     input: 
-        fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
-        fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
-        fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq",
+        fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq.gz",
+        fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq.gz",
+        fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq.gz",
         whitelist = lambda w: config["bc_whitelist"][sample_config[w.sample]['modality']],
         revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt"
     output: 
