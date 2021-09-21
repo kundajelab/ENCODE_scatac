@@ -12,14 +12,15 @@ rule strip_fastq:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
     params:
         url = lambda w: sample_data[w.sample]["fastq"][w.read],
-        username = os.environ["DCC_API_KEY"],
-        password = os.environ["DCC_SECRET_KEY"]
+        usr = os.environ["DCC_API_KEY"],
+        pwd = os.environ["DCC_SECRET_KEY"]
     conda:
         "../envs/fastqs.yaml"
     group: 
         "fastqs"
     shell:
-        "curl -L -u {params.username}:{params.password} {params.url} | zcat | sed 's/ .*//' > {output}"
+        "curl --no-progress-meter -L -u {params.usr}:{params.pwd} {params.url} | "
+        "zcat | sed 's/ .*//' > {output}"
 
 rule fetch_fastq_bc:
     """
@@ -31,14 +32,15 @@ rule fetch_fastq_bc:
         pipe("temp/{sample}/fastqs/fastq_barcode.fastq")
     params:
         url = lambda w: sample_data[w.sample]["fastq"]["BC"][0],
-        username = os.environ["DCC_API_KEY"],
-        password = os.environ["DCC_SECRET_KEY"]
+        usr = os.environ["DCC_API_KEY"],
+        pwd = os.environ["DCC_SECRET_KEY"]
     conda:
         "../envs/fastqs.yaml"
     group: 
         "fastqs"
     shell:
-        "curl -L -u {params.username}:{params.password} {params.url} | zcat > {output} || true"
+        "curl --no-progress-meter -L -u {params.usr}:{params.pwd} {params.url} | "
+        "zcat > {output} || true"
 
 rule detect_revcomp:
     """

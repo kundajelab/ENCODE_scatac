@@ -63,6 +63,7 @@ def match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_
         barcode_counts[np.minimum(values, max_barcode_dist + 1)] += counts
         
         f.write_chunk(pass_filter)
+        print(f"written {total_pass}") ####
         
     with open(qc_path, "w") as stats_output:
         print(f"{total_pass}/{total_reads} reads passing, ({total_pass/total_reads*100:.2f}%)\n", file=stats_output)
