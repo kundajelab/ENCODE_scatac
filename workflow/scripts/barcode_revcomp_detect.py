@@ -24,7 +24,7 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=1000, thresh=0.8):
     num_lines = num_reads * 4
     # with gzip.open(fastq, 'rt') as f: ####
     print("iwheogihwoeghiwe") ####
-    with open(fastq, 'rt') as f: ####
+    with open(fastq) as f: ####
         for lnum, line in enumerate(f):
             print("wogy9384yt93") ####
             print(lnum, line) ####
@@ -39,10 +39,10 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=1000, thresh=0.8):
             if seq in bcrc:
                 bcrc_match += 1
 
-    with open(fastq, 'rt') as f: ####
-        for lnum, line in enumerate(f):
-            print("eiwoe") ####
-            print(lnum, line) ####
+    # with open(fastq, 'rt') as f: ####
+    #     for lnum, line in enumerate(f):
+    #         print("eiwoe") ####
+    #         print(lnum, line) ####
 
     bc_match_prop = bc_match / num_reads
     bcrc_match_prop = bcrc_match / num_reads
