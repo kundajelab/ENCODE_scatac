@@ -45,8 +45,8 @@ rule detect_revcomp:
     Detect whether to reverse complement barcodes
     """
     input:
-        # fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",
-        fastq = "/srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/BC_ENCFF995UIJ.fastq.gz",
+        fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",
+        # fastq = "/srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/BC_ENCFF995UIJ.fastq.gz",
         whitelist = lambda w: config["bc_whitelist"][sample_config[w.sample]['modality']]
     output:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
@@ -56,7 +56,7 @@ rule detect_revcomp:
     group: 
         "fastqs"
     script:
-        "../scripts/barcode_revcomp_detection.py"
+        "../scripts/barcode_revcomp_detect.py"
 
 rule match_barcodes: 
     """

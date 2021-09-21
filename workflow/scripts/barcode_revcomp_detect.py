@@ -1,4 +1,4 @@
-import gzip
+# import gzip ####
 
 REV_COMP = str.maketrans("ATGC", "TACG")
 def reverse_complement(seq):
@@ -22,7 +22,8 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=1000, thresh=0.8):
     bc_match = 0
     bcrc_match = 0
     num_lines = num_reads * 4
-    with gzip.open(fastq, 'rt') as f: ####
+    # with gzip.open(fastq, 'rt') as f: ####
+    with open(fastq, 'rt') as f: ####
         for lnum, line in enumerate(f):
             if lnum >= num_lines:
                 break
