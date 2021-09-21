@@ -36,7 +36,7 @@ def parse_barcode_matching_qc(txt):
         passing, total = words[0].split('/')
         result['num_reads_passing'] = to_int(passing)
         result['num_reads_total'] = to_int(total)
-        result['prop_reads_passing'] = result['num_reads_passing'] / result['num_reads_total']
+        result['frac_reads_passing'] = result['num_reads_passing'] / result['num_reads_total']
         next(f)
         next(f)
         for line in f:
@@ -65,6 +65,7 @@ def parse_adapter_trimming_qc(txt):
 def parse_barcode_revcomp_qc(txt):
     result = OrderedDict()
     if os.path.getsize(txt) == 0:
+        result['barcode_reverse_complement'] = False
         return result
     result["barcode_revcomp_stats"] = {"path": os.path.abspath(txt)}
 

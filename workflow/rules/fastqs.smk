@@ -6,25 +6,42 @@ rule strip_fastq:
     """
     Strip FASTQ read descriptions
     """
-    input:
-        # lambda w: HTTP.remote(sample_data[w.sample]["fastq"][w.read], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"], keep_local=config["keep_inputs"]) 
-        HTTP.remote("genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip", keep_local=True) ####
-
     output:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
+    params:
+        url = sample_data[w.sample]["fastq"][w.read],
+        username = os.environ["DCC_API_KEY"],
+        password = os.environ["DCC_SECRET_KEY"]
     conda:
         "../envs/fastqs.yaml"
     group: 
         "fastqs"
     shell:
-        "zcat {input} | sed 's/ .*//' > {output}"
+        "curl -L -u {params.username}:{params.password} {params.url} | zcat | sed 's/ .*//' > {output}"
+
+rule fetch_fastq_bc:
+    """
+    Fetch barcodes fastq
+    """
+    output:
+        pipe("temp/{sample}/fastqs/fastq_barcode.fastq")
+    params:
+        url = sample_data[w.sample]["fastq"][w.read][0],
+        username = os.environ["DCC_API_KEY"],
+        password = os.environ["DCC_SECRET_KEY"]
+    conda:
+        "../envs/fastqs.yaml"
+    group: 
+        "fastqs"
+    shell:
+        "curl -L -u {params.username}:{params.password} {input} | zcat > {output} || true"
 
 rule detect_revcomp:
     """
     Detect whether to reverse complement barcodes
     """
     input:
-        lambda w: HTTP.remote(sample_data[w.sample]["fastq"]["BC"][0], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"], keep_local=config["keep_inputs"]) 
+        "temp/{sample}/fastqs/fastq_barcode.fastq"
     output:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
         qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")

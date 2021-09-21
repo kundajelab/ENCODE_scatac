@@ -42,30 +42,30 @@ MINIMUM_COUNTS_FOR_BC_MULTIPLETS = 100
 SELF_SIGNAL_THRESHOLD_MULTIPLIER = 0.4
 
 
-def query_path_for_file(path, filename):
-    if os.path.exists(os.path.join(path, filename)):
-        return os.path.join(path, filename)
-    elif os.path.exists(os.path.join(path, "outs", filename)):
-        return os.path.join(path, "outs", filename)
-    else:
-        print("Could not find required file {}.".format(filename))
-        print(
-            "Check that the input path is correct and that this tool is being "
-            "run on a completed CellRanger ATAC analysis."
-        )
-        sys.exit(1)
+# def query_path_for_file(path, filename):
+#     if os.path.exists(os.path.join(path, filename)):
+#         return os.path.join(path, filename)
+#     elif os.path.exists(os.path.join(path, "outs", filename)):
+#         return os.path.join(path, "outs", filename)
+#     else:
+#         print("Could not find required file {}.".format(filename))
+#         print(
+#             "Check that the input path is correct and that this tool is being "
+#             "run on a completed CellRanger ATAC analysis."
+#         )
+#         sys.exit(1)
 
 
-def check_output_path(path, prefix, filename):
-    full_path = os.path.abspath(os.path.join(path, "{}{}".format(prefix, filename)))
-    if not os.access(path, os.W_OK):
-        print(
-            "Putative output file {} is not writeable.  Please check file permissions.".format(
-                full_path
-            )
-        )
-        sys.exit(1)
-    return full_path
+# def check_output_path(path, prefix, filename):
+#     full_path = os.path.abspath(os.path.join(path, "{}{}".format(prefix, filename)))
+#     if not os.access(path, os.W_OK):
+#         print(
+#             "Putative output file {} is not writeable.  Please check file permissions.".format(
+#                 full_path
+#             )
+#         )
+#         sys.exit(1)
+#     return full_path
 
 
 # def parse_args():
