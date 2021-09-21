@@ -62,6 +62,7 @@ try:
     fastq = snakemake.input["fastq"]
     whitelist = snakemake.input["whitelist"]
 
+    print("test") ####
 
     if modality == "10x":
         offset = 0
