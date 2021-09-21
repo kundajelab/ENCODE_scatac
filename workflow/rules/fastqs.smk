@@ -94,14 +94,15 @@ rule fetch_ren:
     input:
         "temp/{sample}/fastqs/stripped_{read}.fastq"
     output:
-        pipe("temp/{sample}/fastqs/{read}_bc_ren.fastq.gz"),
+        temp("temp/{sample}/fastqs/{read}_bc_ren.fastq.gz")
     conda:
         "../envs/fastqs.yaml"
-    group: "fastqs"
+    group: 
+        "fastqs"
     shell:
         "awk -v FS=':' "
         "'{if (NR%4==1) {s=\"@\"$2; for (i=3 ; i<=NF ; i++) {s = s \":\" $i } ; s = s \"\\tCB:Z:\" substr($1,2) ; print s} else {print $0}}' "
-        "{input} | gzip -c -1 > {output}"
+        "{input} | gzip -c > {output}"
 
 rule dummy_qc_ren:
     """
@@ -149,7 +150,8 @@ rule trim_adapter:
         max_threads
     conda:
         "../envs/fastqs.yaml"
-    group: "fastqs"
+    group: 
+        "fastqs"
     shell:
         "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim}"
         " -h {log.html} -j {log.json} -G -Q -L -w {threads} 2> {output.stats}"
