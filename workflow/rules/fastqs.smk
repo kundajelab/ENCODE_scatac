@@ -101,7 +101,7 @@ rule fetch_ren:
         "fastqs"
     shell:
         "awk -v FS=':' "
-        "'{if (NR%4==1) {s=\"@\"$2; for (i=3 ; i<=NF ; i++) {s = s \":\" $i } ; s = s \"\\tCB:Z:\" substr($1,2) ; print s} else {print $0}}' "
+        "'{{if (NR%4==1) {{s=\"@\"$2; for (i=3 ; i<=NF ; i++) {{s = s \":\" $i }} ; s = s \"\\tCB:Z:\" substr($1,2) ; print s}} else {{print $0}}}}' "
         "{input} | gzip -c > {output}"
 
 rule dummy_qc_ren:
