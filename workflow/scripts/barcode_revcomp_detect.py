@@ -24,6 +24,7 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=1000, thresh=0.8):
     num_lines = num_reads * 4
     with open(fastq, 'rt') as f:
         for lnum, line in enumerate(f):
+            print(line) ####
             if lnum >= num_lines:
                 break
             if lnum % 4 != 1:
