@@ -432,7 +432,7 @@ def write_json(data, out_path):
 
 
 try:
-    out_group = snakemake.params['out_group']
+    out_group = snakemake.params['output_group']
     sample_data = snakemake.params['sample_data']
     data_path = snakemake.input['data_file']
     config = snakemake.config

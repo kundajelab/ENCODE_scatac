@@ -212,7 +212,8 @@ rule fastqs_done:
         "results/{sample}/fastqs/barcode_matching.tsv", 
         "results/{sample}/fastqs/trim_adapters.txt",
         "results/{sample}/fastqs/R1_trim_metadata.json", 
-        "results/{sample}/fastqs/R2_trim_metadata.json"
+        "results/{sample}/fastqs/R2_trim_metadata.json",
+        "results/{sample}/fastqs/reads_qc_metadata.json"
     output:
         touch("results/{sample}/fastqs/fastqs.done")
     group: 
