@@ -50,7 +50,7 @@ rule detect_revcomp:
     group: 
         "fastqs"
     script:
-        "scripts/barcode_revcomp_detection.py"
+        "../scripts/barcode_revcomp_detection.py"
 
 rule match_barcodes: 
     """
@@ -76,7 +76,7 @@ rule match_barcodes:
     group: 
         "fastqs"
     script:
-        "scripts/match_barcodes.py"
+        "../scripts/match_barcodes.py"
 
 rule fetch_ren:
     """
