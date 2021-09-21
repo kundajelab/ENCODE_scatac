@@ -56,9 +56,9 @@ def parse_adapter_trimming_qc(txt):
 
     with open(txt, 'r') as f:
         for line in f:
-            k, v = line.rstrip('\n').split(':')
-            if k == 'reads with adapter trimmed':
-                result['num_reads_trimmed'] = to_int(v.strip())
+            entries = line.rstrip('\n').split(':')
+            if entries[0] == 'reads with adapter trimmed':
+                result['num_reads_trimmed'] = to_int(entries[1].strip())
     return result
 
 
