@@ -155,7 +155,8 @@ rule metadata_bam_filtered:
     input: 
         bam = "results/{sample}/filtering/filtered.bam",
         fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz", # attach to fastqs
-        fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
+        fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        input_data = "results/{sample}/input_data.json"
     output: 
         "results/{sample}/filtering/filtered_bam_metadata.json",
     params:
@@ -177,7 +178,8 @@ rule metadata_qc_alignments_filtered:
         samstats_filtered = "results/{sample}/filtering/samstats_filtered.txt",
         picard_markdup = "results/{sample}/filtering/markdup.txt",
         pbc_stats = "results/{sample}/filtering/pbc_stats.tsv",
-        frac_mito = "results/{sample}/filtering/frac_mito.txt"
+        frac_mito = "results/{sample}/filtering/frac_mito.txt",
+        input_data = "results/{sample}/input_data.json"
     output: 
         alignment_stats = "results/{sample}/filtering/alignments_filtered_qc_metadata.json",
         lib_comp_stats = "results/{sample}/filtering/alignments_lib_comp_qc_metadata.json"

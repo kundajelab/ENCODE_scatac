@@ -83,7 +83,7 @@ rule sort_alignments:
         "mapping"
     shell: 
         "samtools sort -T . -@ {threads} -o {output} {input} 2> {log}; "
-        "samtools index {output.bam};"
+        "samtools index {output};"
 
 rule index_bam_raw:
     """
@@ -129,7 +129,8 @@ rule metadata_bam_raw:
     input: 
         bam = "results/{sample}/mapping/raw.bam",
         fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
-        fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
+        fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        input_data = "results/{sample}/input_data.json"
     output: 
         "results/{sample}/mapping/raw_bam_metadata.json"
     params:
@@ -148,7 +149,8 @@ rule metadata_qc_alignments_raw:
     """
     input: 
         data_file = "results/{sample}/mapping/raw.bam",
-        samstats_raw = "results/{sample}/mapping/samstats_raw.txt"
+        samstats_raw = "results/{sample}/mapping/samstats_raw.txt",
+        input_data = "results/{sample}/input_data.json"
     output: 
         alignment_stats = "results/{sample}/mapping/alignments_raw_qc_metadata.json"
     params:

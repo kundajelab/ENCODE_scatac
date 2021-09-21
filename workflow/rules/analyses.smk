@@ -111,7 +111,8 @@ rule metadata_analyses:
     """
     input: 
         archr = "results/{sample}/analyses/archr_project.tar.gz",
-        fragments = "results/{sample}/fragments/fragments.tar.gz"
+        fragments = "results/{sample}/fragments/fragments.tar.gz",
+        input_data = "results/{sample}/input_data.json"
     output: 
         "results/{sample}/analyses/analyses_metadata.json",
     params:
@@ -134,7 +135,8 @@ rule metadata_qc_analyses:
         archr_doublet_summary_figure =  "results/{sample}/analyses/archr_doublet_summary.pdf",
         archr_fragment_size_distribution = "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
         archr_pre_filter_metadata = "results/{sample}/analyses/archr_pre_filter_metadata.tsv",
-        archr_tss_by_unique_frags = "results/{sample}/analyses/archr_tss_by_unique_frags.pdf"
+        archr_tss_by_unique_frags = "results/{sample}/analyses/archr_tss_by_unique_frags.pdf",
+        input_data = "results/{sample}/input_data.json"
     output: 
         analyses_stats = "results/{sample}/analyses/analyses_qc_metadata.json",
     params:

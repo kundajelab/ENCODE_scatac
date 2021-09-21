@@ -79,7 +79,8 @@ rule metadata_fragments:
     """
     input: 
         fragments = "results/{sample}/fragments/fragments.tar.gz",
-        bam = "results/{sample}/filtering/filtered.bam"
+        bam = "results/{sample}/filtering/filtered.bam",
+        input_data = "results/{sample}/input_data.json"
     output: 
         "results/{sample}/fragments/fragments_metadata.json"
     params:

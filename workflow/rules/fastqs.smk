@@ -48,7 +48,8 @@ rule detect_revcomp:
     """
     input:
         fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",
-        whitelist = lambda w: config["bc_whitelist"][sample_config[w.sample]['modality']]
+        whitelist = lambda w: config["bc_whitelist"][sample_config[w.sample]['modality']],
+        input_data = "results/{sample}/input_data.json"
     output:
         revcomp = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
         qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
@@ -70,7 +71,8 @@ rule match_barcodes:
         fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
         fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq",
         whitelist = lambda w: config["bc_whitelist"][sample_config[w.sample]['modality']],
-        revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt"
+        revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt",
+        input_data = "results/{sample}/input_data.json"
     output: 
         fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_full.fastq.gz"),
         fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_full.fastq.gz"),
@@ -162,7 +164,8 @@ rule metadata_fastq:
     """
     input: 
         r1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
-        r2 = "results/{sample}/fastqs/R2_trim.fastq.gz"
+        r2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        input_data = "results/{sample}/input_data.json"
     output: 
         r1 = "results/{sample}/fastqs/R1_trim_metadata.json",
         r2 = "results/{sample}/fastqs/R2_trim_metadata.json"
@@ -184,7 +187,8 @@ rule metadata_qc_reads:
         data_file = "results/{sample}/fastqs/R1_trim.fastq.gz",
         barcode_matching = "results/{sample}/fastqs/barcode_matching.tsv",
         adapter_trimming = "results/{sample}/fastqs/trim_adapters.txt",
-        barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp.txt"
+        barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
+        input_data = "results/{sample}/input_data.json"
     output: 
         read_stats = "results/{sample}/fastqs/reads_qc_metadata.json",
     params:
