@@ -135,7 +135,7 @@ rule metadata_bam_raw:
         "results/{sample}/mapping/raw_bam_metadata.json"
     params:
         output_group = "mapping",
-        sample_data = lambda w: samples[w.sample]
+        sample_data = lambda w: sample_data[w.sample]
     conda:
         "../envs/mapping.yaml"
     group: 
@@ -155,7 +155,7 @@ rule metadata_qc_alignments_raw:
         alignment_stats = "results/{sample}/mapping/alignments_raw_qc_metadata.json"
     params:
         output_group = "mapping",
-        sample_data = lambda w: samples[w.sample]
+        sample_data = lambda w: sample_data[w.sample]
     conda:
         "../envs/mapping.yaml"
     group: 
