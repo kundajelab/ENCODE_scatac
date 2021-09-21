@@ -154,7 +154,7 @@ rule metadata_qc_alignments_raw:
     output: 
         alignment_stats = "results/{sample}/mapping/alignments_raw_qc_metadata.json"
     params:
-        output_group = "alignments",
+        output_group = "mapping",
         sample_data = lambda w: sample_data[w.sample]
     conda:
         "../envs/mapping.yaml"
