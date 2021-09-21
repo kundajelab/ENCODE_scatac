@@ -18,7 +18,7 @@ with open("config/samples.tsv") as sample_file:
     sample_config = {}
     samples = []
     for line in sample_file:
-        if line.startswith("#")
+        if line.startswith("#"):
             continue
         entries = line.rstrip('\n').split('\t')
         exp = entries[exp_ind]
