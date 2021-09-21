@@ -46,7 +46,7 @@ rule frac_mito:
         count_mito = "temp/{sample}/filtering/count_mito.txt",
         count_no_mito = "temp/{sample}/filtering/count_no_mito.txt"
     output: 
-        "results/{sample}/filtering/frac_mito.txt"
+        "results/{sample}/filtering/frac_mito.tsv"
     conda:
         "../envs/filtering.yaml"
     group: 
@@ -54,8 +54,7 @@ rule frac_mito:
     shell: 
         "rm=$(<{input.count_mito}); "
         "rn=$(<{input.count_no_mito}); "
-        "frac=$(($rm / ($rm + $rn))); "
-        "printf \"%d\\t%d\\t%f\" \"$rn\" \"$rm\" \"$frac\" > {output}"
+        "printf \"Non-Mitochondrial\\tMitochondrial\\n%d\\t%d\" \"$rn\" \"$rm\" > {output}"
 
 rule assign_primary:
     """
@@ -178,7 +177,7 @@ rule metadata_qc_alignments_filtered:
         samstats_filtered = "results/{sample}/filtering/samstats_filtered.txt",
         picard_markdup = "results/{sample}/filtering/markdup.txt",
         pbc_stats = "results/{sample}/filtering/pbc_stats.tsv",
-        frac_mito = "results/{sample}/filtering/frac_mito.txt",
+        frac_mito = "results/{sample}/filtering/frac_mito.tsv",
         input_data = "results/{sample}/input_data.json"
     output: 
         alignment_stats = "results/{sample}/filtering/alignments_filtered_qc_metadata.json",
@@ -200,7 +199,7 @@ rule filtering_done:
     input: 
         "results/{sample}/filtering/filtered.bam",
         "results/{sample}/filtering/filtered.bam.bai", 
-        "results/{sample}/filtering/frac_mito.txt", 
+        "results/{sample}/filtering/frac_mito.tsv", 
         "results/{sample}/filtering/markdup.txt",
         "results/{sample}/filtering/pbc_stats.tsv",
         "results/{sample}/filtering/samstats_filtered.txt",

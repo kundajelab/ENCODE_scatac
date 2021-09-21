@@ -83,13 +83,15 @@ def parse_frac_mito_qc(txt):
         return result
     result["mito_stats"] = {"path": os.path.abspath(txt)}
 
-    with open(txt, 'r') as fp:
-        for line in fp.read().strip('\n').split('\n'):
-            k, v = line.split('\t')
-            if k.startswith('frac_'):
-                result[k] = float(v)
-            else:
-                result[k] = int(v)
+    with open(txt, 'r') as f:
+        h = f.readline().rstrip('\n').split('\t')
+        mito_ind = h.index('Mitochondrial')
+        non_mito_ind = h.index('Non-Mitochondrial')
+        for line in f:
+            entries = line.rstrip('\n').split('\t')
+            result['mito_reads'] = to_int(entries[mito_ind])
+            result['non_mito_reads'] = to_int(entries[non_mito_ind])
+            result['frac_mito_reads'] = result['mito_reads'] / (result['mito_reads'] + result['non_mito_reads'])
     return result
 
 
