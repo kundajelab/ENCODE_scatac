@@ -147,7 +147,7 @@ rule metadata_qc_analyses:
     group: 
         "analyses"
     script: 
-        "../scripts/write_file_metadata.py"
+        "../scripts/write_qc_metadata.py"
 
 rule analyses_done:
     """

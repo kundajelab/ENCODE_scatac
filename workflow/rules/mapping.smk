@@ -161,7 +161,7 @@ rule metadata_qc_alignments_raw:
     group: 
         "mapping"
     script: 
-        "../scripts/write_file_metadata.py"
+        "../scripts/write_qc_metadata.py"
 
 rule mapping_done:
     """

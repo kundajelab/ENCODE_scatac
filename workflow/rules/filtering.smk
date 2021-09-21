@@ -191,7 +191,7 @@ rule metadata_qc_alignments_filtered:
     group: 
         "filtering"
     script: 
-        "../scripts/write_file_metadata.py"
+        "../scripts/write_qc_metadata.py"
 
 rule filtering_done:
     """
