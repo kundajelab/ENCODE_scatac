@@ -46,7 +46,7 @@ rule detect_revcomp:
     """
     input:
         # fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",
-        fastq = "/srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/BC_ENCFF995UIJ.fastq.gz"
+        fastq = "/srv/www/kundaje/surag/ENCODE_scatac/data/scATAC_ENCSR198TTU/BC_ENCFF995UIJ.fastq.gz",
         whitelist = lambda w: config["bc_whitelist"][sample_config[w.sample]['modality']]
     output:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
