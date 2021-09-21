@@ -65,42 +65,65 @@ out_data = {
     "modality": modality,
     "platform": platform,
     "read_length": read_length,
-    "fastq": {"R1": [], "R2": [], "BC": []},
-    "accessions": {"R1": [], "R2": [], "BC": []}
 }
 
-for f in bc.values():
-    m0, m1 = f["index_of"]
-
-    if m0 in r1 and m1 in r2:
-        r1_fq = urljoin(server, r1[m0]["href"])
-        r2_fq = urljoin(server, r2[m1]["href"])
-        r1_acc = r1[m0]["accession"]
-        r2_acc = r2[m1]["accession"]
-
-        out_data["fastq"]["R1"].append(r1_fq)
-        out_data["fastq"]["R2"].append(r2_fq)
-        out_data["accessions"]["R1"].append(r1_acc)
-        out_data["accessions"]["R2"].append(r2_acc)
-
-    elif m1 in r1 and m0 in r2:
-        r1_fq = urljoin(server, r1[m1]["href"])
-        r2_fq = urljoin(server, r2[m0]["href"])
-        r1_acc = r1[m1]["accession"]
-        r2_acc = r2[m0]["accession"]
-
-        out_data["fastq"]["R1"].append(r1_fq)
-        out_data["fastq"]["R2"].append(r2_fq)
-        out_data["accessions"]["R1"].append(r1_acc)
-        out_data["accessions"]["R2"].append(r2_acc)
-
-    else:
-        raise ValueError("Index FASTQ does not properly match with reads")
+if modality == "ren":
+    out_data |= {
+        "fastq": {"R1": [], "R2": []},
+        "accessions": {"R1": [], "R2": []}
+    }
     
-    bc_fq = urljoin(server, f["href"])
-    bc_acc = f["accession"]
-    out_data["fastq"]["BC"].append(bc_fq)
-    out_data["accessions"]["BC"].append(bc_acc)
+    for k, v in r1.values():
+        r1_fq = urljoin(server, v["href"])
+        r1_acc = v["accession"]
+
+        p2 = v["paired_with"]
+        r1_fq = urljoin(server, r2[p2]["href"])
+        r2_acc = r2[p2]["accession"]
+
+        out_data["fastq"]["R1"].append(r1_fq)
+        out_data["fastq"]["R2"].append(r2_fq)
+        out_data["accessions"]["R1"].append(r1_acc)
+        out_data["accessions"]["R2"].append(r2_acc)
+
+else:
+    out_data |= {
+        "fastq": {"R1": [], "R2": [], "BC": []},
+        "accessions": {"R1": [], "R2": [], "BC": []}
+    }
+
+    for f in bc.values():
+        m0, m1 = f["index_of"]
+
+        if m0 in r1 and m1 in r2:
+            r1_fq = urljoin(server, r1[m0]["href"])
+            r2_fq = urljoin(server, r2[m1]["href"])
+            r1_acc = r1[m0]["accession"]
+            r2_acc = r2[m1]["accession"]
+
+            out_data["fastq"]["R1"].append(r1_fq)
+            out_data["fastq"]["R2"].append(r2_fq)
+            out_data["accessions"]["R1"].append(r1_acc)
+            out_data["accessions"]["R2"].append(r2_acc)
+
+        elif m1 in r1 and m0 in r2:
+            r1_fq = urljoin(server, r1[m1]["href"])
+            r2_fq = urljoin(server, r2[m0]["href"])
+            r1_acc = r1[m1]["accession"]
+            r2_acc = r2[m0]["accession"]
+
+            out_data["fastq"]["R1"].append(r1_fq)
+            out_data["fastq"]["R2"].append(r2_fq)
+            out_data["accessions"]["R1"].append(r1_acc)
+            out_data["accessions"]["R2"].append(r2_acc)
+
+        else:
+            raise ValueError("Index FASTQ does not properly match with reads")
+        
+        bc_fq = urljoin(server, f["href"])
+        bc_acc = f["accession"]
+        out_data["fastq"]["BC"].append(bc_fq)
+        out_data["accessions"]["BC"].append(bc_acc)
 
 with open(sample_data_file, 'w') as f:
     metadata = json.dump(out_data, f, indent=4)
