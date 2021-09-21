@@ -450,7 +450,7 @@ try:
         m = parse_barcode_matching_qc(barcode_matching)
         a = parse_adapter_trimming_qc(adapter_trimming)
         r = parse_barcode_revcomp_qc(barcode_revcomp)
-        h = build_quality_metric_header(sample_data, config, data_path, step_run)
+        h = build_quality_metric_header(sample_data, config, data_path, read_stats_out, step_run)
         read_stats = h | m | a | r
 
         write_json(read_stats, read_stats_out)
@@ -463,7 +463,7 @@ try:
         samstats_raw = snakemake.input['samstats_raw']
 
         a = parse_flagstat_qc(samstats_raw)
-        h = build_quality_metric_header(sample_data, config, data_path, step_run)
+        h = build_quality_metric_header(sample_data, config, data_path, alignment_stats_out, step_run)
         alignment_stats = h | a
 
         write_json(alignment_stats, alignment_stats_out)
@@ -482,9 +482,10 @@ try:
         p = parse_dup_qc(picard_markdup)
         l = parse_lib_complexity_qc(pbc_stats)
         m = parse_frac_mito_qc(frac_mito)
-        h = build_quality_metric_header(sample_data, config, data_path, step_run)
-        alignment_stats = h | s | m
-        lib_comp_stats = h | p | l
+        ha = build_quality_metric_header(sample_data, config, data_path, alignment_stats_out, step_run)
+        hl = ha = build_quality_metric_header(sample_data, config, data_path, lib_comp_stats_out, step_run)
+        alignment_stats = ha | s | m
+        lib_comp_stats = hl | p | l
 
         write_json(alignment_stats, alignment_stats_out)
         write_json(lib_comp_stats, lib_comp_stats_out)
@@ -512,7 +513,7 @@ try:
             archr_pre_filter_metadata, 
             archr_tss_by_unique_frags
         )
-        h = build_quality_metric_header(sample_data, config, data_path, step_run)
+        h = build_quality_metric_header(sample_data, config, data_path, analyses_stats_out, step_run)
         analyses_stats = h | f
 
         write_json(analyses_stats, analyses_stats_out)
