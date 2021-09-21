@@ -73,12 +73,12 @@ if modality == "ren":
         "accessions": {"R1": [], "R2": []}
     }
     
-    for k, v in r1.values():
+    for k, v in r1.items():
         r1_fq = urljoin(server, v["href"])
         r1_acc = v["accession"]
 
         p2 = v["paired_with"]
-        r1_fq = urljoin(server, r2[p2]["href"])
+        r2_fq = urljoin(server, r2[p2]["href"])
         r2_acc = r2[p2]["accession"]
 
         out_data["fastq"]["R1"].append(r1_fq)
