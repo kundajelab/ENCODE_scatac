@@ -6,6 +6,8 @@ rule strip_fastq:
     """
     Strip FASTQ read descriptions
     """
+    input:
+        "results/{sample}/input_data.json"
     output:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
     params:
@@ -23,6 +25,8 @@ rule fetch_fastq_bc:
     """
     Fetch barcodes fastq
     """
+    input:
+        "results/{sample}/input_data.json"
     output:
         pipe("temp/{sample}/fastqs/fastq_barcode.fastq")
     params:
