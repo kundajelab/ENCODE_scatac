@@ -6,8 +6,8 @@ rule strip_fastq:
     """
     Strip FASTQ read descriptions
     """
-    # input:
-    #     lambda w: HTTP.remote(sample_data[w.sample]["fastq"][w.read], keep_local=config["keep_inputs"], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"]) 
+    input:
+        lambda w: HTTP.remote(sample_data[w.sample]["fastq"][w.read], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"], keep_local=config["keep_inputs"]) 
     output:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
     conda:
@@ -22,7 +22,7 @@ rule detect_revcomp:
     Detect whether to reverse complement barcodes
     """
     input:
-        lambda w: HTTP.remote(sample_data[w.sample]["fastq"]["BC"][0], keep_local=config["keep_inputs"], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"]) 
+        lambda w: HTTP.remote(sample_data[w.sample]["fastq"]["BC"][0], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"], keep_local=config["keep_inputs"]) 
     output:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
         qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
