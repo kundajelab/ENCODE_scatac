@@ -55,6 +55,7 @@ def match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_
     print("start read") ####
     chunk_size = 10000
     while f.read_chunk(chunk_size):
+        print("read") ####
         pass_filter = (f.get_match_result("cell", "dist") <=max_barcode_dist) & \
             (f.get_match_result("cell", "second_best_dist") > f.get_match_result("cell", "dist"))
         print(pass_filter) ####
