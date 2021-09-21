@@ -34,7 +34,7 @@ rule fetch_fastq_bc:
     group: 
         "fastqs"
     shell:
-        "curl -L -u {params.username}:{params.password} {input} | zcat > {output} || true"
+        "curl -L -u {params.username}:{params.password} {params.url} | zcat > {output} || true"
 
 rule detect_revcomp:
     """
