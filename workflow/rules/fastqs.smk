@@ -72,8 +72,8 @@ rule match_barcodes:
         whitelist = lambda w: config["bc_whitelist"][sample_config[w.sample]['modality']],
         revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt"
     output: 
-        fastq1_bc = pipe("temp/{sample}/fastqs/R1_bc_full.fastq"),
-        fastq2_bc = pipe("temp/{sample}/fastqs/R2_bc_full.fastq"),
+        fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_full.fastq"),
+        fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_full.fastq"),
         qc_matching = temp("temp/{sample}/fastqs/barcode_matching_full.tsv")
     params:
         barcode_dist = lambda w: config["max_barcode_dist"],
