@@ -45,7 +45,8 @@ rule detect_revcomp:
     Detect whether to reverse complement barcodes
     """
     input:
-        "temp/{sample}/fastqs/fastq_barcode.fastq"
+        fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",
+        whitelist = lambda w: config["bc_whitelist"][sample_config[w.sample]['modality']]
     output:
         out = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
         qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
