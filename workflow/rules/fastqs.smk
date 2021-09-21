@@ -8,7 +8,7 @@ rule strip_fastq:
     """
     input:
         # lambda w: HTTP.remote(sample_data[w.sample]["fastq"][w.read], username=os.environ["DCC_API_KEY"], password=os.environ["DCC_SECRET_KEY"], keep_local=config["keep_inputs"]) 
-        HTTP.remote("test.encodedcc.org/files/ENCFF587KRI/@@download/ENCFF587KRI.fastq.gz", keep_local=True).download() ####
+        HTTP.remote("genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip", keep_local=True) ####
 
     output:
         pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
