@@ -39,6 +39,11 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=1000, thresh=0.8):
             if seq in bcrc:
                 bcrc_match += 1
 
+    with open(fastq, 'rt') as f: ####
+        for lnum, line in enumerate(f):
+            print("eiwoe") ####
+            print(lnum, line) ####
+
     bc_match_prop = bc_match / num_reads
     bcrc_match_prop = bcrc_match / num_reads
     valid = (bc_match_prop >= thresh) and (bcrc_match_prop >= thresh)
