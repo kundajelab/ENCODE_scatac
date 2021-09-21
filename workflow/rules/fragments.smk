@@ -85,7 +85,7 @@ rule metadata_fragments:
         "results/{sample}/fragments/fragments_metadata.json"
     params:
         output_group = "fragments",
-        sample_data = lambda w: samples[w.sample]
+        sample_data = lambda w: sample_data[w.sample]
     conda:
         "../envs/fragments.yaml"
     group: 

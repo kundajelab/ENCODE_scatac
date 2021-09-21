@@ -161,7 +161,7 @@ rule metadata_bam_filtered:
         "results/{sample}/filtering/filtered_bam_metadata.json",
     params:
         output_group = "filtering",
-        sample_data = lambda w: samples[w.sample]
+        sample_data = lambda w: sample_data[w.sample]
     conda:
         "../envs/filtering.yaml"
     group: 
@@ -185,7 +185,7 @@ rule metadata_qc_alignments_filtered:
         lib_comp_stats = "results/{sample}/filtering/alignments_lib_comp_qc_metadata.json"
     params:
         output_group = "filtering",
-        sample_data = lambda w: samples[w.sample]
+        sample_data = lambda w: sample_data[w.sample]
     conda:
         "../envs/filtering.yaml"
     group: 
