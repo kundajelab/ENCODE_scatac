@@ -52,23 +52,18 @@ def match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_
     total_reads = 0
     total_pass = 0
 
-    print("start read") ####
-    # chunk_size = 10000
-    chunk_size = 100
-    while c := f.read_chunk(chunk_size):
-        print(f"read {c}") ####
+    # print("start read") ####
+    chunk_size = 10000
+    while f.read_chunk(chunk_size):
         pass_filter = (f.get_match_result("cell", "dist") <=max_barcode_dist) & \
             (f.get_match_result("cell", "second_best_dist") > f.get_match_result("cell", "dist"))
-        print(pass_filter) ####
 
         total_reads += len(pass_filter)
         total_pass += pass_filter.sum()
         values, counts = np.unique(f.get_match_result("cell", "dist"), return_counts=True)
         barcode_counts[np.minimum(values, max_barcode_dist + 1)] += counts
         
-        print("start write") ####
         f.write_chunk(pass_filter)
-        print(f"written {total_pass}") ####
         
     with open(qc_path, "w") as stats_output:
         print(f"{total_pass}/{total_reads} reads passing, ({total_pass/total_reads*100:.2f}%)\n", file=stats_output)

@@ -72,8 +72,8 @@ rule match_barcodes:
         whitelist = lambda w: config["bc_whitelist"][sample_config[w.sample]['modality']],
         revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt"
     output: 
-        fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_full.fastq"),
-        fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_full.fastq"),
+        fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_full.fastq.gz"),
+        fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_full.fastq.gz"),
         qc_matching = temp("temp/{sample}/fastqs/barcode_matching_full.tsv")
     params:
         barcode_dist = lambda w: config["max_barcode_dist"],
@@ -94,7 +94,7 @@ rule fetch_ren:
     input:
         "temp/{sample}/fastqs/stripped_{read}.fastq"
     output:
-        pipe("temp/{sample}/fastqs/{read}_bc_ren.fastq"),
+        pipe("temp/{sample}/fastqs/{read}_bc_ren.fastq.gz"),
     conda:
         "../envs/fastqs.yaml"
     group: 
@@ -102,7 +102,7 @@ rule fetch_ren:
     shell:
         "awk -v FS=':' "
         "'{if (NR%4==1) {s=\"@\"$2; for (i=3 ; i<=NF ; i++) {s = s \":\" $i } ; s = s \"\\tCB:Z:\" substr($1,2) ; print s} else {print $0}}' "
-        "{input} > {output}"
+        "{input} | gzip -c -1 > {output}"
 
 rule dummy_qc_ren:
     """
@@ -137,8 +137,8 @@ rule trim_adapter:
     Read adapter trimming
     """
     input:
-        fastq1_bc = lambda w: f"temp/{w.sample}/fastqs/R1_bc_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.fastq",
-        fastq2_bc = lambda w: f"temp/{w.sample}/fastqs/R2_bc_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.fastq"
+        fastq1_bc = lambda w: f"temp/{w.sample}/fastqs/R1_bc_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.fastq.gz",
+        fastq2_bc = lambda w: f"temp/{w.sample}/fastqs/R2_bc_{'ren' if sample_config[w.sample]['modality'] == 'ren' else 'full'}.fastq.gz"
     output:
         fastq1_trim = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2_trim = "results/{sample}/fastqs/R2_trim.fastq.gz",
