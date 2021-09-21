@@ -103,7 +103,7 @@ rule library_complexity:
     output:
         "results/{sample}/filtering/pbc_stats.tsv",
     params:
-        pbc_script = srcdir("scripts/pbc_stats.py")
+        pbc_script = srcdir("../scripts/pbc_stats.py")
     conda:
         "../envs/filtering.yaml"
     group: 

@@ -79,7 +79,7 @@ try:
         out1 = snakemake.output['r1']
         out2 = snakemake.output['r2']
 
-        preds = list(sample_data["accessions"].values())
+        preds = [i in j for j in sample_data["accessions"].values()]
         
         h1 = file_header(sample_data, config, r1, preds, step_run, parse_preds=False)
         h2 = file_header(sample_data, config, r2, preds, step_run, parse_preds=False)
