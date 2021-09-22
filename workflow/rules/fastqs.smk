@@ -39,7 +39,7 @@ rule fetch_fastq_bc:
     group: 
         "fastqs"
     shell:
-        "curl --no-progress-meter -L -u {params.usr}:{params.pwd} {params.url} | "
+        "curl -L -u {params.usr}:{params.pwd} {params.url} | "
         "zcat > {output} || true"
 
 rule detect_revcomp:
