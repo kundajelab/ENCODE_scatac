@@ -125,7 +125,6 @@ rule output_fragments:
         "cp {input.frag} {output.frag}; "
         "cp {input.ind} {output.ind}"
 
-
 rule placeholder_fragments_qc:
     """
     Create placeholder QC files if no filtering is done
