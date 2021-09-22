@@ -1,3 +1,5 @@
+import gzip
+
 REV_COMP = str.maketrans("ATGC", "TACG")
 def reverse_complement(seq):
     return str.translate(seq, REV_COMP)[::-1]
