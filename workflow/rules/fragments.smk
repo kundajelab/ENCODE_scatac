@@ -66,8 +66,8 @@ rule filter_multiplets:
         frag_ind = "temp/{sample}/fragments/fragments_unfiltered.tsv.gz.tbi"
     output: 
         frag = temp("temp/{sample}/fragments/fragments_unsorted.tsv"),
-        barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
-        qc = "results/{sample}/fragments/multiplet_stats.txt"
+        barcodes = temp("temp/{sample}/fragments/excluded_barcodes_unfiltered.tsv"),
+        qc = temp("temp/{sample}/fragments/multiplet_stats_unfiltered.txt")
     conda:
         "../envs/fragments.yaml"
     group: 
@@ -124,6 +124,43 @@ rule output_fragments:
     shell: 
         "cp {input.frag} {output.frag}; "
         "cp {input.ind} {output.ind}"
+
+
+rule placeholder_fragments_qc:
+    """
+    Create placeholder QC files if no filtering is done
+    """
+    input: 
+        "temp/{sample}/fragments/fragments_unfiltered.tsv.gz"
+    output: 
+        barcodes = temp(touch("temp/{sample}/fragments/excluded_barcodes_unfiltered.tsv")),
+        qc = temp(touch("temp/{sample}/fragments/multiplet_stats_unfiltered.txt"))
+    conda:
+        "../envs/fragments.yaml"
+    group: 
+        "fragments"
+    shell: 
+        "cp {input.bc} {output.bc}; "
+        "cp {input.qc} {output.qc}"
+
+
+rule output_fragments_qc:
+    """
+    Move fragments qc files to final location
+    """
+    input: 
+        bc = lambda w: f"temp/{w.sample}/fragments/excluded_barcodes_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv",
+        qc = lambda w: f"temp/{w.sample}/fragments/multiplet_stats{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.txt",
+    output: 
+        bc = "results/{sample}/fragments/excluded_barcodes.tsv",
+        qc = "results/{sample}/fragments/multiplet_stats.txt"
+    conda:
+        "../envs/fragments.yaml"
+    group: 
+        "fragments"
+    shell: 
+        "cp {input.bc} {output.bc}; "
+        "cp {input.qc} {output.qc}"
 
 rule tarball_fragments: 
     """
