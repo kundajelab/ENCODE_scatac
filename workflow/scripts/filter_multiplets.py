@@ -284,7 +284,7 @@ def query_linkage_for_gb_multiplets(
 
 
 def print_and_log(text, outfile, starttime=0):
-    logtime = time.clock() - starttime
+    logtime = time.process_time() - starttime
     if logtime < 60:
         logtime = "{:,}s".format(logtime)
     else:
@@ -319,7 +319,7 @@ def filter_fragments(frag_in, frag_out, exclusions):
 
 def main(fragments, fragments_index, fragments_out, excluded_barcodes, summary):
     logout = open(summary, "w")
-    starttime = time.clock()
+    starttime = time.process_time() 
 
     print_and_log(
         "Identifying candidate barcode for gel bead multiplet detection...",
