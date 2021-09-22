@@ -77,10 +77,9 @@ rule filter_multiplets:
 
 rule sort_fragments_filtered:
     """
-    Sort and compress filtered fragments
+    Compress filtered fragments
     """
     input: 
-        # lambda w: f"temp/{w.sample}/fragments/fragments_{'unsorted' if sample_config[w.sample]['modality'] == '10x' else 'raw'}.tsv"
         "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
         temp("temp/{sample}/fragments/fragments_filtered.tsv.gz")
@@ -91,8 +90,7 @@ rule sort_fragments_filtered:
     group: 
         "fragments"
     shell: 
-        "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' --parallel={threads} {input} | " # Sort the file by chr, start, end, then barcode_id
-        "bgzip > {output}"
+        "bgzip {input} > {output}"
 
 rule index_fragments:
     """
