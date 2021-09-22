@@ -66,8 +66,8 @@ rule filter_multiplets:
         frag_ind = "temp/{sample}/fragments/fragments_unfiltered.tsv.gz.tbi"
     output: 
         frag = temp("temp/{sample}/fragments/fragments_unsorted.tsv"),
-        barcodes = temp("temp/{sample}/fragments/excluded_barcodes_unfiltered.tsv"),
-        qc = temp("temp/{sample}/fragments/multiplet_stats_unfiltered.txt")
+        barcodes = temp("temp/{sample}/fragments/excluded_barcodes_filtered.tsv"),
+        qc = temp("temp/{sample}/fragments/multiplet_stats_filtered.txt")
     conda:
         "../envs/fragments.yaml"
     group: 
