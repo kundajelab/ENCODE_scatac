@@ -80,7 +80,7 @@ rule sort_fragments:
     Sort and compress fragments
     """
     input: 
-        lambda w: f"temp/{w.sample}/fragments/fragments_{'unfiltered' if sample_config[w.sample]['modality'] == '10x' else 'unsorted'}.tsv"
+        lambda w: f"temp/{w.sample}/fragments/fragments_{'unsorted' if sample_config[w.sample]['modality'] == '10x' else 'raw'}.tsv"
     output: 
         "results/{sample}/fragments/fragments.tsv.gz"
     threads: 
