@@ -150,7 +150,7 @@ rule output_fragments_qc:
     """
     input: 
         bc = lambda w: f"temp/{w.sample}/fragments/excluded_barcodes_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv",
-        qc = lambda w: f"temp/{w.sample}/fragments/multiplet_stats{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.txt",
+        qc = lambda w: f"temp/{w.sample}/fragments/multiplet_stats_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.txt",
     output: 
         bc = "results/{sample}/fragments/excluded_barcodes.tsv",
         qc = "results/{sample}/fragments/multiplet_stats.txt"
