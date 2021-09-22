@@ -25,6 +25,7 @@ import pysam
 import os
 import sys
 import time
+import gzip
 import pandas as pd
 import numpy as np
 from collections import Counter
@@ -292,7 +293,31 @@ def print_and_log(text, outfile, starttime=0):
     print("{} - {}".format(logtime, text))
 
 
-def main(fragments, fragments_index, barcodes, excluded_barcodes, summary):
+def get_barcodes(fragments):
+    bc_counter = Counter()
+    with gzip.open(fragments, "rt") as f:
+        for line in f:
+            entries = line.strip("\n").split("\t")
+            bc = entries[3]
+            count = int(entries[4])
+
+            bc_counter[bc] += count
+    return pd.DataFrame.from_records(bc_counter.items(), columns=['barcode', 'passed_filters'])
+
+
+def filter_fragments(frag_in, frag_out, exclusions):
+    blacklist = set(exclusions)
+    with gzip.open(frag_in, "rt") as fi, open(frag_out, "wt") as fo:
+        for line in fi:
+            entries = line.strip("\n").split("\t")
+            bc = entries[3]
+            if bc in blacklist:
+                print(f"exc {bc}") ####
+                continue
+            fo.write(line)
+
+
+def main(fragments, fragments_index, fragments_out, excluded_barcodes, summary):
     logout = open(summary, "w")
     starttime = time.clock()
 
@@ -301,7 +326,7 @@ def main(fragments, fragments_index, barcodes, excluded_barcodes, summary):
         logout,
         starttime,
     )
-    singlecell_df = pd.read_csv(barcodes)
+    singlecell_df = get_barcodes(fragments)
     # Query the singlecell file to identify barcodes to examine for possible gel bead
     # multiplets
     mincounts = MINIMUM_COUNTS_FOR_GB_MULTIPLETS
@@ -633,17 +658,19 @@ def main(fragments, fragments_index, barcodes, excluded_barcodes, summary):
     # with open(args.cell_barcodes, "w") as cell_out:
     #     singlecell_df.to_csv(cell_out, columns=singlecell_df.columns, header=True, index=False)
 
+    filter_fragments(fragments, fragments_out, exclusions)
+    
     logout.close()
 
 try:
     fragments = snakemake.input['frag']
     fragments_index = snakemake.input['frag_ind']
-    barcodes = snakemake.input['barcodes']
     
+    fragments_out = snakemake.output['frag']
     excluded_barcodes = snakemake.output['barcodes']
     summary = snakemake.output['qc']
 
-    main(fragments, fragments_index, barcodes, excluded_barcodes, summary)
+    main(fragments, fragments_index, fragments_out, excluded_barcodes, summary)
 
 except NameError:
     pass 
