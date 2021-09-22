@@ -302,7 +302,7 @@ def get_barcodes(fragments):
             count = int(entries[4])
 
             bc_counter[bc] += count
-    return pd.DataFrame.from_records(bc_counter.items(), columns=['barcode', 'passed_filters'])
+    return pd.DataFrame.from_records([(k, v) for k, v in bc_counter.items()], columns=['barcode', 'passed_filters'])
 
 
 def filter_fragments(frag_in, frag_out, exclusions):
