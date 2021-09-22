@@ -135,14 +135,6 @@ rule placeholder_fragments_qc:
     output: 
         barcodes = temp(touch("temp/{sample}/fragments/excluded_barcodes_unfiltered.tsv")),
         qc = temp(touch("temp/{sample}/fragments/multiplet_stats_unfiltered.txt"))
-    conda:
-        "../envs/fragments.yaml"
-    group: 
-        "fragments"
-    shell: 
-        "cp {input.bc} {output.bc}; "
-        "cp {input.qc} {output.qc}"
-
 
 rule output_fragments_qc:
     """
