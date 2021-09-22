@@ -117,7 +117,7 @@ rule output_fragments:
         frag = lambda w: f"temp/{w.sample}/fragments/fragments_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv.gz",
         ind = lambda w: f"temp/{w.sample}/fragments/fragments_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv.gz.tbi"
     output: 
-        frag = "results/{sample}/fragments/fragments.tsv.gz"
+        frag = "results/{sample}/fragments/fragments.tsv.gz",
         ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     conda:
         "../envs/fragments.yaml"
