@@ -75,14 +75,15 @@ rule filter_multiplets:
     script: 
         "../scripts/filter_multiplets.py"
 
-rule sort_fragments:
+rule sort_fragments_filtered:
     """
-    Sort and compress fragments
+    Sort and compress filtered fragments
     """
     input: 
-        lambda w: f"temp/{w.sample}/fragments/fragments_{'unsorted' if sample_config[w.sample]['modality'] == '10x' else 'raw'}.tsv"
+        # lambda w: f"temp/{w.sample}/fragments/fragments_{'unsorted' if sample_config[w.sample]['modality'] == '10x' else 'raw'}.tsv"
+        "temp/{sample}/fragments/fragments_unsorted.tsv"
     output: 
-        "results/{sample}/fragments/fragments.tsv.gz"
+        temp("temp/{sample}/fragments/fragments_filtered.tsv.gz")
     threads: 
         max_threads
     conda:
@@ -95,18 +96,36 @@ rule sort_fragments:
 
 rule index_fragments:
     """
-    Index fragments file
+    Index filtered fragments file
     """
     input: 
-        "results/{sample}/fragments/fragments.tsv.gz"
+        "temp/{sample}/fragments/fragments_filtered.tsv.gz"
     output: 
-        "results/{sample}/fragments/fragments.tsv.gz.tbi"
+        temp("temp/{sample}/fragments/fragments_filtered.tsv.gz.tbi")
     conda:
         "../envs/fragments.yaml"
     group: 
         "fragments"
     shell: 
         "tabix --zero-based --preset bed {input}"
+
+rule output_fragments:
+    """
+    Move fragments file to final location
+    """
+    input: 
+        frag = lambda w: f"temp/{w.sample}/fragments/fragments_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv.gz",
+        ind = lambda w: f"temp/{w.sample}/fragments/fragments_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv.gz.tbi"
+    output: 
+        frag = "results/{sample}/fragments/fragments.tsv.gz"
+        ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
+    conda:
+        "../envs/fragments.yaml"
+    group: 
+        "fragments"
+    shell: 
+        "cp {input.frag} {output.frag}; "
+        "cp {input.ind} {output.ind}"
 
 rule tarball_fragments: 
     """
