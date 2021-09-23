@@ -173,7 +173,7 @@ def iterate_through_fragment_adjacencies(
 
             # Periodically clean up old keys to reduce the memory footprint
             if len(stops) > MAXIMUM_STOP_DICT_SIZE:
-                for key in stops.keys():
+                for key in list(stops):
                     if key < (start - MAXIMUM_FRAGMENT_SIZE):
                         stops.pop(key)
 
@@ -550,7 +550,7 @@ def main(fragments, fragments_index, fragments_out, excluded_barcodes, summary):
 
     # Post-screen barcode multiplets for mutually linked pairs, and remove the pair
     # where we've excluded the larger barcode
-    for minor_barcode in putative_barcode_multiplets.keys():
+    for minor_barcode in list(putative_barcode_multiplets):
         if minor_barcode not in putative_barcode_multiplets:
             # Because we've popped it off before we got here
             continue
