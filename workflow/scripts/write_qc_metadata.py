@@ -379,6 +379,35 @@ def parse_lib_complexity_qc(txt):
     return result
 
 
+def multiplet_filtering_qc(txt, barcodes):
+    result = OrderedDict()
+    if os.path.getsize(txt) == 0:
+        result['is_multiplet_filtered'] = False
+        return result
+    result['multiplet_stats'] = {"path": os.path.abspath(txt)}
+
+    if os.path.getsize(barcodes) > 0:
+        result['excluded_barcodes'] = {"path": os.path.abspath(barcodes)}
+
+    with open(txt, 'r') as f:
+        for l in f:
+            line = l.split('-', 1)[-1].lstrip(' ').rstrip('\n')
+
+            if line.startswith('Original run had ') and line.endswith(' total cell barcodes'):
+                n = line.removeprefix('Original run had ').removesuffix(' total cell barcodes')
+                result['original_barcode_count'] = to_int(n)
+
+            elif line.startswith('Identified ') and line.endswith(' total barcodes for gel bead multiplet detection.'):
+                n = line.removeprefix('Identified ').removesuffix(' total barcodes for gel bead multiplet detection.')
+                result['gb_analysis_barcode_count'] = to_int(n)
+
+            elif line.startswith('After multiplet exclusions, have ') and line.endswith(' total cell barcodes'):
+                n = line.removeprefix('After multiplet exclusions, have ').removesuffix(' total cell barcodes')
+                result['final_barcode_count'] = to_int(n)
+
+    return result
+
+
 def parse_archr_qc(dt, df, fs, pf, tu):
     result = OrderedDict()
 
@@ -455,7 +484,6 @@ try:
 
         write_json(read_stats, read_stats_out)
 
-
     elif out_group == "mapping":
         step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
 
@@ -490,11 +518,18 @@ try:
         write_json(alignment_stats, alignment_stats_out)
         write_json(lib_comp_stats, lib_comp_stats_out)
 
-    elif out_group == "fragments": #TODO
+    elif out_group == "fragments": 
         step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
 
         fragments_stats_out = snakemake.output['fragments_stats']
         multiplet_stats = snakemake.input['multiplets']
+        excluded_barcodes = snakemake.input['barcodes']
+
+        m = multiplet_filtering_qc(multiplet_stats, excluded_barcodes)
+        h = build_quality_metric_header(sample_data, config, data_path, fragments_stats_out, step_run)
+        fragments_stats = h | m
+
+        write_json(fragments_stats, fragments_stats_out)
 
     elif out_group == "analyses":
         step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value

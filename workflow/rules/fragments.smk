@@ -129,8 +129,6 @@ rule placeholder_fragments_qc:
     """
     Create placeholder QC files if no filtering is done
     """
-    input: 
-        "temp/{sample}/fragments/fragments_unfiltered.tsv.gz"
     output: 
         barcodes = temp(touch("temp/{sample}/fragments/excluded_barcodes_unfiltered.tsv")),
         qc = temp(touch("temp/{sample}/fragments/multiplet_stats_unfiltered.txt"))
@@ -189,6 +187,25 @@ rule metadata_fragments:
     script: 
         "../scripts/write_file_metadata.py"
 
+rule metadata_qc_fragments:
+    """
+    Write fragments QC metadata
+    """
+    input: 
+        multiplets = "results/{sample}/fragments/multiplet_stats.txt",
+        barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
+    output: 
+        fragments_stats = "results/{sample}/fragments/fragments_qc_metadata.json"
+    params:
+        output_group = "fragments",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/fragments.yaml"
+    group: 
+        "fragments"
+    script: 
+        "../scripts/write_qc_metadata.py"
+
 rule fragments_done:
     """
     Touch flag file upon group completion
@@ -200,6 +217,7 @@ rule fragments_done:
         "results/{sample}/fragments/excluded_barcodes.tsv",
         "results/{sample}/fragments/multiplet_stats.txt",
         "results/{sample}/fragments/fragments_metadata.json",
+        "results/{sample}/fragments/fragments_qc_metadata.json"
     output:
         touch("results/{sample}/fragments/fragments.done")
     group: 

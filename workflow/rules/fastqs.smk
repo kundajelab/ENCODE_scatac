@@ -111,8 +111,8 @@ rule dummy_qc_ren:
     Create empty dummy QC files for Bing Ren data
     """
     output:
-        touch("temp/{sample}/fastqs/barcode_revcomp_ren.txt"),
-        touch("temp/{sample}/fastqs/barcode_matching_ren.tsv")
+        temp(touch("temp/{sample}/fastqs/barcode_revcomp_ren.txt")),
+        temp(touch("temp/{sample}/fastqs/barcode_matching_ren.tsv"))
     group: 
         "fastqs"
 

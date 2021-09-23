@@ -582,14 +582,14 @@ def main(fragments, fragments_index, fragments_out, excluded_barcodes, summary):
     # Write out the excluded barcodes to a CSV
     with open(excluded_barcodes, "w") as excluded_out:
         excluded_out.write(
-            "{},{},{}\n".format(
+            "{}\t{}\t{}\n".format(
                 "Excluded Barcode", "Linked Barcode", "Exclusion Reason"
             )
         )
         for excluded_barcode in sorted(exclusions.keys()):
             linked_barcode, reason = exclusions[excluded_barcode]
             excluded_out.write(
-                "{},{},{}\n".format(excluded_barcode, linked_barcode, reason)
+                "{}\t{}\t{}\n".format(excluded_barcode, linked_barcode, reason)
             )
 
     orig_cell_barcodes = all_barcodes.values

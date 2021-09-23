@@ -3,8 +3,6 @@ workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_7/
 max_threads_per_rule: 16
 archr_seed: 8757647
 
-keep_inputs: True
-
 dcc_lab: anshul-kundaje
 dcc_award: UM1HG009442
 
