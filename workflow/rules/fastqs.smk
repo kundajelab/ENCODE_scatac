@@ -44,7 +44,7 @@ rule fetch_fastq_bc:
 
 rule detect_revcomp:
     """
-    Detect whether to reverse complement barcodes
+    Auto-detect barcode complementation
     """
     input:
         fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",

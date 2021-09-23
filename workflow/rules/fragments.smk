@@ -11,6 +11,9 @@ rule bam_to_fragments:
         bai = "results/{sample}/filtering/filtered.bam.bai"
     output:
         pipe("temp/{sample}/fragments/fragments_raw.tsv")
+    params:
+        shift_plus = config["tn5_shift_plus"],
+        shift_minus = config["tn5_shift_minus"]
     log:
         "logs/{sample}/fragments/sinto.log"
     threads:
@@ -21,7 +24,7 @@ rule bam_to_fragments:
         "fragments"
     shell:
         "sinto fragments -b {input.bam} -f {output} " 
-        "--shift_plus 4 --shift_minus -4 --min_mapq 0 "
+        "--shift_plus {params.shift_plus} --shift_minus {params.shift_minus} --min_mapq 0 "
         "--max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads} > {log}"
 
 rule sort_fragments_unfiltered:
