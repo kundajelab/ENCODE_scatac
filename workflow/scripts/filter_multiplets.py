@@ -192,7 +192,7 @@ def iterate_through_fragment_adjacencies(
                 continue
 
             # gem_group = get_barcode_gem_group(barcode)
-            for linked_barcode, count in stops[start].iteritems():
+            for linked_barcode, count in stops[start].items():
                 # # Avoid linking barcodes from different libraries
                 # if gem_group != get_barcode_gem_group(linked_barcode):
                 #     continue
@@ -494,7 +494,7 @@ def main(fragments, fragments_index, fragments_out, excluded_barcodes, summary):
     # main()
     print_and_log("Identifying barcode multiplets", logout, starttime)
     putative_barcode_multiplets = {}
-    for major_barcode, count in fragment_counts_by_barcode.iteritems():
+    for major_barcode, count in fragment_counts_by_barcode.items():
         if count < MINIMUM_COUNTS_FOR_BC_MULTIPLETS:
             # Too small to examine as a potential major barcode
             continue
@@ -569,14 +569,14 @@ def main(fragments, fragments_index, fragments_out, excluded_barcodes, summary):
 
     # Post-screen barcode multiplets for those where the major barcode is itself
     # linked to another barcode
-    for minor_barcode, major_barcode in putative_barcode_multiplets.iteritems():
+    for minor_barcode, major_barcode in putative_barcode_multiplets.items():
         while major_barcode in putative_barcode_multiplets:
             major_barcode = putative_barcode_multiplets[major_barcode]
             putative_barcode_multiplets[minor_barcode] = major_barcode
 
     # Merge these exclusions with the previous gel bead multiplet exclusions
     # Note that this will overwrite older exclusions
-    for excluded_barcode, major_barcode in putative_barcode_multiplets.iteritems():
+    for excluded_barcode, major_barcode in putative_barcode_multiplets.items():
         exclusions[excluded_barcode] = (major_barcode, "barcode_multiplet")
 
     # Write out the excluded barcodes to a CSV
