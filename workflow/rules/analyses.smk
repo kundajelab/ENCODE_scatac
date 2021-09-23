@@ -117,7 +117,7 @@ rule metadata_analyses:
         "results/{sample}/analyses/analyses_metadata.json",
     params:
         output_group = "analyses",
-        sample_data = lambda w: samples[w.sample]
+        sample_data = lambda w: sample_data[w.sample]
     conda:
         "../envs/analyses.yaml"
     group: 
@@ -141,7 +141,7 @@ rule metadata_qc_analyses:
         analyses_stats = "results/{sample}/analyses/analyses_qc_metadata.json",
     params:
         output_group = "analyses",
-        sample_data = lambda w: samples[w.sample]
+        sample_data = lambda w: sample_data[w.sample]
     conda:
         "../envs/analyses.yaml"
     group: 
