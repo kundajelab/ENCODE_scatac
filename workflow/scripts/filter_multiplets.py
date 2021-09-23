@@ -109,15 +109,15 @@ SELF_SIGNAL_THRESHOLD_MULTIPLIER = 0.4
 #     return args
 
 
-def get_barcode_gem_group(barcode):
-    """10x Genomics barcodes have a key after the barcode sequence that identifies
-    the original library the barcode was derived from.  This returns that key.
-    Only necessary for aggregated data (single samples should all have the same key).
-    """
-    split = barcode.split("-")
-    assert len(split) == 2
-    barcode, gem_group = split
-    return gem_group
+# def get_barcode_gem_group(barcode):
+#     """10x Genomics barcodes have a key after the barcode sequence that identifies
+#     the original library the barcode was derived from.  This returns that key.
+#     Only necessary for aggregated data (single samples should all have the same key).
+#     """
+#     split = barcode.split("-")
+#     assert len(split) == 2
+#     barcode, gem_group = split
+#     return gem_group
 
 
 def parsed_fragments_from_file(fragments_filename, fragments_index=None):
@@ -191,11 +191,11 @@ def iterate_through_fragment_adjacencies(
             if len(stops[stop]) + len(fragment_list) > MAXIMUM_PILEUP:
                 continue
 
-            gem_group = get_barcode_gem_group(barcode)
+            # gem_group = get_barcode_gem_group(barcode)
             for linked_barcode, count in stops[start].iteritems():
-                # Avoid linking barcodes from different libraries
-                if gem_group != get_barcode_gem_group(linked_barcode):
-                    continue
+                # # Avoid linking barcodes from different libraries
+                # if gem_group != get_barcode_gem_group(linked_barcode):
+                #     continue
 
                 # Yield the linkage, along with strength of it
                 yield barcode, linked_barcode, count

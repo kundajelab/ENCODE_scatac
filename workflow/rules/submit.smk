@@ -47,6 +47,28 @@ rule submit_fastq_2:
     script: 
         "../scripts/encode_submit.py"
 
+rule submit_reads_qc: 
+    """
+    Submit reads QC
+    """
+    input: 
+        json = "results/{sample}/fastqs/reads_qc_metadata.json",
+        fastq1 = "results/{sample}/submit/R1_trim_submit.done"
+    output: 
+        touch("results/{sample}/submit/reads_qc_metadata_submit.done")
+    params:
+        schema = "file", #TODO
+        dcc_api_key = os.environ["DCC_API_KEY"], 
+        dcc_secret_key = os.environ["DCC_SECRET_KEY"]
+    log:
+        directory("logs/{sample}/submit/reads_qc_metadata_submit")
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "submit"
+    script: 
+        "../scripts/encode_submit.py"
+
 rule submit_bam_raw:
     """
     Submit raw BAM
@@ -122,6 +144,7 @@ rule submit_done:
     input: 
         "results/{sample}/submit/R1_trim_submit.done",
         "results/{sample}/submit/R2_trim_submit.done",
+        "results/{sample}/submit/reads_qc_metadata_submit.done",
         "results/{sample}/submit/raw_bam_submit.done",
         "results/{sample}/submit/filtered_bam_submit.done",
         "results/{sample}/submit/fragments_submit.done"
