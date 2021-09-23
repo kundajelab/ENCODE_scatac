@@ -192,6 +192,7 @@ rule metadata_qc_fragments:
     Write fragments QC metadata
     """
     input: 
+        data_file = "results/{sample}/fragments/fragments.tar.gz",
         multiplets = "results/{sample}/fragments/multiplet_stats.txt",
         barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
     output: 
