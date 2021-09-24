@@ -366,13 +366,13 @@ def parse_lib_complexity_qc(txt):
     result["pbc_stats"] = {"path": os.path.abspath(txt)}
 
     with open(txt, 'r') as f:
-        for line in f:
-            arr = line.strip().split('\t')
-            break
+        next()
+        arr = f.readline().strip().split('\t')
+
     result['total_fragments'] = to_int(arr[0])
     result['distinct_fragments'] = to_int(arr[1])
     result['positions_with_one_read'] = to_int(arr[2])
-    result['positions_with_one_read'] = to_int(arr[3])
+    result['positions_with_two_reads'] = to_int(arr[3])
     result['NRF'] = to_float(arr[4])
     result['PBC1'] = to_float(arr[5])
     result['PBC2'] = to_float(arr[6])

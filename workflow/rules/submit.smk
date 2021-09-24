@@ -92,6 +92,28 @@ rule submit_bam_raw:
     script: 
         "../scripts/encode_submit.py"
 
+rule submit_alignments_raw_qc: 
+    """
+    Submit raw alignments QC
+    """
+    input: 
+        json = "results/{sample}/mapping/alignments_raw_qc_metadata.json",
+        raw_bam = "results/{sample}/submit/raw_bam_submit.done"
+    output: 
+        touch("results/{sample}/submit/alignments_raw_qc_metadata_submit.done")
+    params:
+        schema = "file", #TODO
+        dcc_api_key = os.environ["DCC_API_KEY"], 
+        dcc_secret_key = os.environ["DCC_SECRET_KEY"]
+    log:
+        directory("logs/{sample}/submit/alignments_raw_qc_metadata_submit")
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "submit"
+    script: 
+        "../scripts/encode_submit.py"
+
 rule submit_bam_filtered:
     """
     Submit filtered BAM
@@ -108,6 +130,50 @@ rule submit_bam_filtered:
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
         directory("logs/{sample}/submit/filtered_bam_submit")
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "submit"
+    script: 
+        "../scripts/encode_submit.py"
+
+rule submit_alignments_filtered_qc: 
+    """
+    Submit filtered alignments QC
+    """
+    input: 
+        json = "results/{sample}/filtering/alignments_filtered_qc_metadata.json",
+        filtered_bam = "results/{sample}/submit/filtered_bam_submit.done"
+    output: 
+        touch("results/{sample}/submit/alignments_filtered_qc_metadata_submit.done")
+    params:
+        schema = "file", #TODO
+        dcc_api_key = os.environ["DCC_API_KEY"], 
+        dcc_secret_key = os.environ["DCC_SECRET_KEY"]
+    log:
+        directory("logs/{sample}/submit/alignments_filtered_qc_metadata_submit")
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "submit"
+    script: 
+        "../scripts/encode_submit.py"
+
+rule submit_lib_comp_qc: 
+    """
+    Submit library complexity QC
+    """
+    input: 
+        json = "results/{sample}/filtering/alignments_lib_comp_qc_metadata.json",
+        filtered_bam = "results/{sample}/submit/filtered_bam_submit.done"
+    output: 
+        touch("results/{sample}/submit/alignments_lib_comp_qc_metadata_submit.done")
+    params:
+        schema = "file", #TODO
+        dcc_api_key = os.environ["DCC_API_KEY"], 
+        dcc_secret_key = os.environ["DCC_SECRET_KEY"]
+    log:
+        directory("logs/{sample}/submit/alignments_lib_comp_qc_metadata_submit")
     conda:
         "../envs/portal.yaml"
     group: 
