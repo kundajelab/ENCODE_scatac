@@ -60,16 +60,16 @@ rule index_fragments:
     shell: 
         "tabix --zero-based --preset bed {input}"
 
-rule filter_multiplets:
+rule detect_multiplets:
     """
-    Filter gel bead and barcode multiplets
+    Detect gel bead and barcode multiplets
     """
     input: 
         frag = "temp/{sample}/fragments/fragments_unfiltered.tsv.gz",
         frag_ind = "temp/{sample}/fragments/fragments_unfiltered.tsv.gz.tbi"
     output: 
         barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
-        qc = temp("temp/{sample}/fragments/multiplet_stats_filtered.txt")
+        qc = "results/{sample}/fragments/multiplet_stats_filtered.txt"
     conda:
         "../envs/fragments.yaml"
     group: 
@@ -109,49 +109,49 @@ rule filter_multiplets:
 #     shell: 
 #         "tabix --zero-based --preset bed {input}"
 
-rule output_fragments:
-    """
-    Move fragments file to final location
-    """
-    input: 
-        frag = lambda w: f"temp/{w.sample}/fragments/fragments_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv.gz",
-        ind = lambda w: f"temp/{w.sample}/fragments/fragments_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv.gz.tbi"
-    output: 
-        frag = "results/{sample}/fragments/fragments.tsv.gz",
-        ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
-    conda:
-        "../envs/fragments.yaml"
-    group: 
-        "fragments"
-    shell: 
-        "cp {input.frag} {output.frag}; "
-        "cp {input.ind} {output.ind}"
+# rule output_fragments:
+#     """
+#     Move fragments file to final location
+#     """
+#     input: 
+#         frag = lambda w: f"temp/{w.sample}/fragments/fragments_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv.gz",
+#         ind = lambda w: f"temp/{w.sample}/fragments/fragments_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv.gz.tbi"
+#     output: 
+#         frag = "results/{sample}/fragments/fragments.tsv.gz",
+#         ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
+#     conda:
+#         "../envs/fragments.yaml"
+#     group: 
+#         "fragments"
+#     shell: 
+#         "cp {input.frag} {output.frag}; "
+#         "cp {input.ind} {output.ind}"
 
-rule placeholder_fragments_qc:
-    """
-    Create placeholder QC files if no filtering is done
-    """
-    output: 
-        barcodes = temp(touch("temp/{sample}/fragments/excluded_barcodes_unfiltered.tsv")),
-        qc = temp(touch("temp/{sample}/fragments/multiplet_stats_unfiltered.txt"))
+# rule placeholder_fragments_qc:
+#     """
+#     Create placeholder QC files if no filtering is done
+#     """
+#     output: 
+#         barcodes = temp(touch("temp/{sample}/fragments/excluded_barcodes_unfiltered.tsv")),
+#         qc = temp(touch("temp/{sample}/fragments/multiplet_stats_unfiltered.txt"))
 
-rule output_fragments_qc:
-    """
-    Move fragments qc files to final location
-    """
-    input: 
-        bc = lambda w: f"temp/{w.sample}/fragments/excluded_barcodes_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv",
-        qc = lambda w: f"temp/{w.sample}/fragments/multiplet_stats_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.txt",
-    output: 
-        bc = "results/{sample}/fragments/excluded_barcodes.tsv",
-        qc = "results/{sample}/fragments/multiplet_stats.txt"
-    conda:
-        "../envs/fragments.yaml"
-    group: 
-        "fragments"
-    shell: 
-        "cp {input.bc} {output.bc}; "
-        "cp {input.qc} {output.qc}"
+# rule output_fragments_qc:
+#     """
+#     Move fragments qc files to final location
+#     """
+#     input: 
+#         bc = lambda w: f"temp/{w.sample}/fragments/excluded_barcodes_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.tsv",
+#         qc = lambda w: f"temp/{w.sample}/fragments/multiplet_stats_{'filtered' if sample_config[w.sample]['modality'] == '10x' else 'unfiltered'}.txt",
+#     output: 
+#         bc = "results/{sample}/fragments/excluded_barcodes.tsv",
+#         qc = "results/{sample}/fragments/multiplet_stats.txt"
+#     conda:
+#         "../envs/fragments.yaml"
+#     group: 
+#         "fragments"
+#     shell: 
+#         "cp {input.bc} {output.bc}; "
+#         "cp {input.qc} {output.qc}"
 
 rule tarball_fragments: 
     """
