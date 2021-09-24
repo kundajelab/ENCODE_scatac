@@ -63,10 +63,10 @@ def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min
     with open(excluded_barcodes, 'w') as f:
         f.write("Barcode1\tBarcode2\tBarcode1_counts\tBarcode2_counts\tCommon\tJaccard_Index\n")
         for x, y in pair_counts.items():
-            a, b = x
-            bca = barcode_counts[a]
-            bcb = barcode_counts[b]
             if y >= min_common:
+                a, b = x
+                bca = barcode_counts[a]
+                bcb = barcode_counts[b]
                 blacklist.add(a)
                 f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(a, b, bca, bcb, y, y/(bca + bcb - y)))
 
