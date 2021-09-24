@@ -27,14 +27,14 @@ rule bam_to_fragments:
         "--shift_plus {params.shift_plus} --shift_minus {params.shift_minus} --min_mapq 0 "
         "--max_distance 2000 --min_distance 10 --barcodetag CB --nproc {threads} > {log}"
 
-rule sort_fragments_unfiltered:
+rule sort_fragments:
     """
-    Sort and compress unfiltered fragments
+    Sort and compress fragments
     """
     input: 
         "temp/{sample}/fragments/fragments_raw.tsv"
     output: 
-        temp("temp/{sample}/fragments/fragments_unfiltered.tsv.gz")
+        "results/{sample}/fragments/fragments.tsv.gz"
     threads: 
         max_threads
     conda:
@@ -45,14 +45,14 @@ rule sort_fragments_unfiltered:
         "LC_ALL=C sort -k1,1 -k2,2n -k3,3n -k4,4 -t$'\\t' --parallel={threads} {input} | " # Sort the file by chr, start, end, then barcode_id
         "bgzip > {output}"
 
-rule index_fragments_unfiltered:
+rule index_fragments:
     """
-    Index unfiltered fragments file
+    Index fragments file
     """
     input: 
-        "temp/{sample}/fragments/fragments_unfiltered.tsv.gz"
+        "results/{sample}/fragments/fragments.tsv.gz"
     output: 
-        temp("temp/{sample}/fragments/fragments_unfiltered.tsv.gz.tbi")
+        "results/{sample}/fragments/fragments.tsv.gz.tbi"
     conda:
         "../envs/fragments.yaml"
     group: 
@@ -68,8 +68,7 @@ rule filter_multiplets:
         frag = "temp/{sample}/fragments/fragments_unfiltered.tsv.gz",
         frag_ind = "temp/{sample}/fragments/fragments_unfiltered.tsv.gz.tbi"
     output: 
-        frag = temp("temp/{sample}/fragments/fragments_unsorted.tsv"),
-        barcodes = temp("temp/{sample}/fragments/excluded_barcodes_filtered.tsv"),
+        barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
         qc = temp("temp/{sample}/fragments/multiplet_stats_filtered.txt")
     conda:
         "../envs/fragments.yaml"
@@ -78,37 +77,37 @@ rule filter_multiplets:
     script: 
         "../scripts/filter_multiplets.py"
 
-rule sort_fragments_filtered:
-    """
-    Compress filtered fragments
-    """
-    input: 
-        "temp/{sample}/fragments/fragments_unsorted.tsv"
-    output: 
-        temp("temp/{sample}/fragments/fragments_filtered.tsv.gz")
-    threads: 
-        max_threads
-    conda:
-        "../envs/fragments.yaml"
-    group: 
-        "fragments"
-    shell: 
-        "bgzip {input} > {output}"
+# rule sort_fragments_filtered:
+#     """
+#     Compress filtered fragments
+#     """
+#     input: 
+#         "temp/{sample}/fragments/fragments_unsorted.tsv"
+#     output: 
+#         temp("temp/{sample}/fragments/fragments_filtered.tsv.gz")
+#     threads: 
+#         max_threads
+#     conda:
+#         "../envs/fragments.yaml"
+#     group: 
+#         "fragments"
+#     shell: 
+#         "bgzip {input} > {output}"
 
-rule index_fragments:
-    """
-    Index filtered fragments file
-    """
-    input: 
-        "temp/{sample}/fragments/fragments_filtered.tsv.gz"
-    output: 
-        temp("temp/{sample}/fragments/fragments_filtered.tsv.gz.tbi")
-    conda:
-        "../envs/fragments.yaml"
-    group: 
-        "fragments"
-    shell: 
-        "tabix --zero-based --preset bed {input}"
+# rule index_fragments:
+#     """
+#     Index filtered fragments file
+#     """
+#     input: 
+#         "temp/{sample}/fragments/fragments_filtered.tsv.gz"
+#     output: 
+#         temp("temp/{sample}/fragments/fragments_filtered.tsv.gz.tbi")
+#     conda:
+#         "../envs/fragments.yaml"
+#     group: 
+#         "fragments"
+#     shell: 
+#         "tabix --zero-based --preset bed {input}"
 
 rule output_fragments:
     """

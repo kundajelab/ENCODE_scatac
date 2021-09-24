@@ -12,15 +12,6 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def filter_fragments(frag_in, frag_out, blacklist):
-    with gzip.open(frag_in, "rt") as fi, open(frag_out, "wt") as fo:
-        for line in fi:
-            entries = line.strip("\n").split("\t")
-            bc = entries[3]
-            if bc in blacklist:
-                continue
-            fo.write(line)
-
 def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min_counts=500):
     logout = open(summary, "w")
     starttime = time.process_time() 
@@ -78,8 +69,6 @@ def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min
             if y >= min_common:
                 blacklist.add(a)
                 f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(a, b, bca, bcb, y, y/(bca + bcb - y)))
-
-    filter_fragments(fragments, fragments_out, blacklist)
 
     print_and_log(
         "Original run had {:,} total cell barcodes".format(
