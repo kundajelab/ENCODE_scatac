@@ -73,8 +73,8 @@ def main(fragments, fragments_out, multiplet_barcodes, summary, min_common=2, mi
 
             a_primary = primary_barcodes.setdefault(a, a)
             b_primary = primary_barcodes.setdefault(b, b)
-            a_set = bc_sets.setdefault(a_primary, set()).add(a) # initialize starting sets if needed
-            b_set = bc_sets.setdefault(b_primary, set()).add(b)
+            a_set = bc_sets.setdefault(a_primary, set(a)) # initialize starting sets if needed
+            b_set = bc_sets.setdefault(b_primary, set(b))
             set_info = {a_primary: a_set, b_primary: b_set}
             
 
