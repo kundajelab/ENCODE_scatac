@@ -12,7 +12,7 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def main(fragments, fragments_out, multiplet_barcodes, summary, min_common=2, min_counts=500):
+def main(fragments='/sys/stdin', multiplet_barcodes='/sys/stdout', summary='/dev/null', min_common=2, min_counts=500):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -131,13 +131,14 @@ def main(fragments, fragments_out, multiplet_barcodes, summary, min_common=2, mi
 
 try:
     fragments = snakemake.input['frag']
-    fragments_index = snakemake.input['frag_ind']
-    
-    fragments_out = snakemake.output['frag']
+
     multiplet_barcodes = snakemake.output['barcodes']
     summary = snakemake.output['qc']
 
-    main(fragments, fragments_index, fragments_out, multiplet_barcodes, summary)
+    main(fragments=fragments, multiplet_barcodes=multiplet_barcodes, summary=summary)
 
 except NameError:
     pass 
+
+if __name__ == '__main__':
+    main()
