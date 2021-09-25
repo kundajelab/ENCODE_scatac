@@ -79,7 +79,7 @@ def main(fragments, fragments_out, multiplet_barcodes, summary, min_common=2, mi
             
 
             if a_primary != b_primary:
-                remaining_primary = max([a_primary, b_primary], barcode_counts.get) 
+                remaining_primary = max([a_primary, b_primary], key=barcode_counts.get) 
                 other_primary = a_primary if remaining_primary == b_primary else b_primary   
                 for k in set_info[other_primary]:
                     primary_barcodes[k] = remaining_primary
