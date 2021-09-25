@@ -33,7 +33,7 @@ def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min
 
     i = 0
 
-    print_and_log("Identifying barcode multiplets", logout, starttime)
+    print_and_log("Reading fragments", logout, starttime)
 
     with gzip.open(fragments, 'rt') as f:
         for line in f:
@@ -45,9 +45,9 @@ def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min
 
             this_coord = (chr, start) # Use left insertion
             if this_coord != cur_coord:
-                for x,y in itertools.combinations(cur_clique, 2):
-                    pair_counts[(x,y)] += 1
-                    pair_counts[(y,x)] += 1
+                for x, y in itertools.combinations(cur_clique, 2):
+                    x, y = x, y if x < y else y, x
+                    pair_counts[(x, y)] += 1
 
                 cur_clique = set([barcode])
                 cur_coord = this_coord
@@ -59,16 +59,37 @@ def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min
             if i%1e7==0:
                 print(i)
 
+    print_and_log("Identifying barcode multiplets", logout, starttime)
+
+    multiplet_data = {}
+    bc_set_map = {}
+    for x, y in pair_counts.items():
+        if y >= min_common:
+            a, b = x
+            bca = barcode_counts[a]
+            bcb = barcode_counts[b]
+            multiplet_data[x] = (a, b, bca, bcb, y, y/(bca + bcb - y), None)
+
+            a_set = bc_set_map.setdefault(a, set()).add(a) # initialize starting sets if needed
+            b_set = bc_set_map.setdefault(b, set()).add(a)
+            
+            if a_set is not b_set: # check if they point to same object
+                a_set |= b_set # merge sets if they aren't already
+                bc_set_map[b] = a_set
+
+    primary_barcodes = {}
+    for s in bc_set_map.values():
+        primary_bc = max(barcode_counts[b] for b in s)
+        for i in s:
+            primary_barcodes[s] = primary_bc
+
     blacklist = set()
     with open(excluded_barcodes, 'w') as f:
-        f.write("Barcode1\tBarcode2\tBarcode1_counts\tBarcode2_counts\tCommon\tJaccard_Index\n")
-        for x, y in pair_counts.items():
-            if y >= min_common:
-                a, b = x
-                bca = barcode_counts[a]
-                bcb = barcode_counts[b]
-                blacklist.add(a)
-                f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(a, b, bca, bcb, y, y/(bca + bcb - y)))
+        f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\tPrimaryBarcode\n")
+        for x, data in multiplet_data.items():
+            a, b = x
+            data[-1] = primary_barcodes[a]
+            f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\t{}\n".format(*data))
 
     print_and_log(
         "Original run had {:,} total cell barcodes".format(
