@@ -12,7 +12,7 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min_counts=500):
+def main(fragments, fragments_out, multiplet_barcodes, summary, min_common=2, min_counts=500):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -62,7 +62,8 @@ def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min
     print_and_log("Identifying barcode multiplets", logout, starttime)
 
     multiplet_data = {}
-    bc_set_map = {}
+    primary_barcodes = {}
+    bc_sets = {}
     for x, y in pair_counts.items():
         if y >= min_common:
             a, b = x
@@ -70,21 +71,25 @@ def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min
             bcb = barcode_counts[b]
             multiplet_data[x] = (a, b, bca, bcb, y, y/(bca + bcb - y), None)
 
-            a_set = bc_set_map.setdefault(a, set()).add(a) # initialize starting sets if needed
-            b_set = bc_set_map.setdefault(b, set()).add(a)
+            a_primary = primary_barcodes.setdefault(a, a)
+            b_primary = primary_barcodes.setdefault(b, b)
+            a_set = bc_sets.setdefault(a_primary, set()).add(a) # initialize starting sets if needed
+            b_set = bc_sets.setdefault(b_primary, set()).add(b)
+            set_info = {a_primary: a_set, b_primary: b_set}
             
-            if a_set is not b_set: # check if they point to same object
-                a_set |= b_set # merge sets if they aren't already
-                bc_set_map[b] = a_set
 
-    primary_barcodes = {}
-    for s in bc_set_map.values():
-        primary_bc = max(barcode_counts[b] for b in s)
-        for i in s:
-            primary_barcodes[s] = primary_bc
+            if a_primary != b_primary:
+                remaining_primary = max([a_primary, b_primary], barcode_counts.get) 
+                other_primary = a_primary if remaining_primary == b_primary else b_primary   
+                for k in set_info[other_primary]:
+                    primary_barcodes[k] = remaining_primary
+
+                a_set |= b_set
+                bc_sets[remaining_primary] = a_set
+                bc_sets.pop(other_primary) 
 
     blacklist = set()
-    with open(excluded_barcodes, 'w') as f:
+    with open(multiplet_barcodes, 'w') as f:
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\tPrimaryBarcode\n")
         for x, data in multiplet_data.items():
             a, b = x
@@ -93,6 +98,22 @@ def main(fragments, fragments_out, excluded_barcodes, summary, min_common=2, min
 
     print_and_log(
         "Original run had {:,} total cell barcodes".format(
+            len(barcode_counts)
+        ),
+        logout,
+        starttime,
+    )
+
+    print_and_log(
+        "Identified {:,} barcodes belonging to multiplets".format(
+            len(barcode_counts)
+        ),
+        logout,
+        starttime,
+    )
+
+    print_and_log(
+        "Identified {:,} unique multiplets".format(
             len(barcode_counts)
         ),
         logout,
@@ -114,10 +135,10 @@ try:
     fragments_index = snakemake.input['frag_ind']
     
     fragments_out = snakemake.output['frag']
-    excluded_barcodes = snakemake.output['barcodes']
+    multiplet_barcodes = snakemake.output['barcodes']
     summary = snakemake.output['qc']
 
-    main(fragments, fragments_index, fragments_out, excluded_barcodes, summary)
+    main(fragments, fragments_index, fragments_out, multiplet_barcodes, summary)
 
 except NameError:
     pass 
