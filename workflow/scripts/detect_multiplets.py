@@ -105,7 +105,7 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
 
     print_and_log(
         "Identified {:,} barcodes belonging to multiplets".format(
-            len(barcode_counts)
+            len(primary_barcodes)
         ),
         logout,
         starttime,
@@ -113,7 +113,7 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
 
     print_and_log(
         "Identified {:,} unique multiplets".format(
-            len(barcode_counts)
+            len(bc_sets)
         ),
         logout,
         starttime,
