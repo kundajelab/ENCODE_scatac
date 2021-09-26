@@ -198,7 +198,7 @@ rule metadata_qc_fragments:
         data_file = "results/{sample}/fragments/fragments.tar.gz",
         multiplets_strict = "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
         multiplets_expanded = "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
-        barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
+        multiplet_stats = "results/{sample}/fragments/multiplet_stats.txt"
     output: 
         fragments_stats = "results/{sample}/fragments/fragments_qc_metadata.json"
     params:
