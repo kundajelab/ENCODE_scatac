@@ -12,7 +12,7 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev/null', min_common=2, min_counts=500):
+def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev/null', min_common=1, min_counts=1):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
