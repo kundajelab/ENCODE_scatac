@@ -69,7 +69,7 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
             a, b = x
             bca = barcode_counts[a]
             bcb = barcode_counts[b]
-            multiplet_data[x] = (a, b, bca, bcb, y, y/(bca + bcb - y), None)
+            multiplet_data[x] =[a, b, bca, bcb, y, y/(bca + bcb - y), None]
 
             a_primary = primary_barcodes.setdefault(a, a)
             b_primary = primary_barcodes.setdefault(b, b)
