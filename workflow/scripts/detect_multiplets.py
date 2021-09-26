@@ -111,8 +111,16 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
     )
 
     print_and_log(
-        "Considering {:,} barcode pairs".format(
+        "Considered {:,} barcode pairs".format(
             len(pair_counts)
+        ),
+        logout,
+        starttime,
+    )
+
+    print_and_log(
+        "Identified {:,} barcode pairs above threshold".format(
+            len(multiplet_data)
         ),
         logout,
         starttime,
