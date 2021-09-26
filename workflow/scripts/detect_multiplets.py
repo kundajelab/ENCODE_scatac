@@ -104,6 +104,14 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
     )
 
     print_and_log(
+        "Considering {:,} barcode pairs".format(
+            len(pair_counts)
+        ),
+        logout,
+        starttime,
+    )
+
+    print_and_log(
         "Identified {:,} barcodes belonging to multiplets".format(
             len(primary_barcodes)
         ),
