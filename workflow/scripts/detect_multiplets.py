@@ -85,7 +85,9 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
 
                 a_set |= b_set
                 bc_sets[remaining_primary] = a_set
-                bc_sets.pop(other_primary) 
+                bc_sets.pop(other_primary)
+                
+            print(primary_barcodes) ####
 
     blacklist = set()
     with open(multiplet_barcodes, 'w') as f:
