@@ -46,7 +46,7 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
             this_coord = (chr, start) # Use left insertion
             if this_coord != cur_coord:
                 for x, y in itertools.combinations(cur_clique, 2):
-                    x, y = x, y if x < y else y, x
+                    x, y = (x, y) if x < y else (y, x)
                     pair_counts[(x, y)] += 1
 
                 cur_clique = set([barcode])
