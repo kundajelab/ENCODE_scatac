@@ -190,25 +190,26 @@ rule metadata_fragments:
     script: 
         "../scripts/write_file_metadata.py"
 
-# rule metadata_qc_fragments:
-#     """
-#     Write fragments QC metadata
-#     """
-#     input: 
-#         data_file = "results/{sample}/fragments/fragments.tar.gz",
-#         multiplets = "results/{sample}/fragments/multiplet_stats.txt",
-#         barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
-#     output: 
-#         fragments_stats = "results/{sample}/fragments/fragments_qc_metadata.json"
-#     params:
-#         output_group = "fragments",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/fragments.yaml"
-#     group: 
-#         "fragments"
-#     script: 
-#         "../scripts/write_qc_metadata.py"
+rule metadata_qc_fragments:
+    """
+    Write fragments QC metadata
+    """
+    input: 
+        data_file = "results/{sample}/fragments/fragments.tar.gz",
+        multiplets_strict = "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
+        multiplets_expanded = "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
+        barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
+    output: 
+        fragments_stats = "results/{sample}/fragments/fragments_qc_metadata.json"
+    params:
+        output_group = "fragments",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/fragments.yaml"
+    group: 
+        "fragments"
+    script: 
+        "../scripts/write_qc_metadata.py"
 
 rule fragments_done:
     """
