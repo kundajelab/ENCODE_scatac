@@ -92,7 +92,12 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\tPrimaryBarcode\n")
         for x, data in multiplet_data.items():
             a, b = x
-            data[-1] = primary_barcodes[a]
+            pb = primary_barcodes[a]
+            if a != pb:
+                blacklist.add(a)
+            if b != pb:
+                blacklist.add(b)
+            data[-1] = pb
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\t{}\n".format(*data))
 
     print_and_log(
