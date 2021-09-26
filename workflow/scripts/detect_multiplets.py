@@ -12,7 +12,7 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev/null', min_common=2, min_counts=500):
+def main(fragments='/dev/stdin', barcodes_strict='/dev/stdout', barcodes_expanded='/dev/null', summary='/dev/null', min_common=2, min_counts=500, min_jsd=0.1):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -61,6 +61,7 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
     print_and_log("Identifying barcode multiplets", logout, starttime)
 
     multiplet_data = {}
+    expanded_data = {}
     primary_barcodes = {}
     bc_sets = {}
     for x, y in pair_counts.items():
@@ -68,28 +69,30 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
             a, b = x
             bca = barcode_counts[a]
             bcb = barcode_counts[b]
-            multiplet_data[x] =[a, b, bca, bcb, y, y/(bca + bcb - y), None]
-
-            a_primary = primary_barcodes.setdefault(a, a)
-            b_primary = primary_barcodes.setdefault(b, b)
-            a_set = bc_sets.setdefault(a_primary, set([a])) # initialize starting sets if needed
-            b_set = bc_sets.setdefault(b_primary, set([b]))
-            set_info = {a_primary: a_set, b_primary: b_set}
+            jsd = y/(bca + bcb - y)
+            data = [a, b, bca, bcb, y, jsd, None]
+            expanded_data[x] = data
             
-            if a_primary != b_primary:
-                remaining_primary = max([a_primary, b_primary], key=barcode_counts.get) 
-                other_primary = a_primary if remaining_primary == b_primary else b_primary   
-                for k in set_info[other_primary]:
-                    primary_barcodes[k] = remaining_primary
-
-                a_set |= b_set
-                bc_sets[remaining_primary] = a_set
-                bc_sets.pop(other_primary)
+            if jsd >= min_jsd: 
+                a_primary = primary_barcodes.setdefault(a, a)
+                b_primary = primary_barcodes.setdefault(b, b)
+                a_set = bc_sets.setdefault(a_primary, set([a])) # initialize starting sets if needed
+                b_set = bc_sets.setdefault(b_primary, set([b]))
+                set_info = {a_primary: a_set, b_primary: b_set}
                 
-            print(bc_sets) ####
+                if a_primary != b_primary:
+                    remaining_primary = max([a_primary, b_primary], key=barcode_counts.get) 
+                    other_primary = a_primary if remaining_primary == b_primary else b_primary   
+                    for k in set_info[other_primary]:
+                        primary_barcodes[k] = remaining_primary
+
+                    a_set |= b_set
+                    bc_sets[remaining_primary] = a_set
+                    bc_sets.pop(other_primary)
+                
 
     blacklist = set()
-    with open(multiplet_barcodes, 'w') as f:
+    with open(barcodes_strict, 'w') as f:
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\tPrimaryBarcode\n")
         for x, data in multiplet_data.items():
             a, b = x
@@ -100,6 +103,12 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
                 blacklist.add(b)
             data[-1] = pb
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\t{}\n".format(*data))
+
+    with open(barcodes_expanded, 'w') as f:
+        f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\n")
+        for x, data in expanded_data.items():
+            a, b = x
+            f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(*data[:-1]))
 
     print_and_log(
         "Original run had {:,} total cell barcodes".format(
@@ -118,7 +127,7 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
     )
 
     print_and_log(
-        "Identified {:,} barcode pairs above threshold".format(
+        "Identified {:,} barcode pairs above JSD threshold".format(
             len(multiplet_data)
         ),
         logout,
@@ -155,10 +164,11 @@ if __name__ == '__main__':
     try:
         fragments = snakemake.input['frag']
 
-        multiplet_barcodes = snakemake.output['barcodes']
+        barcodes_strict = snakemake.output['barcodes_strict']
+        barcodes_expanded = snakemake.output['barcodes_expanded']
         summary = snakemake.output['qc']
 
-        main(fragments=fragments, multiplet_barcodes=multiplet_barcodes, summary=summary)
+        main(fragments=fragments, barcodes_strict=barcodes_strict, barcodes_expanded=barcodes_expanded, summary=summary)
 
     except NameError:
         main()
