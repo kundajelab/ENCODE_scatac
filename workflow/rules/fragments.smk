@@ -68,7 +68,8 @@ rule detect_multiplets:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output: 
-        barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
+        barcodes_strict = "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
+        barcodes_expanded = "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
         qc = "results/{sample}/fragments/multiplet_stats.txt"
     conda:
         "../envs/fragments.yaml"
