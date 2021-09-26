@@ -25,7 +25,6 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
             barcode = line[3]
             barcode_counts[barcode] += 1
 
-
     pair_counts = Counter()
     
     cur_clique = set()
@@ -152,16 +151,14 @@ def main(fragments='/dev/stdin', multiplet_barcodes='/dev/stdout', summary='/dev
 
     logout.close()
 
-try:
-    fragments = snakemake.input['frag']
-
-    multiplet_barcodes = snakemake.output['barcodes']
-    summary = snakemake.output['qc']
-
-    main(fragments=fragments, multiplet_barcodes=multiplet_barcodes, summary=summary)
-
-except NameError:
-    pass 
-
 if __name__ == '__main__':
-    main()
+    try:
+        fragments = snakemake.input['frag']
+
+        multiplet_barcodes = snakemake.output['barcodes']
+        summary = snakemake.output['qc']
+
+        main(fragments=fragments, multiplet_barcodes=multiplet_barcodes, summary=summary)
+
+    except NameError:
+        main()
