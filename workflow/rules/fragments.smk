@@ -75,7 +75,7 @@ rule detect_multiplets:
     group: 
         "fragments"
     script: 
-        "../scripts/filter_multiplets.py"
+        "../scripts/detect_multiplets.py"
 
 # rule sort_fragments_filtered:
 #     """

@@ -21,7 +21,7 @@ def main(fragments='/sys/stdin', multiplet_barcodes='/sys/stdout', summary='/dev
     barcode_counts = Counter()
     with gzip.open(fragments, 'rt') as f:
         for line in f:
-            line = line.split('\t')
+            line = line.rstrip('\n').split('\t')
             barcode = line[3]
             barcode_counts[barcode] += 1
 
@@ -37,8 +37,8 @@ def main(fragments='/sys/stdin', multiplet_barcodes='/sys/stdout', summary='/dev
 
     with gzip.open(fragments, 'rt') as f:
         for line in f:
-            line = line.split('\t')
-            chr, start, _, barcode = line[:3]
+            line = line.rstrip('\n').split('\t')
+            chr, start, _, barcode = line[:4]
 
             if barcode_counts[barcode] < min_counts:
                 continue
