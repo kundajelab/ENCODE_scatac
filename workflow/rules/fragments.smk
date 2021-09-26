@@ -65,8 +65,8 @@ rule detect_multiplets:
     Detect gel bead and barcode multiplets
     """
     input: 
-        frag = "temp/{sample}/fragments/fragments_unfiltered.tsv.gz",
-        frag_ind = "temp/{sample}/fragments/fragments_unfiltered.tsv.gz.tbi"
+        frag = "results/{sample}/fragments/fragments.tsv.gz",
+        frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output: 
         barcodes = "results/{sample}/fragments/excluded_barcodes.tsv",
         qc = "results/{sample}/fragments/multiplet_stats.txt"
