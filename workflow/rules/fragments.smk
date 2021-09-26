@@ -219,7 +219,7 @@ rule fragments_done:
         "results/{sample}/fragments/fragments.tsv.gz.tbi",
         "results/{sample}/fragments/fragments.tar.gz",
         "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
-        "results/{sample}/fragments/multiplet_barcodes_expanded.tsv"
+        "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
         "results/{sample}/fragments/multiplet_stats.txt",
         "results/{sample}/fragments/fragments_metadata.json",
         "results/{sample}/fragments/fragments_qc_metadata.json"
