@@ -31,7 +31,7 @@ rule sort_fragments:
     """
     Sort and compress fragments
     """
-    input: 
+    input: b
         "temp/{sample}/fragments/fragments_raw.tsv"
     output: 
         "results/{sample}/fragments/fragments.tsv.gz"

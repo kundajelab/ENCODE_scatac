@@ -9,17 +9,29 @@ def bam_to_frag(in_path, out_path, shift_plus=4, shift_minus=-4):
     """
 
     input = pysam.AlignmentFile(in_path, "rb")
-    with gzip.open(out_path, "wt") as out_file:
+    with open(out_path, "w") as out_file:
+        buf = []
+        curr_pos = None
         for read in input:
-            if not (read.flag & 64 == 64) or (read.flag & 128 == 128): # ignore later read in pair
-                continue
+            if not ((read.flag & 99 == 99) or (read.flag & 147 == 147)): 
+                continue # ignore coordinate-wise second read in pair
             
             chromosome = read.reference_name
             start = read.reference_start + shift_plus
             end = start + read.template_length + shift_minus
             cell_barcode = read.get_tag("CB")
+            data = (chromosome, start, end, cell_barcode, 1)
+            pos = (chromosome, start)
 
-            print(chromosome, start, end, cell_barcode, 1, sep="\t", file=out_file)
+            if pos == curr_pos:
+                buf.append(data)
+            else:
+                buf.sort()
+                for i in buf:
+                    print(*i, sep="\t", file=out_file)
+                buf.clear()
+                buf.append(data)
+                curr_pos = pos
 
 if __name__ == '__main__':
     try:
