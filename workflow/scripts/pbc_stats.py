@@ -16,7 +16,7 @@ def calc_pbc(in_sam, out_path):
         pos = int(fields[3])
         pnext = int(fields[7])
 
-        if not ((flag & 99 == 99) or (flag & 147 == 147)):
+        if not (flag & 35 == 35):
             continue
         
         pair = (rname, pos, pnext)

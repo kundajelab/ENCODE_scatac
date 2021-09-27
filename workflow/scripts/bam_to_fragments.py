@@ -13,15 +13,15 @@ def bam_to_frag(in_path, out_path, shift_plus=4, shift_minus=-4):
         buf = []
         curr_pos = None
         for read in input:
-            # if not ((read.flag & 80 == 80) or (read.flag & 160 == 160)): 
             if read.flag & 16 == 16: 
-                continue # ignore coordinate-wise second read in pair
+                continue # ignore reverse (coordinate-wise second) read in pair
             
             chromosome = read.reference_name
             start = read.reference_start + shift_plus
             end = start + read.template_length + shift_minus
             cell_barcode = read.get_tag("CB")
-            data = (chromosome, start, end, cell_barcode, 1, read.template_length, read.next_reference_start, read.flag) ####
+            assert(read.next_reference_start >= read.reference_start) ####
+            data = (chromosome, start, end, cell_barcode, 1) ####
             pos = (chromosome, start)
 
             if pos == curr_pos:
