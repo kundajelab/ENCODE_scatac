@@ -20,7 +20,7 @@ def bam_to_frag(in_path, out_path, shift_plus=4, shift_minus=-4):
             start = read.reference_start + shift_plus
             end = start + read.template_length + shift_minus
             cell_barcode = read.get_tag("CB")
-            data = (chromosome, start, end, cell_barcode, 1)
+            data = (chromosome, start, end, cell_barcode, 1, read.template_length) ####
             pos = (chromosome, start)
 
             if pos == curr_pos:
