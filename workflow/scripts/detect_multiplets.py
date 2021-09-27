@@ -29,9 +29,9 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, max_frag_clique
 
     x_bc = range(len(barcode_counts))
     y_bc = sorted(barcode_counts.values())
-    kl_bc = KneeLocator(x_bc, y_bc, curve="concave")
-    print(kl_bc.x) ####
-    print(kl_bc.y) ####
+    kl_bc = KneeLocator(x_bc, y_bc, online=True, curve="concave")
+    # print(kl_bc.x) ####
+    # print(kl_bc.y) ####
     print(kl_bc.all_knees) ####
     print(kl_bc.all_knees_y) ####
     min_counts = kl_bc.elbow_y
@@ -98,7 +98,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, max_frag_clique
 
     x_j = range(len(expanded_data))
     y_j = sorted(expanded_data.values())
-    kl_j = KneeLocator(x_j, y_j, curve="convex")
+    kl_j = KneeLocator(x_j, y_j, online=True, curve="convex")
     min_jac = kl_j.knee_y
 
     print_and_log(
