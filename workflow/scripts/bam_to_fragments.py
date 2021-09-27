@@ -26,7 +26,7 @@ def bam_to_frag(in_path, out_path, shift_plus=4, shift_minus=-4):
             if pos == curr_pos:
                 buf.append(data)
             else:
-                buf.sort()
+                # buf.sort()
                 for i in buf:
                     print(*i, sep="\t", file=out_file)
                 buf.clear()
