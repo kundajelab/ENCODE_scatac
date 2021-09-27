@@ -27,10 +27,10 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, max_frag_clique
             barcode = line[3]
             barcode_counts[barcode] += 1
 
-    x_bc = list(range(len(barcode_counts)))
+    x_bc = range(len(barcode_counts))
     y_bc = sorted(barcode_counts.values())
     kl_bc = KneeLocator(x_bc, y_bc, curve="concave")
-    min_counts = kl_bc.knee_y
+    min_counts = kl_bc.elbow_y
 
     print_and_log(
         f"Setting minimum barcode counts threshold as {min_counts}",
@@ -92,7 +92,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, max_frag_clique
             a, b = x
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(*data[:-1]))
 
-    x_j = list(range(len(expanded_data)))
+    x_j = range(len(expanded_data))
     y_j = sorted(expanded_data.values())
     kl_j = KneeLocator(x_j, y_j, curve="convex")
     min_jac = kl_j.knee_y
