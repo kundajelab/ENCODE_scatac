@@ -22,7 +22,7 @@ rule bam_to_fragments:
 
 rule compress_fragments:
     """
-    Compress fragments
+    Compress fragment file
     """
     input:
         "temp/{sample}/fragments/fragments_raw.tsv"
@@ -33,11 +33,11 @@ rule compress_fragments:
     group: 
         "fragments"
     shell: 
-        "bgzip {input} > {output}"
+        "bgzip -c {input} > {output}"
 
 rule index_fragments:
     """
-    Index fragments file
+    Index fragment file
     """
     input: 
         "results/{sample}/fragments/fragments.tsv.gz"

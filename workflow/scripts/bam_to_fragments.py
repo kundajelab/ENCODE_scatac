@@ -19,7 +19,7 @@ def bam_to_frag(in_path, out_path, shift_plus=4, shift_minus=-4):
             start = read.reference_start + shift_plus
             end = start + read.template_length + shift_minus
             cell_barcode = read.get_tag("CB")
-            assert(read.next_reference_start >= read.reference_start) ####
+            # assert(read.next_reference_start >= read.reference_start) ####
             data = (chromosome, start, end, cell_barcode, 1)
             pos = (chromosome, start)
 
