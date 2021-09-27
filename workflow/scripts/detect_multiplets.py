@@ -3,6 +3,8 @@ import itertools
 import gzip
 from collections import Counter
 
+from kneed import KneeLocator
+
 def print_and_log(text, outfile, starttime=0):
     logtime = time.process_time() - starttime
     if logtime < 60:
@@ -12,7 +14,7 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def main(fragments='/dev/stdin', barcodes_strict='/dev/stdout', barcodes_expanded='/dev/null', summary='/dev/null', min_common=2, min_counts=500, min_jsd=0.1):
+def main(fragments, barcodes_strict, barcodes_expanded, summary, max_frag_clique=6, min_common_bc=1):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -24,6 +26,17 @@ def main(fragments='/dev/stdin', barcodes_strict='/dev/stdout', barcodes_expande
             line = line.rstrip('\n').split('\t')
             barcode = line[3]
             barcode_counts[barcode] += 1
+
+    x_bc = range(len(barcode_counts))
+    y_bc = sorted(barcode_counts.values())
+    kl_bc = KneeLocator(x_bc, y_bc, curve="concave")
+    min_counts = kl_bc.knee_y
+
+    print_and_log(
+        f"Setting minimum barcode counts threshold as {min_counts}",
+        logout,
+        starttime,
+    )
 
     pair_counts = Counter()
     
@@ -37,16 +50,17 @@ def main(fragments='/dev/stdin', barcodes_strict='/dev/stdout', barcodes_expande
     with gzip.open(fragments, 'rt') as f:
         for line in f:
             line = line.rstrip('\n').split('\t')
-            chr, start, _, barcode = line[:4]
+            chr, start, end, barcode = line[:4]
 
             if barcode_counts[barcode] < min_counts:
                 continue
 
-            this_coord = (chr, start) # Use left insertion
+            this_coord = (chr, start, end) 
             if this_coord != cur_coord:
-                for x, y in itertools.combinations(cur_clique, 2):
-                    x, y = (x, y) if x < y else (y, x)
-                    pair_counts[(x, y)] += 1
+                if len(cur_clique) <= max_frag_clique:
+                    for x, y in itertools.combinations(cur_clique, 2):
+                        x, y = (x, y) if x < y else (y, x)
+                        pair_counts[(x, y)] += 1
 
                 cur_clique = set([barcode])
                 cur_coord = this_coord
@@ -60,37 +74,60 @@ def main(fragments='/dev/stdin', barcodes_strict='/dev/stdout', barcodes_expande
 
     print_and_log("Identifying barcode multiplets", logout, starttime)
 
-    multiplet_data = {}
     expanded_data = {}
-    primary_barcodes = {}
-    bc_sets = {}
+    jac_dists = {}
     for x, y in pair_counts.items():
-        if y >= min_common:
+        if y >= min_common_bc:
             a, b = x
             bca = barcode_counts[a]
             bcb = barcode_counts[b]
-            jsd = y/(bca + bcb - y)
-            data = [a, b, bca, bcb, y, jsd, None]
+            jac = y/(bca + bcb - y)
+            data = [a, b, bca, bcb, y, jac, None]
             expanded_data[x] = data
+            jac_dists[x] = jac
+
+    with open(barcodes_expanded, 'w') as f:
+        f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\n")
+        for x, data in expanded_data.items():
+            a, b = x
+            f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(*data[:-1]))
+
+    x_j = range(len(expanded_data))
+    y_j = sorted(expanded_data.values())
+    kl_j = KneeLocator(x_j, y_j, curve="convex")
+    min_jac = kl_j.knee_y
+
+    print_and_log(
+        f"Setting minimum pairwise Jaccard distance threshold as {min_jac}",
+        logout,
+        starttime,
+    )
+
+    multiplet_data = {}
+    primary_barcodes = {}
+    bc_sets = {}
+    for x, y in expanded_data.items():
+        jac = y[5]
+        if jac >= min_jac: 
+            multiplet_data[x] = y
+            a, b = x
+
+            a_primary = primary_barcodes.setdefault(a, a)
+            b_primary = primary_barcodes.setdefault(b, b)
+            a_set = bc_sets.setdefault(a_primary, set([a])) # initialize starting sets if needed
+            b_set = bc_sets.setdefault(b_primary, set([b]))
+            set_info = {a_primary: a_set, b_primary: b_set}
             
-            if jsd >= min_jsd: 
-                a_primary = primary_barcodes.setdefault(a, a)
-                b_primary = primary_barcodes.setdefault(b, b)
-                a_set = bc_sets.setdefault(a_primary, set([a])) # initialize starting sets if needed
-                b_set = bc_sets.setdefault(b_primary, set([b]))
-                set_info = {a_primary: a_set, b_primary: b_set}
-                
-                if a_primary != b_primary:
-                    remaining_primary = max([a_primary, b_primary], key=barcode_counts.get) 
-                    other_primary = a_primary if remaining_primary == b_primary else b_primary   
-                    for k in set_info[other_primary]:
-                        primary_barcodes[k] = remaining_primary
+            if a_primary != b_primary:
+                remaining_primary = max([a_primary, b_primary], key=barcode_counts.get) 
+                other_primary = a_primary if remaining_primary == b_primary else b_primary   
+                for k in set_info[other_primary]:
+                    primary_barcodes[k] = remaining_primary
 
-                    a_set |= b_set
-                    bc_sets[remaining_primary] = a_set
-                    bc_sets.pop(other_primary)
+                a_set |= b_set
+                bc_sets[remaining_primary] = a_set
+                bc_sets.pop(other_primary)
                 
-
     blacklist = set()
     with open(barcodes_strict, 'w') as f:
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\tPrimaryBarcode\n")
@@ -103,12 +140,6 @@ def main(fragments='/dev/stdin', barcodes_strict='/dev/stdout', barcodes_expande
                 blacklist.add(b)
             data[-1] = pb
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\t{}\n".format(*data))
-
-    with open(barcodes_expanded, 'w') as f:
-        f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\n")
-        for x, data in expanded_data.items():
-            a, b = x
-            f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(*data[:-1]))
 
     print_and_log(
         f"Original run had {len(barcode_counts)} total cell barcodes",
@@ -156,7 +187,7 @@ if __name__ == '__main__':
         barcodes_expanded = snakemake.output['barcodes_expanded']
         summary = snakemake.output['qc']
 
-        main(fragments=fragments, barcodes_strict=barcodes_strict, barcodes_expanded=barcodes_expanded, summary=summary)
+        main(fragments, barcodes_strict, barcodes_expanded, summary)
 
     except NameError:
-        main()
+        main('/dev/stdin', '/dev/stdout', '/dev/null', '/dev/null')

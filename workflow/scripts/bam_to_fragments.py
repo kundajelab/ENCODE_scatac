@@ -1,11 +1,10 @@
-import sys
-import gzip
 import pysam
 
 def bam_to_frag(in_path, out_path, shift_plus=4, shift_minus=-4):
     """
-    Convert BAM file to a fragment file format, while adding +4/-4 coordinate adjustment
+    Convert coordinate-sorted BAM file to a fragment file format, while adding Tn5 coordinate adjustment
     BAM should be pre-filtered for PCR duplicates, secondary alignments, and unpaired reads
+    Output fragment file is sorted by chr, start, end, barcode
     """
 
     input = pysam.AlignmentFile(in_path, "rb")
@@ -21,7 +20,7 @@ def bam_to_frag(in_path, out_path, shift_plus=4, shift_minus=-4):
             end = start + read.template_length + shift_minus
             cell_barcode = read.get_tag("CB")
             assert(read.next_reference_start >= read.reference_start) ####
-            data = (chromosome, start, end, cell_barcode, 1) ####
+            data = (chromosome, start, end, cell_barcode, 1)
             pos = (chromosome, start)
 
             if pos == curr_pos:
