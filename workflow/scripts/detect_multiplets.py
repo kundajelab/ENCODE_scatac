@@ -111,49 +111,37 @@ def main(fragments='/dev/stdin', barcodes_strict='/dev/stdout', barcodes_expande
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(*data[:-1]))
 
     print_and_log(
-        "Original run had {:,} total cell barcodes".format(
-            len(barcode_counts)
-        ),
+        f"Original run had {len(barcode_counts)} total cell barcodes",
         logout,
         starttime,
     )
 
     print_and_log(
-        "Considered {:,} barcode pairs".format(
-            len(pair_counts)
-        ),
+        f"Considered {len(pair_counts)} barcode pairs",
         logout,
         starttime,
     )
 
     print_and_log(
-        "Identified {:,} barcode pairs above JSD threshold".format(
-            len(multiplet_data)
-        ),
+        f"Identified {len(multiplet_data)} barcode pairs above JSD threshold",
         logout,
         starttime,
     )
 
     print_and_log(
-        "Identified {:,} barcodes belonging to multiplets".format(
-            len(primary_barcodes)
-        ),
+        f"Identified {len(primary_barcodes)} barcodes belonging to multiplets",
         logout,
         starttime,
     )
 
     print_and_log(
-        "Identified {:,} unique multiplets".format(
-            len(bc_sets)
-        ),
+        f"Identified {len(bc_sets)} unique multiplets",
         logout,
         starttime,
     )
 
     print_and_log(
-        "After multiplet exclusions, have {:,} total cell barcodes".format(
-            len(barcode_counts) - len(blacklist)
-        ),
+        f"After multiplet exclusions, have {len(barcode_counts) - len(blacklist)} total cell barcodes",
         logout,
         starttime,
     )
