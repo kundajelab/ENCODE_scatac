@@ -32,8 +32,8 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, max_frag_clique
     kl_bc = KneeLocator(x_bc, y_bc, online=True, curve="concave")
     # print(kl_bc.x) ####
     # print(kl_bc.y) ####
-    print(kl_bc.all_knees) ####
-    print(kl_bc.all_knees_y) ####
+    # print(kl_bc.all_knees) ####
+    # print(kl_bc.all_knees_y) ####
     min_counts = kl_bc.elbow_y
 
     print_and_log(
