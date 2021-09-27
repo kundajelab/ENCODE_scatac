@@ -13,7 +13,7 @@ def bam_to_frag(in_path, out_path, shift_plus=4, shift_minus=-4):
         buf = []
         curr_pos = None
         for read in input:
-            if not ((read.flag & 99 == 99) or (read.flag & 147 == 147)): 
+            if read.flag & 128 == 128: 
                 continue # ignore coordinate-wise second read in pair
             
             chromosome = read.reference_name
