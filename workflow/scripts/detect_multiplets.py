@@ -69,7 +69,6 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
 
     print_and_log("Identifying candidate barcodes", logout, starttime)
 
-    
     cur_clique = set()
     cur_coord = None
     i = 0
@@ -159,7 +158,8 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
             data = [a, b, bca, bcb, y, jac, None]
             expanded_data[x] = data
             if jac > 0:
-                jac_dists[x] = jac
+                jac_dists[a] = max(jac_dists.get(a, 0), jac)
+                jac_dists[b] = max(jac_dists.get(b, 0), jac)
 
     with open(barcodes_expanded, 'w') as f:
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\n")
