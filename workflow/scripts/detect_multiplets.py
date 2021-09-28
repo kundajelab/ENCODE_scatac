@@ -82,8 +82,8 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
             this_coord = (chr, start, end) 
             if this_coord != cur_coord:
                 if len(cur_clique) <= max_frag_clique:
-                    for i in cur_clique:
-                        barcode_counts[i] += 1
+                    for b in cur_clique:
+                        barcode_counts[b] += 1
 
                 cur_clique = set([barcode])
                 cur_coord = this_coord
