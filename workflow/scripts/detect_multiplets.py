@@ -76,7 +76,9 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, bc_plot, jac_pl
             barcode = line[3]
             barcode_counts[barcode] += 1
 
-    dist_bc = np.log10(np.array(barcode_counts.values()).sort())
+    counts_bc = np.array(barcode_counts.values())
+    counts_bc.sort()
+    dist_bc = np.log10(counts_bc)
     cut_ind_bc, cut_k_bc, cut_bc, bound_bc, k_bc = tail_cut(dist_bc, 'l')
     plot_cut(cut_bc, k_bc, dist_bc, bound_bc, "Barcode Count Thresholding", "Log10 Fragment Counts", bc_plot)
     min_counts = 10 ** cut_bc
