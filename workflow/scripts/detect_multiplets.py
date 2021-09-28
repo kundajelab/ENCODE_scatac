@@ -143,7 +143,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, bc_plot, jac_pl
             a, b = x
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(*data[:-1]))
 
-    dist_jac = np.fromiter(expanded_data.values(), dtype=float, count=len(expanded_data))
+    dist_jac = np.fromiter(jac_dists.values(), dtype=float, count=len(jac_dists))
     dist_jac.sort()
     cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac, 'r')
     plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Pairwise Jaccard Distance", jac_plot)
