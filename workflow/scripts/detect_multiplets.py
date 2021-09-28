@@ -16,7 +16,7 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def tail_cut(samples, side, min_keep=0.2):
+def tail_cut(samples, side, min_keep=0.1):
     rev = True if side == 'l' else False
     if rev:
         samples = samples[::-1] # reverse order if detecting left tail
