@@ -234,8 +234,10 @@ if __name__ == '__main__':
         barcodes_strict = snakemake.output['barcodes_strict']
         barcodes_expanded = snakemake.output['barcodes_expanded']
         summary = snakemake.output['qc']
+        bc_plot = snakemake.output['counts_thresh']
+        jac_plot = snakemake.output['multiplets_thresh']
 
-        main(fragments, barcodes_strict, barcodes_expanded, summary)
+        main(fragments, barcodes_strict, barcodes_expanded, summary, bc_plot, jac_plot)
 
     except NameError:
         main('/dev/stdin', '/dev/stdout', '/dev/null', '/dev/null')

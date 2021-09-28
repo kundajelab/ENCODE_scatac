@@ -60,7 +60,9 @@ rule detect_multiplets:
     output: 
         barcodes_strict = "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
         barcodes_expanded = "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
-        qc = "results/{sample}/fragments/multiplet_stats.txt"
+        qc = "results/{sample}/fragments/multiplet_stats.txt",
+        counts_thresh = "results/{sample}/fragments/bc_counts_threshold_plot.png",
+        multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
     conda:
         "../envs/fragments.yaml"
     group: 
