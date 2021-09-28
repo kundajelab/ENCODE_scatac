@@ -26,9 +26,9 @@ def tail_cut(samples, side, min_keep=0.2):
     s = samples - total_mean # shift origin for numerical stability
 
     m0 = np.arange(1, s.shape[0] + 1) # Cumulative sample count
-    m1 = np.cumsum(s) / m0 # 1st cumulative moment (mean)
+    m1 = np.cumsum(s) / m0 # 1st cumulative moment (cumulative mean)
     o2 = np.cumsum(s**2) / m0 # 2nd cumulant moment around origin
-    m2 = o2 - m1**2 # 2nd cumulative central moment
+    m2 = o2 - m1**2 # 2nd cumulative central moment (cumulative variance)
     o3 = np.cumsum(s**3) / m0 # 3rd cumulative moment around origin
     o4 = np.cumsum(s**4) / m0 # 4th cumulative moment around origin
     m4 = o4 - 4 * m1 * o3 + 6 * m1**2 * o2 - 3 * m1**4 # 4th cumulative central moment
@@ -44,6 +44,7 @@ def tail_cut(samples, side, min_keep=0.2):
     
     if rev:
         k = k[::-1] # restore original order
+        cut_ind = samples.shape[0] - cut_ind - 1
 
     return cut_ind, cut_k, cut, bound, k
 
