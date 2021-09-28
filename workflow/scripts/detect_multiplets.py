@@ -63,7 +63,7 @@ def plot_cut(cut, k, pts, lb, title, x_label, out_path):
 
     plt.savefig(out_path)
 
-def main(fragments, barcodes_strict, barcodes_expanded, summary, bc_plot, jac_plot, max_frag_clique=6, min_common_bc=1):
+def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_counts=100, max_frag_clique=6, min_common_bc=1):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -76,12 +76,12 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, bc_plot, jac_pl
             barcode = line[3]
             barcode_counts[barcode] += 1
 
-    counts_bc = np.fromiter(barcode_counts.values(), dtype=float, count=len(barcode_counts))
-    counts_bc.sort()
-    dist_bc = np.log10(counts_bc)
-    cut_ind_bc, cut_k_bc, cut_bc, bound_bc, k_bc = tail_cut(dist_bc, 'l')
-    plot_cut(cut_bc, k_bc, dist_bc, bound_bc, "Barcode Count Thresholding", "Log10 Fragment Counts", bc_plot)
-    min_counts = 10 ** cut_bc
+    # counts_bc = np.fromiter(barcode_counts.values(), dtype=float, count=len(barcode_counts))
+    # counts_bc.sort()
+    # dist_bc = np.log10(counts_bc)
+    # cut_ind_bc, cut_k_bc, cut_bc, bound_bc, k_bc = tail_cut(dist_bc, 'l')
+    # plot_cut(cut_bc, k_bc, dist_bc, bound_bc, "Barcode Count Thresholding", "Log10 Fragment Counts", bc_plot)
+    # min_counts = 10 ** cut_bc
 
     print_and_log(
         f"Setting minimum barcode counts threshold as {min_counts}",
@@ -238,10 +238,9 @@ if __name__ == '__main__':
         barcodes_strict = snakemake.output['barcodes_strict']
         barcodes_expanded = snakemake.output['barcodes_expanded']
         summary = snakemake.output['qc']
-        bc_plot = snakemake.output['counts_thresh']
         jac_plot = snakemake.output['multiplets_thresh']
 
-        main(fragments, barcodes_strict, barcodes_expanded, summary, bc_plot, jac_plot)
+        main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot)
 
     except NameError:
         main('/dev/stdin', '/dev/stdout', '/dev/null', '/dev/null')
