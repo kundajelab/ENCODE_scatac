@@ -171,7 +171,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
     dist_jac.sort()
     dist_jac_log = np.log10(dist_jac)
     cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac_log, 'r')
-    plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Log10 Pairwise Jaccard Distance", jac_plot)
+    plot_cut(cut_jac, k_jac, dist_jac_log, bound_jac, "Multiplet Thresholding", "Log10 Pairwise Jaccard Distance", jac_plot)
     min_jac = 10 ** cut_jac
 
     print_and_log(
