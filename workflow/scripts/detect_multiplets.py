@@ -69,12 +69,35 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
 
     print_and_log("Identifying candidate barcodes", logout, starttime)
 
+    
+    cur_clique = set()
+    cur_coord = None
+    i = 0
     barcode_counts = Counter()
     with gzip.open(fragments, 'rt') as f:
         for line in f:
             line = line.rstrip('\n').split('\t')
-            barcode = line[3]
-            barcode_counts[barcode] += 1
+            chr, start, end, barcode = line[:4]
+
+            if barcode_counts[barcode] < min_counts:
+                continue
+
+            this_coord = (chr, start, end) 
+            if this_coord != cur_coord:
+                if len(cur_clique) <= max_frag_clique:
+                    for i in cur_clique:
+                        barcode_counts[i] += 1
+
+                cur_clique = set([barcode])
+                cur_coord = this_coord
+
+            else:
+                cur_clique.add(barcode)
+
+            i += 1
+            if i%1e7==0:
+                print(i)
+
 
     # counts_bc = np.fromiter(barcode_counts.values(), dtype=float, count=len(barcode_counts))
     # counts_bc.sort()
@@ -89,15 +112,12 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
         starttime,
     )
 
-    pair_counts = Counter()
-    
-    cur_clique = set()
-    cur_coord = None
-
-    i = 0
-
     print_and_log("Reading fragments", logout, starttime)
 
+    pair_counts = Counter()
+    cur_clique = set()
+    cur_coord = None
+    i = 0
     with gzip.open(fragments, 'rt') as f:
         for line in f:
             line = line.rstrip('\n').split('\t')
@@ -135,7 +155,8 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
             jac = y/(bca + bcb - y)
             data = [a, b, bca, bcb, y, jac, None]
             expanded_data[x] = data
-            jac_dists[x] = jac
+            if jac > 0:
+                jac_dists[x] = jac
 
     with open(barcodes_expanded, 'w') as f:
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\n")
@@ -206,7 +227,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
     )
 
     print_and_log(
-        f"Identified {len(multiplet_data)} barcode pairs above JSD threshold",
+        f"Identified {len(multiplet_data)} barcode pairs above Jaccard threshold",
         logout,
         starttime,
     )
