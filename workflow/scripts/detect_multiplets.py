@@ -79,9 +79,6 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
             line = line.rstrip('\n').split('\t')
             chr, start, end, barcode = line[:4]
 
-            if barcode_counts[barcode] < min_counts:
-                continue
-
             this_coord = (chr, start, end) 
             if this_coord != cur_coord:
                 if len(cur_clique) <= max_frag_clique:
