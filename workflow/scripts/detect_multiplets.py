@@ -104,7 +104,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
     # min_counts = 10 ** cut_bc
 
     print_and_log(
-        f"Setting minimum barcode counts threshold as {min_counts}",
+        f"Considering {len(barcode_counts)} cell barcodes",
         logout,
         starttime,
     )
@@ -142,6 +142,12 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
 
     print_and_log("Identifying barcode multiplets", logout, starttime)
 
+    print_and_log(
+        f"Considered {len(pair_counts)} barcode pairs",
+        logout,
+        starttime,
+    )
+
     expanded_data = {}
     jac_dists = {}
     for x, y in pair_counts.items():
@@ -163,9 +169,10 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
 
     dist_jac = np.fromiter(jac_dists.values(), dtype=float, count=len(jac_dists))
     dist_jac.sort()
-    cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac, 'r')
-    plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Pairwise Jaccard Distance", jac_plot)
-    min_jac = cut_jac
+    dist_jac_log = np.log10(dist_jac)
+    cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac_log, 'r')
+    plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Log10 Pairwise Jaccard Distance", jac_plot)
+    min_jac = 10 ** cut_jac
 
     print_and_log(
         f"Setting minimum pairwise Jaccard distance threshold as {min_jac}",
@@ -210,18 +217,6 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
                 blacklist.add(b)
             data[-1] = pb
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\t{}\n".format(*data))
-
-    print_and_log(
-        f"Original run had {len(barcode_counts)} total cell barcodes",
-        logout,
-        starttime,
-    )
-
-    print_and_log(
-        f"Considered {len(pair_counts)} barcode pairs",
-        logout,
-        starttime,
-    )
 
     print_and_log(
         f"Identified {len(multiplet_data)} barcode pairs above Jaccard threshold",
