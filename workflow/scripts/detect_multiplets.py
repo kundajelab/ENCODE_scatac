@@ -3,7 +3,9 @@ import itertools
 import gzip
 from collections import Counter
 
-from kneed import KneeLocator
+import numpy as np
+import matplotlib.pyplot as plt
+# from kneed import KneeLocator
 
 def print_and_log(text, outfile, starttime=0):
     logtime = time.process_time() - starttime
@@ -14,7 +16,53 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def main(fragments, barcodes_strict, barcodes_expanded, summary, max_frag_clique=6, min_common_bc=1):
+def tail_cut(samples, side, min_keep=0.2):
+    rev = True if side == 'l' else False
+    if rev:
+        samples = samples[::-1] # reverse order if detecting left tail
+
+    lbound = int(samples.shape[0] * min_keep)
+    total_mean = samples.mean()
+    s = samples - total_mean # shift origin for numerical stability
+
+    m0 = np.arange(1, s.shape[0] + 1) # Cumulative sample count
+    m1 = np.cumsum(s) / m0 # 1st cumulative moment (mean)
+    o2 = np.cumsum(s**2) / m0 # 2nd cumulant moment around origin
+    m2 = o2 - m1**2 # 2nd cumulative central moment
+    o3 = np.cumsum(s**3) / m0 # 3rd cumulative moment around origin
+    o4 = np.cumsum(s**4) / m0 # 4th cumulative moment around origin
+    m4 = o4 - 4 * m1 * o3 + 6 * m1**2 * o2 - 3 * m1**4 # 4th cumulative central moment
+
+    with np.errstate(divide='ignore', invalid='ignore'):
+        k = m4 / m2**2 # Cumulative kurtosis
+
+    cut_ind = np.nanargmin(k[lbound:])
+    cut_k = k[lbound:][cut_ind]
+    cut = samples[lbound:][cut_ind]
+    bound = samples[lbound]
+    k[:lbound] = np.nan
+    
+    if rev:
+        k = k[::-1] # restore original order
+
+    return cut_ind, cut_k, cut, bound, k
+
+def plot_cut(cut, k, pts, lb, title, x_label, out_path):
+    fig, ax = plt.subplots(tight_layout=True)
+    ax.hist(pts, bins=200)
+    ax2 = ax.twinx()
+    ax2.plot(pts, k, color="g")
+    ax.axvline(x=cut, color="r")
+    ax.axvline(x=lb, color="k")
+
+    ax.set_title(title)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel("Histogram Frequency")
+    ax2.set_ylabel("Cumulative Kurtosis")
+
+    plt.savefig(out_path)
+
+def main(fragments, barcodes_strict, barcodes_expanded, summary, bc_plot, jac_plot, max_frag_clique=6, min_common_bc=1):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -27,14 +75,10 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, max_frag_clique
             barcode = line[3]
             barcode_counts[barcode] += 1
 
-    x_bc = range(len(barcode_counts))
-    y_bc = sorted(barcode_counts.values())
-    kl_bc = KneeLocator(x_bc, y_bc, online=True, curve="concave")
-    # print(kl_bc.x) ####
-    # print(kl_bc.y) ####
-    # print(kl_bc.all_knees) ####
-    # print(kl_bc.all_knees_y) ####
-    min_counts = kl_bc.elbow_y
+    dist_bc = np.log10(np.array(barcode_counts.values()).sort())
+    cut_ind_bc, cut_k_bc, cut_bc, bound_bc, k_bc = tail_cut(dist_bc, 'l')
+    plot_cut(cut_bc, k_bc, dist_bc, bound_bc, "Barcode Count Thresholding", "Log10 Fragment Counts", bc_plot)
+    min_counts = 10 ** cut_bc
 
     print_and_log(
         f"Setting minimum barcode counts threshold as {min_counts}",
@@ -96,10 +140,10 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, max_frag_clique
             a, b = x
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(*data[:-1]))
 
-    x_j = range(len(expanded_data))
-    y_j = sorted(expanded_data.values())
-    kl_j = KneeLocator(x_j, y_j, online=True, curve="convex")
-    min_jac = kl_j.knee_y
+    dist_jac = np.log10(np.array(expanded_data.values()).sort())
+    cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac, 'r')
+    plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Pairwise Jaccard Distance", jac_plot)
+    min_jac = cut_jac
 
     print_and_log(
         f"Setting minimum pairwise Jaccard distance threshold as {min_jac}",
