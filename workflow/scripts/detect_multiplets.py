@@ -76,7 +76,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, bc_plot, jac_pl
             barcode = line[3]
             barcode_counts[barcode] += 1
 
-    counts_bc = np.array(barcode_counts.values())
+    counts_bc = np.fromiter(barcode_counts.values(), dtype=float, count=len(barcode_counts))
     counts_bc.sort()
     dist_bc = np.log10(counts_bc)
     cut_ind_bc, cut_k_bc, cut_bc, bound_bc, k_bc = tail_cut(dist_bc, 'l')
@@ -143,7 +143,8 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, bc_plot, jac_pl
             a, b = x
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(*data[:-1]))
 
-    dist_jac = np.log10(np.array(expanded_data.values()).sort())
+    dist_jac = np.fromiter(expanded_data.values(), dtype=float, count=len(expanded_data))
+    dist_jac.sort()
     cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac, 'r')
     plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Pairwise Jaccard Distance", jac_plot)
     min_jac = cut_jac
