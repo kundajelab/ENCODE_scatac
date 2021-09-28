@@ -16,7 +16,7 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def tail_cut(samples, side, min_keep=0.1):
+def tail_cut(samples, side, min_keep=0.2):
     rev = True if side == 'l' else False
     if rev:
         samples = samples[::-1] # reverse order if detecting left tail
@@ -169,10 +169,14 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
 
     dist_jac = np.fromiter(jac_dists.values(), dtype=float, count=len(jac_dists))
     dist_jac.sort()
-    dist_jac_log = np.log10(dist_jac)
-    cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac_log, 'r')
-    plot_cut(cut_jac, k_jac, dist_jac_log, bound_jac, "Multiplet Thresholding", "Max Marginal Log10 Jaccard Distance", jac_plot)
-    min_jac = 10 ** cut_jac
+    # dist_jac_log = np.log10(dist_jac)
+    # cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac_log, 'r')
+    # plot_cut(cut_jac, k_jac, dist_jac_log, bound_jac, "Multiplet Thresholding", "Max Marginal Log10 Jaccard Distance", jac_plot)
+    # min_jac = 10 ** cut_jac
+
+    cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac, 'r')
+    plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot)
+    min_jac = cut_jac
 
     print_and_log(
         f"Setting minimum pairwise Jaccard distance threshold as {min_jac}",
@@ -256,4 +260,4 @@ if __name__ == '__main__':
         main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot)
 
     except NameError:
-        main('/dev/stdin', '/dev/stdout', '/dev/null', '/dev/null')
+        main('/dev/stdin', '/dev/stdout', '/dev/null', '/dev/null', '/dev/null')
