@@ -543,7 +543,7 @@ try:
         step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
 
         fragments_stats_out = snakemake.output['fragments_stats']
-        multiplet_stats = snakemake.input['multiplets']
+        multiplet_stats = snakemake.input['multiplet_stats']
         barcodes_pairs_strict = snakemake.input['barcode_pairs_strict']
         barcodes_pairs_expanded = snakemake.input['barcode_pairs_expanded']
         barcodes_status = snakemake.input['barcodes_status']
