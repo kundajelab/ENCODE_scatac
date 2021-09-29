@@ -422,7 +422,7 @@ def multiplet_detection_qc(txt, ps, pe, bs, mt):
 
                 n = m_splice(line, 'Setting multiplet threshold as  ', ' for minimum pairwise Jaccard distance')
                 if n is not None:
-                    result['multiplet_threshold'] = to_int(n)
+                    result['multiplet_threshold'] = to_float(n)
 
             result['frac_multiplets'] = result['multiplet_barcode_count'] / result['analyzed_barcode_count']
 
