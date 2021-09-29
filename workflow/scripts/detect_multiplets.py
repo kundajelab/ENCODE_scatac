@@ -23,6 +23,8 @@ def multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh):
     p = 1 - (np.searchsorted(nulls, samples) + null_zeros) / null_total
     p_bonf = p * (num_bc - 1)
     q = (p_bonf * sample_total) / (sample_total - np.arange(sample_total))
+    print(q) ####
+    print(np.nonzero(q <= fdr_thresh)) ####
     cut = np.nonzero(q <= fdr_thresh)[0][0]
 
     return cut, q
@@ -34,7 +36,7 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
     if log_x:
         ax.set_xscale('log')
         hist_bins_samples = np.geomspace(samples[0], samples[-1], hist_bins)
-        hist_bins_null = np.geomspace(nulls.min(), nulls.max(), hist_bins)
+        hist_bins_null = np.geomspace(nulls[0], nulls[-1], hist_bins)
     else:
         hist_bins_samples = hist_bins
         hist_bins_null = hist_bins
