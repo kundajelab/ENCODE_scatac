@@ -61,7 +61,6 @@ rule detect_multiplets:
         barcodes_strict = "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
         barcodes_expanded = "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
         qc = "results/{sample}/fragments/multiplet_stats.txt",
-        # counts_thresh = "results/{sample}/fragments/bc_counts_threshold_plot.png",
         multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
     conda:
         "../envs/fragments.yaml"
@@ -114,7 +113,8 @@ rule metadata_qc_fragments:
         data_file = "results/{sample}/fragments/fragments.tar.gz",
         multiplets_strict = "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
         multiplets_expanded = "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
-        multiplet_stats = "results/{sample}/fragments/multiplet_stats.txt"
+        multiplet_stats = "results/{sample}/fragments/multiplet_stats.txt",
+        multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
     output: 
         fragments_stats = "results/{sample}/fragments/fragments_qc_metadata.json"
     params:
@@ -137,6 +137,7 @@ rule fragments_done:
         "results/{sample}/fragments/fragments.tar.gz",
         "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
         "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
+        "results/{sample}/fragments/multiplets_threshold_plot.png",
         "results/{sample}/fragments/multiplet_stats.txt",
         "results/{sample}/fragments/fragments_metadata.json",
         "results/{sample}/fragments/fragments_qc_metadata.json"
