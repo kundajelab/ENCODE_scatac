@@ -16,7 +16,7 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def tail_cut(samples, side, min_keep=0.2):
+def tail_cut(samples, side, min_keep=0.6):
     rev = True if side == 'l' else False
     if rev:
         samples = samples[::-1] # reverse order if detecting left tail
@@ -48,8 +48,11 @@ def tail_cut(samples, side, min_keep=0.2):
 
     return cut_ind, cut_k, cut, bound, k
 
-def plot_cut(cut, k, pts, lb, title, x_label, out_path):
+def plot_cut(cut, k, pts, lb, title, x_label, out_path, log_scale=False):
     fig, ax = plt.subplots(tight_layout=True)
+    if log_scale:
+        ax.set_xscale('log')
+
     ax.hist(pts, bins=200)
     ax2 = ax.twinx()
     ax2.plot(pts, k, color="g")
@@ -175,7 +178,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
     # min_jac = 10 ** cut_jac
 
     cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac, 'r')
-    plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot)
+    plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_scale=True)
     min_jac = cut_jac
 
     print_and_log(
