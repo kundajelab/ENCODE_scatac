@@ -544,8 +544,8 @@ try:
 
         fragments_stats_out = snakemake.output['fragments_stats']
         multiplet_stats = snakemake.input['multiplets']
-        barcodes_pairs_strict = snakemake.input['barcodes_pairs_strict']
-        barcodes_pairs_expanded = snakemake.input['barcodes_pairs_expanded']
+        barcodes_pairs_strict = snakemake.input['barcode_pairs_strict']
+        barcodes_pairs_expanded = snakemake.input['barcode_pairs_expanded']
         barcodes_status = snakemake.input['barcodes_status']
         multiplets_thresh = snakemake.input['multiplets_thresh']
 

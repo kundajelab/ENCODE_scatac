@@ -58,8 +58,8 @@ rule detect_multiplets:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output: 
-        barcodes_pairs_strict = "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
-        barcodes_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
+        barcode_pairs_strict = "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
+        barcode_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
         barcodes_status = "results/{sample}/fragments/multiplet_barcodes_status.tsv",
         qc = "results/{sample}/fragments/multiplet_stats.txt",
         multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
@@ -112,8 +112,8 @@ rule metadata_qc_fragments:
     """
     input: 
         data_file = "results/{sample}/fragments/fragments.tar.gz",
-        barcodes_pairs_strict = "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
-        barcodes_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
+        barcode_pairs_strict = "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
+        barcode_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
         barcodes_status = "results/{sample}/fragments/multiplet_barcodes_status.tsv",
         multiplet_stats = "results/{sample}/fragments/multiplet_stats.txt",
         multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
