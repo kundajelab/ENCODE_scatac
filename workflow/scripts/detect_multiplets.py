@@ -48,12 +48,13 @@ def tail_cut(samples, side, min_keep=0.6):
 
     return cut_ind, cut_k, cut, bound, k
 
-def plot_cut(cut, k, pts, lb, title, x_label, out_path, log_scale=False):
+def plot_cut(cut, k, pts, lb, title, x_label, out_path, log_scale=False, hist_bins=200):
     fig, ax = plt.subplots(tight_layout=True)
     if log_scale:
         ax.set_xscale('log')
+        hist_bins = np.geomspace(pts.min(), pts.max(), hist_bins)
 
-    ax.hist(pts, bins=200)
+    ax.hist(pts, bins=hist_bins)
     ax2 = ax.twinx()
     ax2.plot(pts, k, color="g")
     ax.axvline(x=cut, color="r")
