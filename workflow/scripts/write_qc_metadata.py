@@ -408,19 +408,19 @@ def multiplet_detection_qc(txt, ps, pe, bs, mt):
                 if n is not None:
                     result['original_barcode_count'] = to_int(n)
 
-                n = m_splice('Identified ', ' total barcodes for multiplet detection')
+                n = m_splice(line, 'Identified ', ' total barcodes for multiplet detection')
                 if n is not None:
                     result['analyzed_barcode_count'] = to_int(n)
 
-                n = m_splice('Identified ', ' barcodes belonging to multiplets')
+                n = m_splice(line, 'Identified ', ' barcodes belonging to multiplets')
                 if n is not None:
                     result['multiplet_barcode_count'] = to_int(n)
 
-                n = m_splice('After multiplet exclusions, have ', ' total cell barcodes')
+                n = m_splice(line, 'After multiplet exclusions, have ', ' total cell barcodes')
                 if n is not None:
                     result['final_barcode_count'] = to_int(n)
 
-                n = m_splice('Setting multiplet threshold as  ', ' for minimum pairwise Jaccard distance')
+                n = m_splice(line, 'Setting multiplet threshold as  ', ' for minimum pairwise Jaccard distance')
                 if n is not None:
                     result['multiplet_threshold'] = to_int(n)
 
