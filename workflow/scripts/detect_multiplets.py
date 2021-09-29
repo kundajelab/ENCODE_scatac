@@ -40,7 +40,7 @@ def tail_cut(samples, side, min_keep=0.6):
     cut_k = k[lbound:][cut_ind]
     cut = samples[lbound:][cut_ind]
     bound = samples[lbound]
-    lower_visual = min(100, int(samples.shape[0] * 0.2))
+    lower_visual = min(max(100, int(samples.shape[0] * 0.2)), lbound)
     k[:lower_visual] = np.nan
     
     if rev:
