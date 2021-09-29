@@ -403,7 +403,6 @@ def multiplet_detection_qc(txt, ps, pe, bs, mt):
         with open(txt, 'r') as f:
             for l in f:
                 line = l.split('-')[-1].lstrip(' ').rstrip('\n')
-                print(line) ####
 
                 n = m_splice(line, 'Original run had ', ' total cell barcodes')
                 if n is not None:
@@ -425,7 +424,7 @@ def multiplet_detection_qc(txt, ps, pe, bs, mt):
                 if n is not None:
                     result['multiplet_threshold'] = to_int(n)
 
-                result['frac_multiplets'] = result['multiplet_barcode_count'] / result['analyzed_barcode_count']
+            result['frac_multiplets'] = result['multiplet_barcode_count'] / result['analyzed_barcode_count']
 
     return result
 
