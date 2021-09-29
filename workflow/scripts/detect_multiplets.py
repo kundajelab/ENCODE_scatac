@@ -213,6 +213,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
     samples = np.fromiter(jac_dists_max.values(), dtype=float, count=len(jac_dists_max))
     samples.sort()
     nulls = np.fromiter(jac_dists_pairs.values(), dtype=float, count=len(jac_dists_pairs))
+    nulls.sort()
     null_zeros = num_bc * (num_bc - 1) / 2 - len(jac_dists_pairs)
 
     cut, q = multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh)
