@@ -22,8 +22,9 @@ def multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh):
 
     p = 1 - (np.searchsorted(nulls, samples) + null_zeros) / null_total
     print(p)
-    p_bonf = p * (num_bc - 1)
-    q = (p_bonf * sample_total) / (sample_total - np.arange(sample_total))
+    # p_bonf = p * (num_bc - 1)
+    p_sidak = 1 - (1 - p)**(num_bc - 1)
+    q = (p_sidak * sample_total) / (sample_total - np.arange(sample_total))
     print(q) ####
     cut = np.nonzero(q <= fdr_thresh)[0][0]
 
