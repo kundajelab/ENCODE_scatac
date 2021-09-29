@@ -21,12 +21,17 @@ def multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh):
     sample_total = samples.shape[0]
 
     p = 1 - (np.searchsorted(nulls, samples) + null_zeros) / null_total
-    print(p)
+    # print(p)
     # p_bonf = p * (num_bc - 1)
     p_sidak = 1 - (1 - p)**(num_bc - 1)
+    print(p_sidak)
     q = (p_sidak * sample_total) / (sample_total - np.arange(sample_total))
     print(q) ####
-    cut = np.nonzero(q <= fdr_thresh)[0][0]
+    candidiates = np.nonzero(q <= fdr_thresh)[0]
+    if candidiates.size == 0:
+        cut = samples[-1]
+    else:
+        cut = samples[candidiates[0]]
 
     return cut, q
 
@@ -106,7 +111,7 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
 
 #     plt.savefig(out_path)
 
-def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, max_frag_clique=6, fdr_thresh=0.2):
+def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, max_frag_clique=6, fdr_thresh=1):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
