@@ -216,7 +216,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
     null_zeros = num_bc * (num_bc - 1) / 2 - len(jac_dists_pairs)
 
     cut, q = multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh)
-    plot_dist(cut, q, samples, nulls, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_scale=True)
+    plot_dist(cut, q, samples, nulls, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_x=True)
     
     # cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac, 'r')
     # plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_scale=True)
