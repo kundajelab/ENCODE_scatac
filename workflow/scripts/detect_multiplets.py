@@ -185,7 +185,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
     min_jac = cut_jac
 
     print_and_log(
-        f"Setting minimum pairwise Jaccard distance threshold as {min_jac}",
+        f"Setting multiplet threshold as {min_jac} for minimum pairwise Jaccard distance",
         logout,
         starttime,
     )

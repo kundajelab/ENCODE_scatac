@@ -383,7 +383,7 @@ def m_splice(line, prefix, suffix):
         return line.removeprefix(prefix).removesuffix(suffix)
     return None
 
-def multiplet_detection_qc(txt, ps, pe, bs):
+def multiplet_detection_qc(txt, ps, pe, bs, mt):
     result = OrderedDict()
 
     if os.path.getsize(ps) > 0:
@@ -394,6 +394,9 @@ def multiplet_detection_qc(txt, ps, pe, bs):
 
     if os.path.getsize(bs) > 0:
         result['barcodes_status'] = {"path": os.path.abspath(bs)}
+
+    if os.path.getsize(mt) > 0:
+        result['multiplet_threshold_plot'] = {"path": os.path.abspath(mt)}
 
     if os.path.getsize(txt) == 0:
         result['multiplet_stats'] = {"path": os.path.abspath(txt)}
@@ -416,6 +419,10 @@ def multiplet_detection_qc(txt, ps, pe, bs):
                 n = m_splice('After multiplet exclusions, have ', ' total cell barcodes')
                 if n is not None:
                     result['final_barcode_count'] = to_int(n)
+
+                n = m_splice('Setting multiplet threshold as  ', ' for minimum pairwise Jaccard distance')
+                if n is not None:
+                    result['multiplet_threshold'] = to_int(n)
 
                 result['frac_multiplets'] = result['multiplet_barcode_count'] / result['analyzed_barcode_count']
 
@@ -537,9 +544,19 @@ try:
 
         fragments_stats_out = snakemake.output['fragments_stats']
         multiplet_stats = snakemake.input['multiplets']
-        excluded_barcodes = snakemake.input['barcodes']
+        barcodes_pairs_strict = snakemake.input['barcodes_pairs_strict']
+        barcodes_pairs_expanded = snakemake.input['barcodes_pairs_expanded']
+        barcodes_status = snakemake.input['barcodes_status']
+        multiplets_thresh = snakemake.input['multiplets_thresh']
 
-        m = multiplet_filtering_qc(multiplet_stats, excluded_barcodes)
+        m = multiplet_detection_qc(
+            multiplet_stats, 
+            barcodes_pairs_strict, 
+            barcodes_pairs_expanded, 
+            barcodes_status, 
+            multiplets_thresh
+        )
+
         h = build_quality_metric_header(sample_data, config, data_path, fragments_stats_out, step_run)
         fragments_stats = h | m
 
