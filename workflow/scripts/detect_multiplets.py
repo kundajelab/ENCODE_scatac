@@ -68,7 +68,7 @@ def plot_cut(cut, k, pts, lb, title, x_label, out_path, log_scale=False, hist_bi
 
     plt.savefig(out_path)
 
-def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_counts=100, max_frag_clique=6, min_common_bc=1):
+def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=100, max_frag_clique=6, min_common_bc=1):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -100,15 +100,16 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
                 print(i)
 
 
-    # counts_bc = np.fromiter(barcode_counts.values(), dtype=float, count=len(barcode_counts))
-    # counts_bc.sort()
-    # dist_bc = np.log10(counts_bc)
-    # cut_ind_bc, cut_k_bc, cut_bc, bound_bc, k_bc = tail_cut(dist_bc, 'l')
-    # plot_cut(cut_bc, k_bc, dist_bc, bound_bc, "Barcode Count Thresholding", "Log10 Fragment Counts", bc_plot)
-    # min_counts = 10 ** cut_bc
+    print_and_log(
+        f"Original run had {len(barcode_counts)} total cell barcodes",
+        logout,
+        starttime,
+    )
+    
+    barcodes_considered = set(k for k, v in barcode_counts.items() if v >= min_counts)
 
     print_and_log(
-        f"Considering {len(barcode_counts)} cell barcodes",
+        f"Identified {len(barcodes_considered)} total barcodes for multiplet detection",
         logout,
         starttime,
     )
@@ -124,7 +125,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
             line = line.rstrip('\n').split('\t')
             chr, start, end, barcode = line[:4]
 
-            if barcode_counts[barcode] < min_counts:
+            if barcode not in barcodes_considered:
                 continue
 
             this_coord = (chr, start, end) 
@@ -166,7 +167,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
                 jac_dists[a] = max(jac_dists.get(a, 0), jac)
                 jac_dists[b] = max(jac_dists.get(b, 0), jac)
 
-    with open(barcodes_expanded, 'w') as f:
+    with gzip.open(barcodes_expanded, 'wt') as f:
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\n")
         for x, data in expanded_data.items():
             a, b = x
@@ -190,7 +191,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
     )
 
     multiplet_data = {}
-    primary_barcodes = {}
+    primary_bc_map = {}
     bc_sets = {}
     for x, y in expanded_data.items():
         jac = y[5]
@@ -198,8 +199,8 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
             multiplet_data[x] = y
             a, b = x
 
-            a_primary = primary_barcodes.setdefault(a, a)
-            b_primary = primary_barcodes.setdefault(b, b)
+            a_primary = primary_bc_map.setdefault(a, a)
+            b_primary = primary_bc_map.setdefault(b, b)
             a_set = bc_sets.setdefault(a_primary, set([a])) # initialize starting sets if needed
             b_set = bc_sets.setdefault(b_primary, set([b]))
             set_info = {a_primary: a_set, b_primary: b_set}
@@ -208,7 +209,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
                 remaining_primary = max([a_primary, b_primary], key=barcode_counts.get) 
                 other_primary = a_primary if remaining_primary == b_primary else b_primary   
                 for k in set_info[other_primary]:
-                    primary_barcodes[k] = remaining_primary
+                    primary_bc_map[k] = remaining_primary
 
                 a_set |= b_set
                 bc_sets[remaining_primary] = a_set
@@ -219,13 +220,23 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\tPrimaryBarcode\n")
         for x, data in multiplet_data.items():
             a, b = x
-            pb = primary_barcodes[a]
+            pb = primary_bc_map[a]
             if a != pb:
                 blacklist.add(a)
             if b != pb:
                 blacklist.add(b)
             data[-1] = pb
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\t{}\n".format(*data))
+
+    with open(barcodes_status, 'w') as f:
+        f.write("Barcode\tIsMultiplet\tPrimaryBarcode\n")
+        for b in barcode_counts.keys():
+            if b not in barcodes_considered:
+                f.write(f"{b}\tIndeterminate\tNone\n")
+            elif b in multiplet_data:
+                f.write(f"{b}\tTrue\t{primary_bc_map[b]}\n")
+            else:
+                f.write(f"{b}\tFalse\tNone\n")
 
     print_and_log(
         f"Identified {len(multiplet_data)} barcode pairs above Jaccard threshold",
@@ -234,7 +245,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot, min_c
     )
 
     print_and_log(
-        f"Identified {len(primary_barcodes)} barcodes belonging to multiplets",
+        f"Identified {len(primary_bc_map)} barcodes belonging to multiplets",
         logout,
         starttime,
     )
@@ -257,12 +268,13 @@ if __name__ == '__main__':
     try:
         fragments = snakemake.input['frag']
 
-        barcodes_strict = snakemake.output['barcodes_strict']
-        barcodes_expanded = snakemake.output['barcodes_expanded']
+        barcodes_strict = snakemake.output['barcode_pairs_strict']
+        barcodes_expanded = snakemake.output['barcode_pairs_expanded']
+        barcodes_status = snakemake.output['barcodes_status']
         summary = snakemake.output['qc']
         jac_plot = snakemake.output['multiplets_thresh']
 
-        main(fragments, barcodes_strict, barcodes_expanded, summary, jac_plot)
+        main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot)
 
     except NameError:
         main('/dev/stdin', '/dev/stdout', '/dev/null', '/dev/null', '/dev/null')

@@ -58,8 +58,9 @@ rule detect_multiplets:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output: 
-        barcodes_strict = "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
-        barcodes_expanded = "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
+        barcodes_pairs_strict = "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
+        barcodes_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
+        barcodes_status = "results/{sample}/fragments/multiplet_barcodes_status.tsv",
         qc = "results/{sample}/fragments/multiplet_stats.txt",
         multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
     conda:
@@ -111,8 +112,9 @@ rule metadata_qc_fragments:
     """
     input: 
         data_file = "results/{sample}/fragments/fragments.tar.gz",
-        multiplets_strict = "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
-        multiplets_expanded = "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
+        barcodes_pairs_strict = "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
+        barcodes_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
+        barcodes_status = "results/{sample}/fragments/multiplet_barcodes_status.tsv",
         multiplet_stats = "results/{sample}/fragments/multiplet_stats.txt",
         multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
     output: 
@@ -135,8 +137,9 @@ rule fragments_done:
         "results/{sample}/fragments/fragments.tsv.gz",
         "results/{sample}/fragments/fragments.tsv.gz.tbi",
         "results/{sample}/fragments/fragments.tar.gz",
-        "results/{sample}/fragments/multiplet_barcodes_strict.tsv",
-        "results/{sample}/fragments/multiplet_barcodes_expanded.tsv",
+        "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
+        "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
+        "results/{sample}/fragments/multiplet_barcodes_status.tsv",
         "results/{sample}/fragments/multiplets_threshold_plot.png",
         "results/{sample}/fragments/multiplet_stats.txt",
         "results/{sample}/fragments/fragments_metadata.json",

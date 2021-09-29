@@ -378,32 +378,46 @@ def parse_lib_complexity_qc(txt):
     result['PBC2'] = to_float(arr[6])
     return result
 
+def m_splice(line, prefix, suffix):
+    if line.startswith(prefix) and line.endswith(suffix):
+        return line.removeprefix(prefix).removesuffix(suffix)
+    return None
 
-def multiplet_filtering_qc(txt, barcodes):
+def multiplet_detection_qc(txt, ps, pe, bs):
     result = OrderedDict()
+
+    if os.path.getsize(ps) > 0:
+        result['barcode_pairs_multiplets'] = {"path": os.path.abspath(ps)}
+
+    if os.path.getsize(pe) > 0:
+        result['barcode_pairs_expanded'] = {"path": os.path.abspath(pe)}
+
+    if os.path.getsize(bs) > 0:
+        result['barcodes_status'] = {"path": os.path.abspath(bs)}
+
     if os.path.getsize(txt) == 0:
-        result['is_multiplet_filtered'] = False
-        return result
-    result['multiplet_stats'] = {"path": os.path.abspath(txt)}
+        result['multiplet_stats'] = {"path": os.path.abspath(txt)}
+        with open(txt, 'r') as f:
+            for l in f:
+                line = l.split('-')[-1].lstrip(' ').rstrip('\n')
 
-    if os.path.getsize(barcodes) > 0:
-        result['excluded_barcodes'] = {"path": os.path.abspath(barcodes)}
+                n = m_splice(line, 'Original run had ', ' total cell barcodes')
+                if n is not None:
+                    result['original_barcode_count'] = to_int(n)
 
-    with open(txt, 'r') as f:
-        for l in f:
-            line = l.split('-', 1)[-1].lstrip(' ').rstrip('\n')
+                n = m_splice('Identified ', ' total barcodes for multiplet detection')
+                if n is not None:
+                    result['analyzed_barcode_count'] = to_int(n)
 
-            if line.startswith('Original run had ') and line.endswith(' total cell barcodes'):
-                n = line.removeprefix('Original run had ').removesuffix(' total cell barcodes')
-                result['original_barcode_count'] = to_int(n)
+                n = m_splice('Identified ', ' barcodes belonging to multiplets')
+                if n is not None:
+                    result['multiplet_barcode_count'] = to_int(n)
 
-            elif line.startswith('Identified ') and line.endswith(' total barcodes for gel bead multiplet detection.'):
-                n = line.removeprefix('Identified ').removesuffix(' total barcodes for gel bead multiplet detection.')
-                result['gb_analysis_barcode_count'] = to_int(n)
+                n = m_splice('After multiplet exclusions, have ', ' total cell barcodes')
+                if n is not None:
+                    result['final_barcode_count'] = to_int(n)
 
-            elif line.startswith('After multiplet exclusions, have ') and line.endswith(' total cell barcodes'):
-                n = line.removeprefix('After multiplet exclusions, have ').removesuffix(' total cell barcodes')
-                result['final_barcode_count'] = to_int(n)
+                result['frac_multiplets'] = result['multiplet_barcode_count'] / result['analyzed_barcode_count']
 
     return result
 
