@@ -403,6 +403,7 @@ def multiplet_detection_qc(txt, ps, pe, bs, mt):
         with open(txt, 'r') as f:
             for l in f:
                 line = l.split('-')[-1].lstrip(' ').rstrip('\n')
+                print(line) ####
 
                 n = m_splice(line, 'Original run had ', ' total cell barcodes')
                 if n is not None:
