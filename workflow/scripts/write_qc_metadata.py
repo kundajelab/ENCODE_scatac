@@ -420,7 +420,7 @@ def multiplet_detection_qc(txt, ps, pe, bs, mt):
                 if n is not None:
                     result['final_barcode_count'] = to_int(n)
 
-                n = m_splice(line, 'Setting multiplet threshold as  ', ' for minimum pairwise Jaccard distance')
+                n = m_splice(line, 'Setting multiplet threshold as ', ' for minimum pairwise Jaccard distance')
                 if n is not None:
                     result['multiplet_threshold'] = to_float(n)
 
