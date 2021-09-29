@@ -379,7 +379,6 @@ def parse_lib_complexity_qc(txt):
     return result
 
 def m_splice(line, prefix, suffix):
-    print(line) ####
     if line.startswith(prefix) and line.endswith(suffix):
         return line.removeprefix(prefix).removesuffix(suffix)
     return None
@@ -399,7 +398,7 @@ def multiplet_detection_qc(txt, ps, pe, bs, mt):
     if os.path.getsize(mt) > 0:
         result['multiplet_threshold_plot'] = {"path": os.path.abspath(mt)}
 
-    if os.path.getsize(txt) == 0:
+    if os.path.getsize(txt) > 0:
         result['multiplet_stats'] = {"path": os.path.abspath(txt)}
         with open(txt, 'r') as f:
             for l in f:
