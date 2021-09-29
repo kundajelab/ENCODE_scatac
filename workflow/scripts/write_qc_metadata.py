@@ -379,6 +379,7 @@ def parse_lib_complexity_qc(txt):
     return result
 
 def m_splice(line, prefix, suffix):
+    print(line) ####
     if line.startswith(prefix) and line.endswith(suffix):
         return line.removeprefix(prefix).removesuffix(suffix)
     return None
