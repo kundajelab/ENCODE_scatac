@@ -65,6 +65,9 @@ include:
 include:
     "rules/submit.smk"
 
+localrules: 
+    all, submit, query_portal
+
 rule all:
     """
     Generate all outputs (default)
