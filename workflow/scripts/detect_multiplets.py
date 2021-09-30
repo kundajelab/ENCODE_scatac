@@ -69,7 +69,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
 
             this_coord = (chr, start, end) 
             if this_coord != cur_coord:
-                if len(cur_clique) <= max_frag_clique:
+                if len(cur_clique) <= max_beads_per_drop:
                     for b in cur_clique:
                         barcode_counts[b] += 1
 
