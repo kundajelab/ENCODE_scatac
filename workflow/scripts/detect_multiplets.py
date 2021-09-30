@@ -16,6 +16,25 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
+# def multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh):
+#     null_total = nulls.shape[0] + null_zeros
+#     sample_total = samples.shape[0]
+
+#     p = 1 - (np.searchsorted(nulls, samples) + null_zeros) / null_total
+#     # print(p)
+#     # p_bonf = p * (num_bc - 1)
+#     p_sidak = 1 - (1 - p)**(num_bc - 1)
+#     print(p_sidak)
+#     q = (p_sidak * sample_total) / (sample_total - np.arange(sample_total))
+#     print(q) ####
+#     candidiates = np.nonzero(q <= fdr_thresh)[0]
+#     if candidiates.size == 0:
+#         cut = samples[-1]
+#     else:
+#         cut = samples[candidiates[0]]
+
+#     return cut, q
+
 def multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh):
     null_total = nulls.shape[0] + null_zeros
     sample_total = samples.shape[0]
@@ -47,10 +66,10 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
         hist_bins_samples = hist_bins
         hist_bins_null = hist_bins
 
-    ax.hist(samples, bins=hist_bins_samples, density=True, alpha=0.5, color="b")
     ax.hist(nulls, bins=hist_bins_null, density=True, alpha=0.5, color="k")
     ax2.plot(samples, q, color="g")
     ax.axvline(x=cut, color="r")
+    ax.hist(samples, bins=hist_bins_samples, density=True, alpha=0.5, color="b")
 
     ax.set_title(title)
     ax.set_xlabel(x_label)
