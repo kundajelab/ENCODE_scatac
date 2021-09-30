@@ -124,7 +124,7 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
 
 #     plt.savefig(out_path)
 
-def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, max_frag_clique=6, fdr_thresh=0.2):
+def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, max_frag_clique=6, fdr_thresh=0.05):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
