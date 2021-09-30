@@ -5,12 +5,12 @@ max_threads_per_rule: 16
 dcc_lab: anshul-kundaje
 dcc_award: UM1HG009442
 
-dcc_mode: dev
+dcc_mode: prod
 
 max_barcode_dist: 1
 bc_whitelist:
-  10x: /srv/scratch/surag/chromap_misc/737K-cratac-v1.rc.txt
-  multiome: /srv/www/kundaje/surag/resources/737K-arc-v1.txt.gz
+  10x: mitra.stanford.edu/kundaje/atwang/encode_scatac/whitelists/737K-cratac-v1.rc.txt.gz
+  multiome: mitra.stanford.edu/kundaje/atwang/encode_scatac/whitelists/737K-arc-v1.txt.gz
 
 bwt2_idx: genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
 bwt2_idx_name: GRCh38_noalt_as
