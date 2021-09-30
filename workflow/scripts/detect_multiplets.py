@@ -17,33 +17,15 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-# def multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh):
-#     null_total = nulls.shape[0] + null_zeros
-#     sample_total = samples.shape[0]
-
-#     p = 1 - (np.searchsorted(nulls, samples) + null_zeros) / null_total
-#     # print(p)
-#     # p_bonf = p * (num_bc - 1)
-#     p_sidak = 1 - (1 - p)**(num_bc - 1)
-#     print(p_sidak)
-#     q = (p_sidak * sample_total) / (sample_total - np.arange(sample_total))
-#     print(q) ####
-#     candidiates = np.nonzero(q <= fdr_thresh)[0]
-#     if candidiates.size == 0:
-#         cut = samples[-1]
-#     else:
-#         cut = samples[candidiates[0]]
-
-#     return cut, q
-
 def multiplet_fdr(samples, nulls, fdr_thresh):
     null_total = nulls.shape[0]
     sample_total = samples.shape[0]
 
     p = 1 - np.searchsorted(nulls, samples) / null_total
-    print(p)
-    q = (p * sample_total) / (sample_total - np.arange(sample_total))
-    print(q) ####
+    p_corr = 1 - (1 - p)**6
+    # print(p) ####
+    q = (p_corr * sample_total) / (sample_total - np.arange(sample_total))
+    # print(q) ####
     candidiates = np.nonzero(q <= fdr_thresh)[0]
     if candidiates.size == 0:
         cut = samples[-1]
@@ -72,59 +54,7 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
 
     plt.savefig(out_path)
 
-# def tail_cut(samples, side, min_keep=0.6):
-#     rev = True if side == 'l' else False
-#     if rev:
-#         samples = samples[::-1] # reverse order if detecting left tail
-
-#     lbound = int(samples.shape[0] * min_keep)
-#     total_mean = samples.mean()
-#     s = samples - total_mean # shift origin for numerical stability
-
-#     m0 = np.arange(1, s.shape[0] + 1) # Cumulative sample count
-#     m1 = np.cumsum(s) / m0 # 1st cumulative moment (cumulative mean)
-#     o2 = np.cumsum(s**2) / m0 # 2nd cumulant moment around origin
-#     m2 = o2 - m1**2 # 2nd cumulative central moment (cumulative variance)
-#     o3 = np.cumsum(s**3) / m0 # 3rd cumulative moment around origin
-#     o4 = np.cumsum(s**4) / m0 # 4th cumulative moment around origin
-#     m4 = o4 - 4 * m1 * o3 + 6 * m1**2 * o2 - 3 * m1**4 # 4th cumulative central moment
-
-#     with np.errstate(divide='ignore', invalid='ignore'):
-#         k = m4 / m2**2 # Cumulative kurtosis
-
-#     cut_ind = np.nanargmin(k[lbound:])
-#     cut_k = k[lbound:][cut_ind]
-#     cut = samples[lbound:][cut_ind]
-#     bound = samples[lbound]
-#     lower_visual = min(max(100, int(samples.shape[0] * 0.2)), lbound)
-#     k[:lower_visual] = np.nan
-    
-#     if rev:
-#         k = k[::-1] # restore original order
-#         cut_ind = samples.shape[0] - cut_ind - 1
-
-#     return cut_ind, cut_k, cut, bound, k
-
-# def plot_cut(cut, k, pts, lb, title, x_label, out_path, log_scale=False, hist_bins=200):
-#     fig, ax = plt.subplots(tight_layout=True)
-#     if log_scale:
-#         ax.set_xscale('log')
-#         hist_bins = np.geomspace(pts.min(), pts.max(), hist_bins)
-
-#     ax.hist(pts, bins=hist_bins)
-#     ax2 = ax.twinx()
-#     ax2.plot(pts, k, color="g")
-#     ax.axvline(x=cut, color="r")
-#     ax.axvline(x=lb, color="k")
-
-#     ax.set_title(title)
-#     ax.set_xlabel(x_label)
-#     ax.set_ylabel("Histogram Frequency")
-#     ax2.set_ylabel("Cumulative Kurtosis")
-
-#     plt.savefig(out_path)
-
-def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, max_frag_clique=6, fdr_thresh=0.05):
+def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, max_frag_clique=6, fdr_thresh=0.1):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -212,7 +142,6 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
 
     expanded_data = {}
     jac_dists_max = {}
-    # jac_dists_pairs = {}
     jac_dists_top = {}
     for x, y in pair_counts.items():
         a, b = x
@@ -222,7 +151,6 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
         data = [a, b, bca, bcb, y, jac, None]
         expanded_data[x] = data
         if jac > 0:
-            # jac_dists_pairs[x] = jac 
             jac_dists_max[a] = max(jac_dists_max.get(a, 0), jac)
             jac_dists_max[b] = max(jac_dists_max.get(b, 0), jac)
 
@@ -238,7 +166,6 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
             else:
                 heapq.heappushpop(bheap, jac)
 
-    # jac_dists_7th = {k: (v[0] if len(v) == 7 else 1e-5) for k, v in jac_dists_top.items()}
     jac_dists_7th = {k: v[0] for k, v in jac_dists_top.items()}
 
     with gzip.open(barcodes_expanded, 'wt') as f:
@@ -250,16 +177,10 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
     samples = np.fromiter(jac_dists_max.values(), dtype=float, count=len(jac_dists_max))
     samples.sort()
     nulls = np.fromiter(jac_dists_7th.values(), dtype=float, count=len(jac_dists_7th))
-    # nulls = np.fromiter(jac_dists_pairs.values(), dtype=float, count=len(jac_dists_pairs))
     nulls.sort()
-    # null_zeros = num_bc * (num_bc - 1) / 2 - len(jac_dists_pairs)
 
-    # cut, q = multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh)
     cut, q = multiplet_fdr(samples, nulls, fdr_thresh)
     plot_dist(cut, q, samples, nulls, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_x=True)
-    
-    # cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac, 'r')
-    # plot_cut(cut_jac, k_jac, dist_jac, bound_jac, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_scale=True)
 
     min_jac = cut
 
