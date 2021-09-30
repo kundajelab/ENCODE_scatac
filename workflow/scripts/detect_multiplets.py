@@ -40,7 +40,7 @@ def multiplet_fdr(samples, nulls, fdr_thresh):
     null_total = nulls.shape[0]
     sample_total = samples.shape[0]
 
-    p = 1 - np.searchsorted(nulls, samples) / null_total + 1e-10
+    p = 1 - np.searchsorted(nulls, samples) / null_total
     print(p)
     q = (p * sample_total) / (sample_total - np.arange(sample_total))
     print(q) ####
@@ -67,7 +67,7 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
 
     ax.set_title(title)
     ax.set_xlabel(x_label)
-    ax.set_ylabel("Histogram Frequency")
+    ax.set_ylabel("Histogram Density")
     ax2.set_ylabel("Unadjusted Q-Value")
 
     plt.savefig(out_path)
@@ -233,7 +233,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
                 heapq.heappushpop(aheap, jac)
 
             bheap = jac_dists_top.setdefault(b, [])
-            if len(aheap) < 7:
+            if len(bheap) < 7:
                 heapq.heappush(bheap, jac)
             else:
                 heapq.heappushpop(bheap, jac)
