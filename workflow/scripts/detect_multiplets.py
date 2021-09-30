@@ -1,6 +1,7 @@
 import time
 import itertools
 import gzip
+import heapq
 from collections import Counter
 
 import numpy as np
@@ -35,16 +36,13 @@ def print_and_log(text, outfile, starttime=0):
 
 #     return cut, q
 
-def multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh):
-    null_total = nulls.shape[0] + null_zeros
+def multiplet_fdr(samples, nulls, fdr_thresh):
+    null_total = nulls.shape[0]
     sample_total = samples.shape[0]
 
-    p = 1 - (np.searchsorted(nulls, samples) + null_zeros) / null_total
-    # print(p)
-    # p_bonf = p * (num_bc - 1)
-    p_sidak = 1 - (1 - p)**(num_bc - 1)
-    print(p_sidak)
-    q = (p_sidak * sample_total) / (sample_total - np.arange(sample_total))
+    p = 1 - np.searchsorted(nulls, samples) / null_total
+    print(p)
+    q = (p * sample_total) / (sample_total - np.arange(sample_total))
     print(q) ####
     candidiates = np.nonzero(q <= fdr_thresh)[0]
     if candidiates.size == 0:
@@ -130,7 +128,7 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
 
 #     plt.savefig(out_path)
 
-def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, max_frag_clique=6, fdr_thresh=1):
+def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, max_frag_clique=6, fdr_thresh=0.2):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -218,7 +216,8 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
 
     expanded_data = {}
     jac_dists_max = {}
-    jac_dists_pairs = {}
+    # jac_dists_pairs = {}
+    jac_dists_top = {}
     for x, y in pair_counts.items():
         a, b = x
         bca = barcode_counts[a]
@@ -227,9 +226,23 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
         data = [a, b, bca, bcb, y, jac, None]
         expanded_data[x] = data
         if jac > 0:
-            jac_dists_pairs[x] = jac 
+            # jac_dists_pairs[x] = jac 
             jac_dists_max[a] = max(jac_dists_max.get(a, 0), jac)
             jac_dists_max[b] = max(jac_dists_max.get(b, 0), jac)
+
+            aheap = jac_dists_top.setdefault(a, [])
+            if len(aheap) < 7:
+                heapq.heappush(aheap, jac)
+            else:
+                heapq.heappushpop(aheap, jac)
+
+            bheap = jac_dists_top.setdefault(b, [])
+            if len(aheap) < 7:
+                heapq.heappush(bheap, jac)
+            else:
+                heapq.heappushpop(bheap, jac)
+
+    jac_dists_7th = {k: (min(v) if len(v) == 7 else 0) for k, v in jac_dists_top.items()}
 
     with gzip.open(barcodes_expanded, 'wt') as f:
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\n")
@@ -239,11 +252,13 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
 
     samples = np.fromiter(jac_dists_max.values(), dtype=float, count=len(jac_dists_max))
     samples.sort()
-    nulls = np.fromiter(jac_dists_pairs.values(), dtype=float, count=len(jac_dists_pairs))
+    nulls = np.fromiter(jac_dists_7th.values(), dtype=float, count=len(jac_dists_7th))
+    # nulls = np.fromiter(jac_dists_pairs.values(), dtype=float, count=len(jac_dists_pairs))
     nulls.sort()
     null_zeros = num_bc * (num_bc - 1) / 2 - len(jac_dists_pairs)
 
-    cut, q = multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh)
+    # cut, q = multiplet_fdr(samples, nulls, null_zeros, num_bc, fdr_thresh)
+    cut, q = multiplet_fdr(samples, nulls, fdr_thresh)
     plot_dist(cut, q, samples, nulls, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_x=True)
     
     # cut_ind_jac, cut_k_jac, cut_jac, bound_jac, k_jac = tail_cut(dist_jac, 'r')
