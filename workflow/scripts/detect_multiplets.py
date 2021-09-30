@@ -40,7 +40,7 @@ def multiplet_fdr(samples, nulls, fdr_thresh):
     null_total = nulls.shape[0]
     sample_total = samples.shape[0]
 
-    p = 1 - np.searchsorted(nulls, samples) / null_total
+    p = 1 - np.searchsorted(nulls, samples) / null_total + 1e-10
     print(p)
     q = (p * sample_total) / (sample_total - np.arange(sample_total))
     print(q) ####
