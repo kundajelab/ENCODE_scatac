@@ -238,7 +238,8 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
             else:
                 heapq.heappushpop(bheap, jac)
 
-    jac_dists_7th = {k: (v[0] if len(v) == 7 else 1e-5) for k, v in jac_dists_top.items()}
+    # jac_dists_7th = {k: (v[0] if len(v) == 7 else 1e-5) for k, v in jac_dists_top.items()}
+    jac_dists_7th = {k: v[0] for k, v in jac_dists_top.items()}
 
     with gzip.open(barcodes_expanded, 'wt') as f:
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\n")
