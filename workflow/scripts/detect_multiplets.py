@@ -17,16 +17,14 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def multiplet_fdr(samples, nulls, fdr_thresh):
+def multiplet_fdr(samples, nulls, fdr_thresh, max_beads_per_drop):
     null_total = nulls.shape[0]
     sample_total = samples.shape[0]
 
     p = 1 - np.searchsorted(nulls, samples) / null_total
-    p_corr = 1 - (1 - p)**6
-    # print(p) ####
+    p_corr = 1 - (1 - p)**max_beads_per_drop
     q = (p_corr * sample_total) / (sample_total - np.arange(sample_total))
-    # print(q) ####
-    candidiates = np.nonzero(q <= fdr_thresh)[0]
+    candidiates, = np.nonzero(q <= fdr_thresh)
     if candidiates.size == 0:
         cut = samples[-1]
     else:
@@ -50,11 +48,11 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
     ax.set_title(title)
     ax.set_xlabel(x_label)
     ax.set_ylabel("Histogram Frequency")
-    ax2.set_ylabel("Unadjusted Q-Value")
+    ax2.set_ylabel("Non-Monotonicized Q-Value")
 
     plt.savefig(out_path)
 
-def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, max_frag_clique=6, fdr_thresh=0.15):
+def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, fdr_thresh=0.15, max_beads_per_drop=6):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -117,7 +115,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
 
             this_coord = (chr, start, end) 
             if this_coord != cur_coord:
-                if len(cur_clique) <= max_frag_clique:
+                if len(cur_clique) <= max_beads_per_drop:
                     for x, y in itertools.combinations(cur_clique, 2):
                         x, y = (x, y) if x < y else (y, x)
                         pair_counts[(x, y)] += 1
@@ -143,6 +141,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
     expanded_data = {}
     jac_dists_max = {}
     jac_dists_top = {}
+    top_len = max_beads_per_drop + 1
     for x, y in pair_counts.items():
         a, b = x
         bca = barcode_counts[a]
@@ -155,13 +154,13 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
             jac_dists_max[b] = max(jac_dists_max.get(b, 0), jac)
 
             aheap = jac_dists_top.setdefault(a, [])
-            if len(aheap) < 7:
+            if len(aheap) < top_len:
                 heapq.heappush(aheap, jac)
             else:
                 heapq.heappushpop(aheap, jac)
 
             bheap = jac_dists_top.setdefault(b, [])
-            if len(bheap) < 7:
+            if len(bheap) < top_len:
                 heapq.heappush(bheap, jac)
             else:
                 heapq.heappushpop(bheap, jac)
@@ -179,7 +178,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
     nulls = np.fromiter(jac_dists_7th.values(), dtype=float, count=len(jac_dists_7th))
     nulls.sort()
 
-    cut, q = multiplet_fdr(samples, nulls, fdr_thresh)
+    cut, q = multiplet_fdr(samples, nulls, fdr_thresh, max_beads_per_drop)
     plot_dist(cut, q, samples, nulls, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_x=True)
 
     min_jac = cut
