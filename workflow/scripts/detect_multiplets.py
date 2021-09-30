@@ -58,16 +58,12 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
     ax2.set_yscale('log')
     if log_x:
         ax.set_xscale('log')
-        hist_bins_samples = np.geomspace(samples[0], samples[-1], hist_bins)
-        hist_bins_null = np.geomspace(nulls[0], nulls[-1], hist_bins)
-    else:
-        hist_bins_samples = hist_bins
-        hist_bins_null = hist_bins
+        hist_bins = np.geomspace(min(samples[0], nulls[0]), max(samples[-1], nulls[-1]), hist_bins)
 
-    ax.hist(nulls, bins=hist_bins_null, density=True, alpha=0.5, color="k")
+    ax.hist(nulls, bins=hist_bins, density=True, alpha=0.5, color="k")
     ax2.plot(samples, q, color="g")
     ax.axvline(x=cut, color="r")
-    ax.hist(samples, bins=hist_bins_samples, density=True, alpha=0.5, color="b")
+    ax.hist(samples, bins=hist_bins, density=True, alpha=0.5, color="b")
 
     ax.set_title(title)
     ax.set_xlabel(x_label)
