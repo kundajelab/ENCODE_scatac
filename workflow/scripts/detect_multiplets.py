@@ -60,14 +60,14 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
         ax.set_xscale('log')
         hist_bins = np.geomspace(min(samples[0], nulls[0]), max(samples[-1], nulls[-1]), hist_bins)
 
-    ax.hist(nulls, bins=hist_bins, density=True, alpha=0.5, color="k")
+    ax.hist(nulls, bins=hist_bins, alpha=0.5, color="k")
+    ax.hist(samples, bins=hist_bins, alpha=0.5, color="b")
     ax2.plot(samples, q, color="g")
     ax.axvline(x=cut, color="r")
-    ax.hist(samples, bins=hist_bins, density=True, alpha=0.5, color="b")
 
     ax.set_title(title)
     ax.set_xlabel(x_label)
-    ax.set_ylabel("Histogram Density")
+    ax.set_ylabel("Histogram Frequency")
     ax2.set_ylabel("Unadjusted Q-Value")
 
     plt.savefig(out_path)
