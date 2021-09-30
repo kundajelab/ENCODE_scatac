@@ -47,8 +47,8 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
         hist_bins_samples = hist_bins
         hist_bins_null = hist_bins
 
-    ax.hist(samples, bins=hist_bins_samples, alpha=0.5, color="b")
-    ax.hist(nulls, bins=hist_bins_null, alpha=0.5, color="k")
+    ax.hist(samples, bins=hist_bins_samples, density=True, alpha=0.5, color="b")
+    ax.hist(nulls, bins=hist_bins_null, density=True, alpha=0.5, color="k")
     ax2.plot(samples, q, color="g")
     ax.axvline(x=cut, color="r")
 
