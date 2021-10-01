@@ -5,7 +5,7 @@ max_threads_per_rule: 4
 dcc_lab: anshul-kundaje
 dcc_award: UM1HG009442
 
-dcc_mode: dev
+dcc_mode: prod
 
 max_barcode_dist: 1
 bc_whitelist:
