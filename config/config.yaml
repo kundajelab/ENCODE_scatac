@@ -1,11 +1,11 @@
-workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_7/
+workdir: ""
 
-max_threads_per_rule: 16
+max_threads_per_rule: 4
 
 dcc_lab: anshul-kundaje
 dcc_award: UM1HG009442
 
-dcc_mode: prod
+dcc_mode: dev
 
 max_barcode_dist: 1
 bc_whitelist:
@@ -23,6 +23,7 @@ tn5_shift_minus: -4
 archr_seed: 8757647
 
 
+# workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_7/
 
 # mapping_index: /srv/scratch/surag/pipeline/GRCh38_noalt_as/GRCh38_noalt_as
 
