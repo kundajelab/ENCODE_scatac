@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  # - bioconda::fastp=0.20.1
+  - bioconda::fastp=0.22.0
   - conda-forge::curl=7.79.0
   - conda-forge::sed=4.8
   - conda-forge::python=3.9.6
