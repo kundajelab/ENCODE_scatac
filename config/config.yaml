@@ -1,4 +1,4 @@
-workdir: ""
+workdir: .
 
 max_threads_per_rule: 4
 
