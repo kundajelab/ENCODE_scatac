@@ -50,7 +50,7 @@ def script_path(script_name):
     return str(workflow.source_path(script_name))
 
 container: 
-    "docker://continuumio/miniconda3"
+    "docker://mambaorg/micromamba:0.15.3"
 
 include:
     "rules/fastqs.smk"
