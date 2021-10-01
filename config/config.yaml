@@ -11,10 +11,12 @@ max_barcode_dist: 1
 bc_whitelist:
   10x: mitra.stanford.edu/kundaje/atwang/encode_scatac/whitelists/737K-cratac-v1.rc.txt.gz
   multiome: mitra.stanford.edu/kundaje/atwang/encode_scatac/whitelists/737K-arc-v1.txt.gz
+bc_https: False
 
 bwt2_idx: genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
 bwt2_idx_name: GRCh38_noalt_as
 bwt2_idx_prefix: GRCh38_noalt_as
+idx_https: True
 multimapping: 4
 
 tn5_shift_plus: 4
