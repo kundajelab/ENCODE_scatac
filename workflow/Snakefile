@@ -68,7 +68,7 @@ include:
 localrules: 
     all, 
     submit, 
-    query_portal,
+    # query_portal,
     # fetch_whitelist,
     # fetch_index
 
