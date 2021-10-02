@@ -1,4 +1,5 @@
-workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_8/
+# workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_8/
+workdir: .
 
 max_threads_per_rule: 4
 
