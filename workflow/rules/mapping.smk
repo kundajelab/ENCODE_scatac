@@ -2,22 +2,6 @@
 Read mapping
 """
 
-rule fetch_index:
-    """
-    Fetch Bowtie2 hg38 index
-    """
-    input:
-        HTTP.remote(config["bwt2_idx"], insecure=(not config["idx_https"]), keep_local=True)
-    output:
-        idx = directory("bwt2_idx"),
-        flag = touch(os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_prefix"]))
-    conda:
-        "../envs/mapping.yaml"
-    group: 
-        "mapping"
-    shell:
-        "unzip {input} -d {output.idx}"
-
 rule bowtie2:
     """
     Read mapping (Bowtie2 aligner)

@@ -49,8 +49,8 @@ max_threads = config["max_threads_per_rule"]
 def script_path(script_name):
     return str(workflow.source_path(script_name))
 
-container: 
-    "docker://continuumio/miniconda3:4.10.3"
+# container: 
+#     "docker://continuumio/miniconda3:4.10.3"
 
 include:
     "rules/fastqs.smk"
@@ -66,7 +66,10 @@ include:
     "rules/submit.smk"
 
 localrules: 
-    all, submit, query_portal
+    all, 
+    submit, 
+    query_portal,
+    fetch_index
 
 rule all:
     """
@@ -122,6 +125,32 @@ class SampleDataFetcher:
         return data
 
 sample_data = SampleDataFetcher(checkpoints.query_portal) 
+
+rule fetch_whitelist:
+    """
+    Fetch barcode whitelist
+    """
+    input:
+        lambda w: HTTP.remote(config["bc_whitelist"][w.modality], insecure=(not config["bc_https"]))
+    output:
+        "bc_whitelists/{modality}.txt.gz"
+
+    shell:
+        "mv {input} {output}"
+
+rule fetch_index:
+    """
+    Fetch Bowtie2 hg38 index
+    """
+    input:
+        HTTP.remote(config["bwt2_idx"], insecure=(not config["idx_https"]))
+    output:
+        idx = directory("bwt2_idx"),
+        flag = touch(os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_prefix"]))
+    conda:
+        "envs/portal.yaml"
+    shell:
+        "unzip {input} -d {output.idx}"
 
 # rule all:
 #     """

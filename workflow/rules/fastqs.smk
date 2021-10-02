@@ -48,7 +48,7 @@ rule detect_revcomp:
     """
     input:
         fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",
-        whitelist = lambda w: HTTP.remote(config["bc_whitelist"][sample_config[w.sample]['modality']], insecure=(not config["bc_https"]), keep_local=True),
+        whitelist = lambda w: f"bc_whitelists/{sample_data[w.sample]["modality"]}.txt.gz",
         input_data = "results/{sample}/input_data.json"
     output:
         revcomp = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
@@ -70,8 +70,7 @@ rule match_barcodes:
         fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
         fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
         fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq",
-        whitelist = lambda w: HTTP.remote(config["bc_whitelist"][sample_config[w.sample]['modality']], insecure=(not config["bc_https"]), keep_local=True),
-        revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt",
+        whitelist = lambda w: f"bc_whitelists/{sample_data[w.sample]["modality"]}.txt.gz",        revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt",
         input_data = "results/{sample}/input_data.json"
     output: 
         fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_full.fastq.gz"),
