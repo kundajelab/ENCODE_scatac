@@ -68,9 +68,9 @@ include:
 localrules: 
     all, 
     submit, 
-    # query_portal,
-    # fetch_whitelist,
-    # fetch_index
+    query_portal,
+    fetch_whitelist,
+    fetch_index
 
 rule all:
     """
@@ -135,6 +135,8 @@ rule fetch_whitelist:
         lambda w: HTTP.remote(config["bc_whitelist"][w.modality], insecure=(not config["bc_https"]))
     output:
         "bc_whitelists/{modality}.txt.gz"
+    conda:
+        "envs/portal.yaml"
     shell:
         "mv {input} {output}"
 
