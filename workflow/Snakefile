@@ -66,7 +66,11 @@ include:
     "rules/submit.smk"
 
 localrules: 
-    all, submit, query_portal, fetch_whitelist, fetch_index
+    all, 
+    submit, 
+    query_portal,
+    fetch_whitelist,
+    fetch_index
 
 rule all:
     """
@@ -128,11 +132,12 @@ rule fetch_whitelist:
     Fetch barcode whitelist
     """
     input:
-        lambda w: HTTP.remote(config["bc_whitelist"][w.modality], insecure=(not config["bc_https"]))
+        data = "results/{sample}/input_data.json",
+        wl = lambda w: HTTP.remote(config["bc_whitelist"][w.modality], insecure=(not config["bc_https"]))
     output:
         "bc_whitelists/{modality}.txt.gz"
     shell:
-        "mv {input} {output}"
+        "mv {input.wl} {output}"
 
 rule fetch_index:
     """
