@@ -11,7 +11,7 @@ rule bowtie2:
         fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
         idx = os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_prefix"])
     output:
-        bam_raw = pipe("temp/{sample}/mapping/raw.bam"),
+        bam_raw = temp("temp/{sample}/mapping/raw.bam"),
     params:
         k = 1 + config["multimapping"],
     log:
@@ -34,7 +34,7 @@ rule filter_multimappers:
     input:
         "temp/{sample}/mapping/raw.bam"
     output:
-        pipe("temp/{sample}/mapping/de-multimap.bam")
+        temp("temp/{sample}/mapping/de-multimap.bam")
     params:
         multimapping = config["multimapping"],
         mmp_path = script_path("scripts/assign_multimappers.py")
