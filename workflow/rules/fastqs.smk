@@ -9,7 +9,7 @@ rule strip_fastq:
     input:
         "results/{sample}/input_data.json"
     output:
-        pipe("temp/{sample}/fastqs/stripped_{read}.fastq")
+        temp("temp/{sample}/fastqs/stripped_{read}.fastq")
     params:
         url = lambda w: sample_data[w.sample]["fastq"][w.read],
         usr = os.environ["DCC_API_KEY"],
@@ -29,7 +29,7 @@ rule fetch_fastq_bc:
     input:
         "results/{sample}/input_data.json"
     output:
-        pipe("temp/{sample}/fastqs/fastq_barcode.fastq")
+        temp("temp/{sample}/fastqs/fastq_barcode.fastq")
     params:
         url = lambda w: sample_data[w.sample]["fastq"]["BC"][0],
         usr = os.environ["DCC_API_KEY"],
