@@ -164,20 +164,24 @@ try:
         "R2": snakemake.input["fq_BC"],
         "R3": snakemake.input["fq_R2"],
     }
-    whitelists = {
-        "R2": snakemake.input["whitelist"],
-    }
+    
     revcomp = {
         "R2": snakemake.input["revcomp"],
     }
 
     if modality == "10x":
+        whitelists = {
+            "R2": snakemake.input["whitelist_10x"],
+        }
         offsets = {
             "R2": 0,
         }
         match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_out_path, fastq2_out_path, qc_path, threads)
 
     elif modality == "multiome":
+        whitelists = {
+            "R2": snakemake.input["whitelist_multiome"],
+        }
         offsets = {
             "R2": 8,
         }

@@ -48,8 +48,9 @@ rule detect_revcomp:
     """
     input:
         fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",
-        # whitelist = lambda w: f"bc_whitelists/{sample_data[w.sample]['modality']}.txt.gz",
-        # input_data = "results/{sample}/input_data.json"
+        whitelist_10x = "bc_whitelists/10x.txt.gz",
+        whitelist_multiome = "bc_whitelists/multiome.txt.gz",
+        input_data = "results/{sample}/input_data.json"
     output:
         revcomp = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
         qc = temp("temp/{sample}/fastqs/barcode_revcomp_full.txt")
@@ -70,9 +71,10 @@ rule match_barcodes:
         fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
         fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
         fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq",
-        # whitelist = lambda w: f"bc_whitelists/{sample_data[w.sample]['modality']}.txt.gz",        
+        whitelist_10x = "bc_whitelists/10x.txt.gz",
+        whitelist_multiome = "bc_whitelists/multiome.txt.gz",
         revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt",
-        # input_data = "results/{sample}/input_data.json"
+        input_data = "results/{sample}/input_data.json"
     output: 
         fastq1_bc = temp("temp/{sample}/fastqs/R1_bc_full.fastq.gz"),
         fastq2_bc = temp("temp/{sample}/fastqs/R2_bc_full.fastq.gz"),

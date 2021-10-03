@@ -59,13 +59,14 @@ try:
     qc = snakemake.output['qc']
 
     fastq = snakemake.input["fastq"]
-    whitelist = snakemake.input["whitelist"]
-
+    
     if modality == "10x":
+        whitelist = snakemake.input["whitelist_10x"]
         offset = 0
         bc_detect(fastq, whitelist, out, qc, offset)
 
     elif modality == "multiome":
+        whitelist = snakemake.input["whitelist_multiome"]
         offset = 8
         bc_detect(fastq, whitelist, out, qc, offset)
 
