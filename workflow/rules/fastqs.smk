@@ -70,7 +70,7 @@ rule match_barcodes:
         fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
         fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
         fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq",
-        whitelist = lambda w: f"bc_whitelists/{sample_data[w.sample]['modality']}.txt.gz",        
+        # whitelist = lambda w: f"bc_whitelists/{sample_data[w.sample]['modality']}.txt.gz",        
         revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt",
         # input_data = "results/{sample}/input_data.json"
     output: 
