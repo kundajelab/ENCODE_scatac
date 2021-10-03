@@ -9,7 +9,7 @@ rule strip_fastq:
     input:
         "results/{sample}/input_data.json"
     output:
-        temp("temp/{sample}/fastqs/stripped_{read}.fastq")
+        temp("temp/{sample}/fastqs/stripped_{read}.fastq.gz")
     params:
         url = lambda w: sample_data[w.sample]["fastq"][w.read],
         usr = os.environ["DCC_API_KEY"],
@@ -20,7 +20,7 @@ rule strip_fastq:
         "fastqs"
     shell:
         "curl --no-progress-meter -L -u {params.usr}:{params.pwd} {params.url} | "
-        "zcat | sed 's/ .*//' > {output}"
+        "zcat | sed 's/ .*//' | gzip > {output}"
 
 rule fetch_fastq_bc:
     """
@@ -68,9 +68,9 @@ rule match_barcodes:
     Barcode correction and filtering
     """
     input: 
-        fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq",
-        fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq",
-        fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq",
+        fq_R1 = "temp/{sample}/fastqs/stripped_R1.fastq.gz",
+        fq_R2 = "temp/{sample}/fastqs/stripped_R2.fastq.gz",
+        fq_BC = "temp/{sample}/fastqs/stripped_BC.fastq.gz",
         whitelist_10x = "bc_whitelists/10x.txt.gz",
         whitelist_multiome = "bc_whitelists/multiome.txt.gz",
         revcomp = "temp/{sample}/fastqs/revcomp_indicator.txt",
@@ -96,7 +96,7 @@ rule fetch_ren:
     Entry point for Bing Ren data
     """
     input:
-        "temp/{sample}/fastqs/stripped_{read}.fastq"
+        "temp/{sample}/fastqs/stripped_{read}.fastq.gz"
     output:
         temp("temp/{sample}/fastqs/{read}_bc_ren.fastq.gz")
     conda:
@@ -106,7 +106,7 @@ rule fetch_ren:
     shell:
         "awk -v FS=':' "
         "'{{if (NR%4==1) {{s=\"@\"$2; for (i=3 ; i<=NF ; i++) {{s = s \":\" $i }} ; s = s \"\\tCB:Z:\" substr($1,2) ; print s}} else {{print $0}}}}' "
-        "{input} | gzip -c > {output}"
+        "zcat {input} | gzip > {output}"
 
 rule dummy_qc_ren:
     """
