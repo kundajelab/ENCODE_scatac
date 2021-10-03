@@ -48,7 +48,7 @@ rule detect_revcomp:
     """
     input:
         fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",
-        whitelist = lambda w: f"bc_whitelists/{sample_data[w.sample]['modality']}.txt.gz",
+        # whitelist = lambda w: f"bc_whitelists/{sample_data[w.sample]['modality']}.txt.gz",
         # input_data = "results/{sample}/input_data.json"
     output:
         revcomp = temp("temp/{sample}/fastqs/revcomp_indicator.txt"),
