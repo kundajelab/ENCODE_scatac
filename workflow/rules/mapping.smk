@@ -9,7 +9,8 @@ rule bowtie2:
     input:
         fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
-        idx = os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_prefix"])
+        idx = os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_prefix"]),
+        files = expand(os.path.join("bwt2_idx", config["bwt2_idx_name"], f), f=config["bwt2_idx_files"])
     output:
         bam_raw = temp("temp/{sample}/mapping/raw.bam"),
     params:

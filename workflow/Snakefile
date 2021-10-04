@@ -148,7 +148,7 @@ rule fetch_index:
         HTTP.remote(config["bwt2_idx"], insecure=(not config["idx_https"]))
     output:
         idx = directory("bwt2_idx"),
-        flag = touch(os.path.join("bwt2_idx", config["bwt2_idx_name"], config["bwt2_idx_prefix"]))
+        files = expand(os.path.join("bwt2_idx", config["bwt2_idx_name"], f), f=config["bwt2_idx_files"])
     conda:
         "envs/portal.yaml"
     shell:
