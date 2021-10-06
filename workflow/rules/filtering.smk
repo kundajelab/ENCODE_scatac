@@ -27,7 +27,7 @@ rule remove_mito:
         bam = "results/{sample}/mapping/raw.bam",
         bai = "results/{sample}/mapping/raw.bam.bai"
     output: 
-        bam = pipe("temp/{sample}/filtering/no_mito.bam"),
+        bam = temp("temp/{sample}/filtering/no_mito.bam"),
         count_no_mito = temp("temp/{sample}/filtering/count_no_mito.txt")
     conda:
         "../envs/filtering.yaml"
@@ -78,7 +78,7 @@ rule remove_duplicates:
     input:
         "temp/{sample}/filtering/primary_align.bam"
     output:
-        bam_markdup = pipe("temp/{sample}/filtering/markdup.bam"),
+        bam_markdup = temp("temp/{sample}/filtering/markdup.bam"),
         bam_nodup = "results/{sample}/filtering/filtered.bam",
         markdup_stats = "results/{sample}/filtering/markdup.txt"
     log:

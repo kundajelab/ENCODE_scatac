@@ -9,7 +9,7 @@ rule bam_to_fragments:
     input:
         "results/{sample}/filtering/filtered.bam",
     output:
-        pipe("temp/{sample}/fragments/fragments_raw.tsv")
+        temp("temp/{sample}/fragments/fragments_raw.tsv")
     params:
         shift_plus = config["tn5_shift_plus"],
         shift_minus = config["tn5_shift_minus"]
