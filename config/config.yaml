@@ -14,18 +14,31 @@ bc_whitelist:
   multiome: mitra.stanford.edu/kundaje/atwang/encode_scatac/whitelists/737K-arc-v1.txt.gz
 bc_https: False
 
-bwt2_idx: genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
-bwt2_idx_name: GRCh38_noalt_as
-bwt2_idx_prefix: GRCh38_noalt_as
-bwt2_idx_files:
-  - GRCh38_noalt_as.1.bt2
-  - GRCh38_noalt_as.2.bt2
-  - GRCh38_noalt_as.3.bt2
-  - GRCh38_noalt_as.4.bt2
-  - GRCh38_noalt_as.rev.1.bt2
-  - GRCh38_noalt_as.rev.2.bt2
-
+idx:
+  hg38:
+    bwt2_idx: genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
+    bwt2_idx_name: GRCh38_noalt_as
+    bwt2_idx_prefix: GRCh38_noalt_as
+    bwt2_idx_files:
+      - GRCh38_noalt_as.1.bt2
+      - GRCh38_noalt_as.2.bt2
+      - GRCh38_noalt_as.3.bt2
+      - GRCh38_noalt_as.4.bt2
+      - GRCh38_noalt_as.rev.1.bt2
+      - GRCh38_noalt_as.rev.2.bt2
+  mm10:
+    bwt2_idx: genome-idx.s3.amazonaws.com/bt/mm10.zip
+    bwt2_idx_name: mm10
+    bwt2_idx_prefix: mm10
+    bwt2_idx_files:
+      - mm10.1.bt2
+      - mm10.2.bt2
+      - mm10.3.bt2
+      - mm10.4.bt2
+      - mm10.rev.1.bt2
+      - mm10.rev.2.bt2
 idx_https: True
+
 multimapping: 4
 
 tn5_shift_plus: 4
