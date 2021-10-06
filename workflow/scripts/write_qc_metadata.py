@@ -366,7 +366,7 @@ def parse_lib_complexity_qc(txt):
     result["pbc_stats"] = {"path": os.path.abspath(txt)}
 
     with open(txt, 'r') as f:
-        next()
+        next(f)
         arr = f.readline().strip().split('\t')
 
     result['total_fragments'] = to_int(arr[0])
