@@ -10,7 +10,7 @@ rule bowtie2:
         fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
         idx = lambda w: os.path.join("bwt2_idx", config["genome"][sample_config[w.sample]["genome"]]["bwt2_idx_name"], config["genome"][sample_config[w.sample]["genome"]]["bwt2_idx_prefix"]),
-        files = lambda w: [os.path.join("bwt2_idx", config["genome"][sample_config[w.sample]["genome"]]["bwt2_idx_name"], f) for f in config["genome"][sample_config[w.sample]["genome"]][["bwt2_idx_files"]]
+        files = lambda w: [os.path.join("bwt2_idx", config["genome"][sample_config[w.sample]["genome"]]["bwt2_idx_name"], f) for f in config["genome"][sample_config[w.sample]["genome"]][["bwt2_idx_files"]]]
     output:
         bam_raw = temp("temp/{sample}/mapping/raw.bam"),
     params:
