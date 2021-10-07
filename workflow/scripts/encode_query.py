@@ -9,6 +9,7 @@ dcc_mode = snakemake.config["dcc_mode"]
 experiment = snakemake.params["experiment"]
 replicate_num = snakemake.params["replicate"]
 modality = snakemake.params["modality"]
+assembly = snakemake.params["assembly"]
 log_dir, = snakemake.log
 
 os.environ["DCC_API_KEY"] = snakemake.params["dcc_api_key"]
@@ -65,6 +66,7 @@ out_data = {
     "modality": modality,
     "platform": platform,
     "read_length": read_length,
+    "assembly": assembly
 }
 
 if modality == "ren":

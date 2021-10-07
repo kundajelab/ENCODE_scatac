@@ -20,11 +20,11 @@ addArchRVerbose(verbose = FALSE)
 Sys.setenv("HDF5_USE_FILE_LOCKING" = "FALSE")
 Sys.setenv("RHDF5_USE_FILE_LOCKING" = "FALSE")
 
-build_archr_project <- function(arrow_sample_name, input_path, output_paths, threads, log_paths, seed) {
+build_archr_project <- function(arrow_sample_name, input_path, output_paths, threads, log_paths, genome, seed) {
     set.seed(seed)
 
     addArchRThreads(threads = threads)
-    addArchRGenome("hg38")
+    addArchRGenome(genome)
 
     # input_paths = unlist(input_paths)]
     # print(output_paths) ####
@@ -190,7 +190,7 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
 
 }
 
-build_archr_project(snakemake@params[["sample_name"]], snakemake@input[["frag"]], snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["seed"]])
+build_archr_project(snakemake@params[["sample_name"]], snakemake@input[["frag"]], snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["genome"]], snakemake@params[["seed"]])
 
 sink(type = "message")
 sink()

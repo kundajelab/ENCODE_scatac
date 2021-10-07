@@ -20,6 +20,7 @@ rule archr_build:
         qc_tss = temp("temp/{sample}/analyses/qc/{sample}/{sample}-TSS_by_Unique_Frags.pdf")
     params:
         sample_name = lambda w: w.sample,
+        genome = lambda w: config["genome"][sample_config[w.sample]["genome"]]["archr_genome"],
         seed = config["archr_seed"],
     log:
         console = "logs/{sample}/analyses/archr/console.log",

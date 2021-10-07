@@ -40,7 +40,7 @@ def fastq_metadata(sample_data, pair, other):
 def bam_metadata(sample_data):
     d = OrderedDict({
         "file_format": "bam",
-        "assembly": "GRCh38",
+        "assembly": sample_data["assembly"],
         "mapped_run_type": "paired-ended",
         "output_type": "alignments",
         "mapped_read_length": sample_data["read_length"],
@@ -50,7 +50,7 @@ def bam_metadata(sample_data):
 def fragments_metadata(sample_data):
     d = OrderedDict({
         "file_format": "tar",
-        "assembly": "GRCh38",
+        "assembly": sample_data["assembly"],
         "output_type": "fragments",
     })
     return d
@@ -58,7 +58,7 @@ def fragments_metadata(sample_data):
 def analyses_metadata(sample_data): #TODO
     d = OrderedDict({
         "file_format": "tar",
-        "assembly": "GRCh38",
+        "assembly": sample_data["assembly"],
     })
     return d
 

@@ -14,8 +14,9 @@ bc_whitelist:
   multiome: mitra.stanford.edu/kundaje/atwang/encode_scatac/whitelists/737K-arc-v1.txt.gz
 bc_https: False
 
-idx:
-  hg38:
+genome:
+  GRCh38:
+    archr_genome: hg38
     bwt2_idx: genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
     bwt2_idx_name: GRCh38_noalt_as
     bwt2_idx_prefix: GRCh38_noalt_as
@@ -27,6 +28,7 @@ idx:
       - GRCh38_noalt_as.rev.1.bt2
       - GRCh38_noalt_as.rev.2.bt2
   mm10:
+    archr_genome: mm10
     bwt2_idx: genome-idx.s3.amazonaws.com/bt/mm10.zip
     bwt2_idx_name: mm10
     bwt2_idx_prefix: mm10
@@ -37,6 +39,7 @@ idx:
       - mm10.4.bt2
       - mm10.rev.1.bt2
       - mm10.rev.2.bt2
+
 idx_https: True
 
 multimapping: 4
