@@ -144,11 +144,19 @@ rule fetch_index:
     input:
         lambda w: HTTP.remote(idx_urls[(w.bwt2_idx, w.bwt2_name)], insecure=(not config["idx_https"]))
     output:
-        prefix = touch("bwt2_idx/{bwt2_idx}/{bwt2_name}"),
-        out_dir = directory("bwt2_idx/{bwt2_idx}")
+        directory("bwt2_idx/{bwt2_idx}")
     params:
         out_parent = "bwt2_idx"
     conda:
         "envs/portal.yaml"
     shell:
         "unzip {input} -d {params.out_parent}"
+
+rule idx_prefix_placeholder:
+    """
+    Create Bowtie2 index prefix dummy file
+    """
+    input:
+        "bwt2_idx/{bwt2_idx}"
+    output:
+        touch("bwt2_idx/{bwt2_idx}/{bwt2_name}"),
