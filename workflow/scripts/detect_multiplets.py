@@ -17,13 +17,13 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def multiplet_fdr(samples, nulls, fdr_thresh, max_beads_per_drop):
+def multiplet_fdr(samples, nulls, fdr_thresh):
     null_total = nulls.shape[0]
     sample_total = samples.shape[0]
 
     p = 1 - np.searchsorted(nulls, samples) / null_total
-    p_corr = 1 - (1 - p)**max_beads_per_drop
-    q = (p_corr * sample_total) / (sample_total - np.arange(sample_total))
+    # p_corr = 1 - (1 - p)**max_beads_per_drop
+    q = (p * sample_total) / (sample_total - np.arange(sample_total))
     candidiates, = np.nonzero(q <= fdr_thresh)
     if candidiates.size == 0:
         cut = samples[-1]
@@ -165,20 +165,34 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
             else:
                 heapq.heappushpop(bheap, jac)
 
-    jac_dists_7th = {k: v[0] for k, v in jac_dists_top.items()}
-
     with gzip.open(barcodes_expanded, 'wt') as f:
         f.write("Barcode1\tBarcode2\tBarcode1Counts\tBarcode2Counts\tCommon\tJaccardIndex\n")
         for x, data in expanded_data.items():
             a, b = x
             f.write("{}\t{}\t{}\t{}\t{}\t{:.4f}\n".format(*data[:-1]))
 
-    samples = np.fromiter(jac_dists_max.values(), dtype=float, count=len(jac_dists_max))
+    jac_dists_ref_filt = {}
+    jac_dists_max_filt = {}
+    jac_dists_ratios = []
+    for k, v in jac_dists_top.items():
+        if len(jac_dists_max) < top_len:
+            continue
+        dist_max = jac_dists_max[k]
+        dist_ref = v[0]
+        if dist_ref < (1 / min_counts):
+            continue
+        jac_dists_ref_filt[k] = dist_ref
+        jac_dists_max_filt[k] = dist_max
+        jac_dists_ratios.append(dist_max/dist_ref)
+
+    jac_shift = np.median(jac_dists_ratios)
+
+    samples = np.fromiter(jac_dists_max_filt.values(), dtype=float, count=len(jac_dists_max_filt)) * jac_shift
     samples.sort()
-    nulls = np.fromiter(jac_dists_7th.values(), dtype=float, count=len(jac_dists_7th))
+    nulls = np.fromiter(jac_dists_ref_filt.values(), dtype=float, count=len(jac_dists_ref_filt))
     nulls.sort()
 
-    cut, q = multiplet_fdr(samples, nulls, fdr_thresh, max_beads_per_drop)
+    cut, q = multiplet_fdr(samples, nulls, fdr_thresh)
     plot_dist(cut, q, samples, nulls, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_x=True)
 
     min_jac = cut
