@@ -7,7 +7,7 @@ rule strip_fastq:
     Strip FASTQ read descriptions
     """
     input:
-        "results/{sample}/input_data.json"
+        ancient("results/{sample}/input_data.json")
     output:
         temp("temp/{sample}/fastqs/stripped_{read}.fastq.gz")
     params:
@@ -27,7 +27,7 @@ rule fetch_fastq_bc:
     Fetch barcodes fastq
     """
     input:
-        "results/{sample}/input_data.json"
+        ancient("results/{sample}/input_data.json")
     output:
         temp("temp/{sample}/fastqs/fastq_barcode.fastq")
     params:
