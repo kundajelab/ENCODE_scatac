@@ -54,9 +54,8 @@ rule tar_archr_results:
     Create ArchR results archive
     """
     input:
-        "temp/{sample}/analyses/archr_flag.txt"
-    params:
-        project_dir = lambda w: f"temp/{w.sample}/analyses/archr_project",
+        project_dir = "temp/{sample}/analyses/archr_project"
+        flag = "temp/{sample}/analyses/archr_flag.txt"
     output:
         "results/{sample}/analyses/archr_project.tar.gz"
     conda:
@@ -64,7 +63,7 @@ rule tar_archr_results:
     group:
         "analyses"
     shell:
-        "tar -zcf {output} {params.project_dir}"
+        "tar -zcf {output} {input.project_dir}"
 
 rule write_archr_qc_pdf:
     """
