@@ -3,12 +3,12 @@ Read mapping
 """
 
 def get_mapping_idx(w):
-    genome = sample_config[w.sample]["genome"]]
+    genome = sample_config[w.sample]["genome"]
     entry = config["genome"][genome]
     return os.path.join("bwt2_idx", entry["bwt2_idx_name"], entry["bwt2_idx_prefix"])
 
 def get_idx_files(w):
-    genome = sample_config[w.sample]["genome"]]
+    genome = sample_config[w.sample]["genome"]
     entry = config["genome"][genome]
     return [
         os.path.join("bwt2_idx", entry["bwt2_idx_name"], f) 
@@ -25,9 +25,9 @@ rule bowtie2:
         idx = get_mapping_idx,
         files = get_idx_files
     output:
-        bam_raw = temp("temp/{sample}/mapping/raw.bam"),
+        bam_raw = temp("temp/{sample}/mapping/raw.bam")
     params:
-        k = 1 + config["multimapping"],
+        k = 1 + config["multimapping"]
     log:
         "logs/{sample}/mapping/bwt2.log"
     threads:
