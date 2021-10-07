@@ -144,7 +144,7 @@ rule fetch_index:
     input:
         lambda w: HTTP.remote(idx_urls[(w.bwt2_idx, w.bwt2_name)], insecure=(not config["idx_https"]))
     output:
-        prefix = touch("bwt2_idx/{bwt2_idx}/{bwt2_name}")
+        prefix = touch("bwt2_idx/{bwt2_idx}/{bwt2_name}"),
         out_dir = directory("bwt2_idx/{bwt2_idx}")
     params:
         out_parent = "bwt2_idx"
