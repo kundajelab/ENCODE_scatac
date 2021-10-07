@@ -65,7 +65,8 @@ localrules:
     submit, 
     query_portal,
     fetch_whitelist,
-    fetch_index
+    fetch_index,
+    idx_prefix_placeholder
 
 rule all:
     """
