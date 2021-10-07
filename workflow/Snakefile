@@ -137,13 +137,13 @@ rule fetch_whitelist:
     shell:
         "mv {input} {output}"
 
-idx_urls = {(v["bwt2_idx_prefix"], v["bwt2_idx_name"]): v["bwt2_idx"] for v in config["genome"].values()}
+idx_urls = {v["bwt2_idx_prefix"]: v["bwt2_idx"] for v in config["genome"].values()}
 rule fetch_index:
     """
     Fetch Bowtie2 index
     """
     input:
-        lambda w: HTTP.remote(idx_urls[(w.bwt2_idx, w.bwt2_name)], insecure=(not config["idx_https"]))
+        lambda w: HTTP.remote(idx_urls[w.bwt2_idx], insecure=(not config["idx_https"]))
     output:
         directory("bwt2_idx/{bwt2_idx}")
     params:
@@ -160,4 +160,4 @@ rule idx_prefix_placeholder:
     input:
         "bwt2_idx/{bwt2_idx}"
     output:
-        touch("bwt2_idx/{bwt2_idx}/{bwt2_name}"),
+        touch("bwt2_idx/{bwt2_idx}/{bwt2_name}")
