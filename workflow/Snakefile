@@ -136,7 +136,7 @@ rule fetch_whitelist:
     shell:
         "mv {input} {output}"
 
-idx_urls = {}
+idx_urls = {(v["bwt2_idx_prefix"], v["bwt2_idx_name"]): v["bwt2_idx"] for v in config["genome"].values()}
 rule fetch_index:
     """
     Fetch Bowtie2 index
