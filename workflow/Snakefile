@@ -138,7 +138,7 @@ rule fetch_whitelist:
         "mv {input} {output}"
 
 idx_urls = {v["bwt2_idx_prefix"]: v["bwt2_idx"] for v in config["genome"].values()}
-rule fetch_index:
+checkpoint fetch_index:
     """
     Fetch Bowtie2 index
     """
@@ -160,9 +160,9 @@ rule idx_prefix_placeholder:
     output:
         touch("bwt2_idx/{bwt2_idx}/{bwt2_name,[A-Za-z0-9]+}")
 
-rule capture_idx_files:
-    """
-    Dummy rule for capturing extracted index files
-    """
-    output:
-        "bwt2_idx/{bwt2_idx}/{bwt2_name,[A-Za-z0-9]+}.{idx}.bt2"
+# rule capture_idx_files:
+#     """
+#     Dummy rule for capturing extracted index files
+#     """
+#     output:
+#         "bwt2_idx/{bwt2_idx}/{bwt2_name,[A-Za-z0-9]+}.{idx}.bt2"
