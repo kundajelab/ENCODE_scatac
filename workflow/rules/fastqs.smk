@@ -104,9 +104,10 @@ rule fetch_ren:
     group: 
         "fastqs"
     shell:
+        "zcat {input} | "
         "awk -v FS=':' "
-        "'{{if (NR%4==1) {{s=\"@\"$2; for (i=3 ; i<=NF ; i++) {{s = s \":\" $i }} ; s = s \"\\tCB:Z:\" substr($1,2) ; print s}} else {{print $0}}}}' "
-        "zcat {input} | gzip > {output}"
+        "'{{if (NR%4==1) {{s=\"@\"$2; for (i=3 ; i<=NF ; i++) {{s = s \":\" $i }} ; s = s \"\\tCB:Z:\" substr($1,2) ; print s}} else {{print $0}}}}' | "
+        "gzip > {output}"
 
 rule dummy_qc_ren:
     """
