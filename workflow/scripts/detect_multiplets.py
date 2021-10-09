@@ -179,17 +179,17 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
             continue
         dist_max = jac_dists_max[k]
         dist_ref = v[0]
-        if dist_ref < (1 / min_counts):
-            continue
+        # if dist_ref < (1 / min_counts):
+        #     continue
         jac_dists_ref_filt[k] = dist_ref
         jac_dists_max_filt[k] = dist_max
         jac_dists_ratios.append(dist_max/dist_ref)
 
     jac_shift = np.median(jac_dists_ratios)
 
-    samples = np.fromiter(jac_dists_max_filt.values(), dtype=float, count=len(jac_dists_max_filt)) * jac_shift
+    samples = np.fromiter(jac_dists_max_filt.values(), dtype=float, count=len(jac_dists_max_filt))
     samples.sort()
-    nulls = np.fromiter(jac_dists_ref_filt.values(), dtype=float, count=len(jac_dists_ref_filt))
+    nulls = np.fromiter(jac_dists_ref_filt.values(), dtype=float, count=len(jac_dists_ref_filt)) * jac_shift
     nulls.sort()
 
     cut, q = multiplet_fdr(samples, nulls, fdr_thresh)
