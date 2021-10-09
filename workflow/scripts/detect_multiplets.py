@@ -17,7 +17,7 @@ def print_and_log(text, outfile, starttime=0):
     outfile.write("{} - {}\n".format(logtime, text))
     print("{} - {}".format(logtime, text))
 
-def multiplet_fdr(samples, nulls, fdr_thresh):
+def multiplet_fdr(samples, nulls, fdr_thresh, min_cutoff):
     null_total = nulls.shape[0]
     sample_total = samples.shape[0]
 
@@ -26,9 +26,9 @@ def multiplet_fdr(samples, nulls, fdr_thresh):
     q = (p * sample_total) / (sample_total - np.arange(sample_total))
     candidiates, = np.nonzero(q <= fdr_thresh)
     if candidiates.size == 0:
-        cut = samples[-1]
+        cut = min_cutoff
     else:
-        cut = samples[candidiates[0]]
+        cut = max(min_cutoff, samples[candidiates[0]])
 
     return cut, q
 
@@ -52,7 +52,7 @@ def plot_dist(cut, q, samples, nulls, title, x_label, out_path, log_x=False, his
 
     plt.savefig(out_path)
 
-def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, fdr_thresh=0.01, max_beads_per_drop=6):
+def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status, jac_plot, min_counts=500, fdr_thresh=0.15, max_beads_per_drop=6, min_cutoff=1e-3):
     logout = open(summary, "w")
     starttime = time.process_time() 
 
@@ -192,7 +192,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
     nulls = np.fromiter(jac_dists_ref_filt.values(), dtype=float, count=len(jac_dists_ref_filt)) * jac_shift
     nulls.sort()
 
-    cut, q = multiplet_fdr(samples, nulls, fdr_thresh)
+    cut, q = multiplet_fdr(samples, nulls, fdr_thresh, min_cutoff)
     plot_dist(cut, q, samples, nulls, "Multiplet Thresholding", "Max Marginal Jaccard Distance", jac_plot, log_x=True)
 
     min_jac = cut
