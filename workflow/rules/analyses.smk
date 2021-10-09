@@ -54,7 +54,7 @@ rule tar_archr_results:
     Create ArchR results archive
     """
     input:
-        project_dir = "temp/{sample}/analyses/archr_project",
+        project_dir = "temp/{sample}/analyses/archr_project/",
         flag = "temp/{sample}/analyses/archr_flag.txt"
     output:
         "results/{sample}/analyses/archr_project.tar.gz"
