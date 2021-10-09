@@ -175,7 +175,7 @@ def main(fragments, barcodes_strict, barcodes_expanded, summary, barcodes_status
     jac_dists_max_filt = {}
     jac_dists_ratios = []
     for k, v in jac_dists_top.items():
-        if len(jac_dists_max) < top_len:
+        if len(v) < top_len:
             continue
         dist_max = jac_dists_max[k]
         dist_ref = v[0]
