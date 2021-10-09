@@ -157,5 +157,7 @@ rule idx_prefix_placeholder:
     """
     Create Bowtie2 index prefix dummy file
     """
+    input:
+        "bwt2_idx/{bwt2_idx}"
     output:
         touch("bwt2_idx/{bwt2_idx}/{bwt2_name}")
