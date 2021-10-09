@@ -2,6 +2,11 @@
 Read mapping
 """
 
+def get_mapping_dir(w):
+    genome = sample_config[w.sample]["genome"]
+    entry = config["genome"][genome]
+    return os.path.join("bwt2_idx", entry["bwt2_idx_name"])
+
 def get_mapping_idx(w):
     genome = sample_config[w.sample]["genome"]
     entry = config["genome"][genome]
@@ -22,6 +27,7 @@ rule bowtie2:
     input:
         fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        mapdir = get_mapping_dir,
         idx = get_mapping_idx,
         files = get_idx_files
     output:
