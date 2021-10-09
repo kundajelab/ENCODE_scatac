@@ -188,6 +188,9 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
         logFile = log_paths[["save"]],
     )
 
+    tar_cmd = paste("tar -zcf", output_paths[["project_tar"]], output_paths[["project_dir"]])
+    system(tar_cmd)
+
 }
 
 build_archr_project(snakemake@params[["sample_name"]], snakemake@input[["frag"]], snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["genome"]], snakemake@params[["seed"]])

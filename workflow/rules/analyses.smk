@@ -10,9 +10,10 @@ rule archr_build:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
     output:
-        qc_dir =temp(directory("temp/{sample}/analyses/qc")),
+        project_tar = "results/{sample}/analyses/archr_project.tar.gz",
+        qc_dir = temp(directory("temp/{sample}/analyses/qc")),
         project_dir = temp(directory("temp/{sample}/analyses/archr_project")),
-        flag = touch("temp/{sample}/analyses/archr_flag.txt"),
+        # flag = touch("temp/{sample}/analyses/archr_flag.txt"),
         qc_ds_pdf = temp("temp/{sample}/analyses/qc/{sample}/{sample}-Doublet-Summary.pdf"),
         qc_ds_rds = temp("temp/{sample}/analyses/qc/{sample}/{sample}-Doublet-Summary.rds"),
         qc_frag = temp("temp/{sample}/analyses/qc/{sample}/{sample}-Fragment_Size_Distribution.pdf"),
@@ -49,21 +50,21 @@ rule archr_build:
     script:
         "../scripts/build_archr_project.R"
 
-rule tar_archr_results:
-    """
-    Create ArchR results archive
-    """
-    input:
-        project_dir = "temp/{sample}/analyses/archr_project/",
-        flag = "temp/{sample}/analyses/archr_flag.txt"
-    output:
-        "results/{sample}/analyses/archr_project.tar.gz"
-    conda:
-        "../envs/analyses.yaml"
-    group:
-        "analyses"
-    shell:
-        "tar -zcf {output} {input.project_dir}"
+# rule tar_archr_results:
+#     """
+#     Create ArchR results archive
+#     """
+#     input:
+#         project_dir = "temp/{sample}/analyses/archr_project/",
+#         flag = "temp/{sample}/analyses/archr_flag.txt"
+#     output:
+#         "results/{sample}/analyses/archr_project.tar.gz"
+#     conda:
+#         "../envs/analyses.yaml"
+#     group:
+#         "analyses"
+#     shell:
+#         "tar -zcf {output} {input.project_dir}"
 
 rule write_archr_qc_pdf:
     """

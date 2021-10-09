@@ -14,7 +14,7 @@ Information on the specific analysis steps can be found in the [pipeline specifi
 - An ENCODE DCC account with access to the necessary datasets
 
 Additional requirements for cloud execution:
-- [Kubectl] https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+- [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 - A cloud provider CLI for Kubernetes cluster creation
 - A cloud provider CLI for remote storage (if different from above)
 
@@ -50,10 +50,10 @@ Note: When run for the first time, the pipeline will take some time to install c
     snakemake --kubernetes --use-conda --default-remote-provider $REMOTE --default-remote-prefix $PREFIX --jobs $NJOBS --envvars $VARS
     ```
     Here:
-        - `$REMOTE` is the cloud storage provider, and should be one of `{S3,GS,FTP,SFTP,S3Mocked,gfal,gridftp,iRODS,AzBlob,XRootD}`
-        - `$PREFIX` is the target bucket name or subfolder in storage
-        - `$NJOBS` is the maximum number of jobs to be run in parallel
-        - `$VARS` is a list of environment variables for accessing remote storage. The `--envvars` flag can be omitted if no variables are required.
+        * `$REMOTE` is the cloud storage provider, and should be one of `{S3,GS,FTP,SFTP,S3Mocked,gfal,gridftp,iRODS,AzBlob,XRootD}`
+        * `$PREFIX` is the target bucket name or subfolder in storage
+        * `$NJOBS` is the maximum number of jobs to be run in parallel
+        * `$VARS` is a list of environment variables for accessing remote storage. The `--envvars` flag can be omitted if no variables are required.
 
 ## Additional Execution Modes
 
