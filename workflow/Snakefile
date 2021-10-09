@@ -159,10 +159,3 @@ rule idx_prefix_placeholder:
     """
     output:
         touch("bwt2_idx/{bwt2_idx}/{bwt2_name,[A-Za-z0-9]+}")
-
-# rule capture_idx_files:
-#     """
-#     Dummy rule for capturing extracted index files
-#     """
-#     output:
-#         "bwt2_idx/{bwt2_idx}/{bwt2_name,[A-Za-z0-9]+}.{idx}.bt2"
