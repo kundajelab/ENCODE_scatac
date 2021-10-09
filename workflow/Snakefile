@@ -145,7 +145,7 @@ rule fetch_index:
     input:
         lambda w: HTTP.remote(idx_urls[w.bwt2_idx], insecure=(not config["idx_https"]))
     output:
-        directory("bwt2_idx/{bwt2_idx}")
+        directory("bwt2_idx/{bwt2_idx,[A-Za-z0-9]+}")
     params:
         out_parent = "bwt2_idx"
     conda:
