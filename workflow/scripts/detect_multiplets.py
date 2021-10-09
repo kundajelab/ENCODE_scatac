@@ -28,7 +28,7 @@ def multiplet_fdr(samples, nulls, fdr_thresh, min_cutoff):
     if candidiates.size == 0:
         cut = min_cutoff
     else:
-        cut = max(min_cutoff, samples[candidiates[0]])
+        cut = max(min_cutoff, samples[candidiates.min()])
 
     return cut, q
 
