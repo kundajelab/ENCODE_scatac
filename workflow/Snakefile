@@ -165,4 +165,4 @@ rule capture_idx_files:
     Dummy rule for capturing extracted index files
     """
     output:
-        "bwt2_idx/{bwt2_idx}/{bwt2_name,[A-Za-z0-9]+}/{bwt2_name}.{file}.bt2"
+        "bwt2_idx/{bwt2_idx}/{bwt2_name,[A-Za-z0-9]+}.{idx}.bt2"
