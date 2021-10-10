@@ -39,7 +39,7 @@ rule bowtie2:
     shell:
         "bowtie2 -X 2000 --threads {threads} -x {input.prefix} "
         "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
-        "samtools view -u -S -o {output.bam_raw} -"
+        "samtools view -b -S -o {output.bam_raw} -"
 
 rule filter_multimappers:
     """
@@ -59,7 +59,7 @@ rule filter_multimappers:
     shell:
         "samtools view -h -f 2 {input} | "
         "python {params.mmp_path} --paired-end -k {params.multimapping} | "
-        "samtools view -u -o {output} - "
+        "samtools view -b -o {output} - "
 
 rule sort_alignments:
     """
@@ -80,8 +80,7 @@ rule sort_alignments:
     group: 
         "mapping"
     shell: 
-        "samtools sort -T . -@ {threads} -o {output} {input} 2> {log}; "
-        "samtools index {output};"
+        "samtools sort -T . -@ {threads} -o {output} {input} 2> {log} "
 
 rule index_bam_raw:
     """

@@ -17,7 +17,7 @@ rule count_mito:
     group: 
         "filtering"
     shell: 
-        "samtools view -F 264 -c -u -o {output} {input.bam} chrM "
+        "samtools view -F 264 -c -b -o {output} {input.bam} chrM "
 
 rule remove_mito:
     """
@@ -35,7 +35,7 @@ rule remove_mito:
         "filtering"
     shell: 
         "samtools idxstats {input.bam} | cut -f 1 | grep -v chrM | "
-        "xargs samtools view -u {input.bam} | "
+        "xargs samtools view -b {input.bam} | "
         "tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -"
 
 rule frac_mito:
@@ -88,7 +88,7 @@ rule remove_duplicates:
     group: 
         "filtering"
     shell:
-        "picard MarkDuplicates --INPUT {input} --OUTPUT /dev/stdout --METRICS_FILE {output.markdup_stats} --COMPRESSION_LEVEL 0 "
+        "picard MarkDuplicates --INPUT {input} --OUTPUT /dev/stdout --METRICS_FILE {output.markdup_stats} "
         "--VALIDATION_STRINGENCY LENIENT --ASSUME_SORTED true --REMOVE_DUPLICATES false --BARCODE_TAG CB 2> {log} | "
         "tee {output.bam_markdup} | "
         "samtools view -F 1024 -f 2 -b -o {output.bam_nodup} -"

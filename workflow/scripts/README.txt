@@ -1,1 +1,0 @@
-Scripts specific to scATAC.
