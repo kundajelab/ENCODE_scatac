@@ -63,7 +63,7 @@ rule filter_multimappers:
 
 rule sort_alignments:
     """
-    Sort and index alignments
+    Sort  alignments
     """
     input: 
         "temp/{sample}/mapping/de-multimap.bam"
@@ -110,7 +110,7 @@ rule samstats_raw:
     threads:
         max_threads
     conda:
-        "../envs/filtering.yaml"
+        "../envs/mapping.yaml"
     group: 
         "mapping"
     shadow: 
