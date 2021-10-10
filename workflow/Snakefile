@@ -138,14 +138,19 @@ rule fetch_whitelist:
         "mv {input} {output}"
 
 idx_urls = {v["bwt2_idx_prefix"]: v["bwt2_idx"] for v in config["genome"].values()}
-checkpoint fetch_index:
+rule fetch_index:
     """
     Fetch Bowtie2 index
     """
     input:
-        lambda w: HTTP.remote(idx_urls[w.bwt2_idx], insecure=(not config["idx_https"]))
+        lambda w: HTTP.remote(idx_urls[w.bwt2_prefix], insecure=(not config["idx_https"]))
     output:
-        directory("bwt2_idx/{bwt2_idx,[A-Za-z0-9]+}")
+        "bwt2_idx/{bwt2_name}/{bwt2_prefix}.1.bt2",
+        "bwt2_idx/{bwt2_name}/{bwt2_prefix}.2.bt2",
+        "bwt2_idx/{bwt2_name}/{bwt2_prefix}.3.bt2",
+        "bwt2_idx/{bwt2_name}/{bwt2_prefix}.4.bt2",
+        "bwt2_idx/{bwt2_name}/{bwt2_prefix}.rev.1.bt2",
+        "bwt2_idx/{bwt2_name}/{bwt2_prefix}.rev.2.bt2"
     params:
         out_parent = "bwt2_idx"
     conda:
@@ -158,4 +163,4 @@ rule idx_prefix_placeholder:
     Create Bowtie2 index prefix dummy file
     """
     output:
-        touch("bwt2_idx/{bwt2_idx}/{bwt2_name,[A-Za-z0-9]+}")
+        touch("bwt2_idx/{bwt2_name}/{bwt2_prefix,[A-Za-z0-9]+}")
