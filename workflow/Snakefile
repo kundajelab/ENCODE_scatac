@@ -151,7 +151,7 @@ rule fetch_index:
     conda:
         "envs/portal.yaml"
     shell:
-        "unzip {input} {params.ind} > {output}"
+        "unzip -p {input} {params.ind} > {output}"
 
 rule idx_prefix_placeholder:
     """
