@@ -1,11 +1,9 @@
-# workdir: /mnt/lab_data2/atwang/data/encode_scatac/test_all_8/
 workdir: .
 
 max_threads_per_rule: 4
 
 dcc_lab: anshul-kundaje
 dcc_award: UM1HG009442
-
 dcc_mode: prod
 
 max_barcode_dist: 1
@@ -25,9 +23,7 @@ genome:
     bwt2_idx: genome-idx.s3.amazonaws.com/bt/mm10.zip
     bwt2_idx_name: mm10
     bwt2_idx_prefix: mm10
-
 idx_https: True
-
 multimapping: 4
 
 tn5_shift_plus: 4

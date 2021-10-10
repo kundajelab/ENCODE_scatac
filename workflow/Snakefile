@@ -152,7 +152,7 @@ rule fetch_index:
         "bwt2_idx/{bwt2_name}/{bwt2_prefix}.rev.1.bt2",
         "bwt2_idx/{bwt2_name}/{bwt2_prefix}.rev.2.bt2"
     params:
-        out_parent = "bwt2_idx"
+        out_parent = lambda w: f"bwt2_idx/{w.bwt2_name}"
     conda:
         "envs/portal.yaml"
     shell:
