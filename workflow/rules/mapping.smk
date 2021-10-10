@@ -37,7 +37,7 @@ rule bowtie2:
     group: 
         "mapping"
     shell:
-        "bowtie2 -X 2000 --threads {threads} -x {input.idx} "
+        "bowtie2 -X 2000 --threads {threads} -x {input.prefix} "
         "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
         "samtools view -u -S -o {output.bam_raw} -"
 
