@@ -16,7 +16,7 @@ def read_barcodes(path):
     bcrc = [reverse_complement(b) for b in bc]
     return set(bc), set(bcrc)
 
-def bc_detect(fastq, whitelist, out, qc, offset, num_reads=1000, thresh=0.8):
+def bc_detect(fastq, whitelist, out, qc, offset, num_reads=10000, thresh=0.8):
     bc, bcrc = read_barcodes(whitelist)
 
     bc_match = 0

@@ -69,7 +69,7 @@ rule assign_primary:
     group: 
         "filtering"
     shell:
-        "samtools view -F 1804 -b -o {output} {input} "
+        "samtools view -F 1804 -f 2 -b -o {output} {input} "
 
 rule remove_duplicates:
     """

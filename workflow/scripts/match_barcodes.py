@@ -22,11 +22,11 @@ def read_barcodes(path, revcomp):
     with open_fn(path, 'rt') as file:
         bc = [b.strip() for b in file]
     if revcomp:
-        bcrc = [reverse_complement(b) for b in bc]
+        valid = [reverse_complement(b) for b in bc]
     else:
-        bcrc = bc
+        valid = bc
 
-    return bc, bcrc
+    return valid
 
 def match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_out_path, fastq2_out_path, qc_path, threads):
     f = matcha.FastqReader(threads = threads)
@@ -37,10 +37,10 @@ def match_one_bc(fastqs, whitelists, revcomp, max_barcode_dist, offsets, fastq1_
     with open(revcomp["R2"]) as rf:
         rc = (int(rf.read().strip()) == 1)
 
-    valid_barcodes, barcode_sequences = read_barcodes(whitelists["R2"], rc)
+    barcode_sequences = read_barcodes(whitelists["R2"], rc)
     cell_barcode = matcha.HashMatcher(
         sequences = barcode_sequences,
-        labels = valid_barcodes,
+        labels = barcode_sequences,
         max_mismatches=max_barcode_dist,
         subsequence_count=2
     )

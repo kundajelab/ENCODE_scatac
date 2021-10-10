@@ -71,6 +71,8 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
     )
     markers_dir = file.path(output_paths[["project_dir"]], "Markers")
     dir.create(markers_dir)
+    enrichments_dir = file.path(output_paths[["project_dir"]], "Enrichments")
+    dir.create(enrichments_dir)
     
     # Filter doublets
     proj <- filterDoublets(proj)
@@ -164,11 +166,13 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
         cutOff = "FDR <= 0.1 & Log2FC >= 0.5",
         logFile = log_paths[["enr_motif"]]
     )
+    enrich_motif_path <- file.path(enrichments_dir, "cisbp_motif_enrichments.rds")
+    saveRDS(enrichMotifs, enrich_motif_path)
 
     # Calculate ENCODE TF binding site enrichment
     proj <- addArchRAnnotations(
         ArchRProj = proj,
-        db = "ArchR",
+        db = "LOLA",
         collection = "EncodeTFBS",
         logFile = log_paths[["fetch_tf"]]
     )
@@ -179,11 +183,12 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
         cutOff = "FDR <= 0.1 & Log2FC >= 0.5",
         logFile = log_paths[["enr_tf"]]
     )
+    enrich_tf_path <- file.path(enrichments_dir, "cisbp_tf_enrichments.rds")
+    saveRDS(enrichTF, enrich_tf_path)
 
     saveArchRProject(
         ArchRProj = proj,
         overwrite = TRUE,
-        # dropCells = TRUE,
         load = FALSE,
         logFile = log_paths[["save"]],
     )

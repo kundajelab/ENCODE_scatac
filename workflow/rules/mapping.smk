@@ -63,7 +63,7 @@ rule filter_multimappers:
 
 rule sort_alignments:
     """
-    Sort  alignments
+    Sort alignments
     """
     input: 
         "temp/{sample}/mapping/de-multimap.bam"
