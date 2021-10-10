@@ -140,22 +140,18 @@ rule fetch_whitelist:
 idx_urls = {v["bwt2_idx_prefix"]: v["bwt2_idx"] for v in config["genome"].values()}
 rule fetch_index:
     """
-    Fetch Bowtie2 index
+    Fetch Bowtie2 index files
     """
     input:
         lambda w: HTTP.remote(idx_urls[w.bwt2_prefix], insecure=(not config["idx_https"]))
     output:
-        i1 = "bwt2_idx/{bwt2_name}/{bwt2_prefix}.1.bt2",
-        i2 = "bwt2_idx/{bwt2_name}/{bwt2_prefix}.2.bt2",
-        i3 = "bwt2_idx/{bwt2_name}/{bwt2_prefix}.3.bt2",
-        i4 = "bwt2_idx/{bwt2_name}/{bwt2_prefix}.4.bt2",
-        r1 = "bwt2_idx/{bwt2_name}/{bwt2_prefix}.rev.1.bt2",
-        r2 = "bwt2_idx/{bwt2_name}/{bwt2_prefix}.rev.2.bt2",
-        out_dir = "bwt2_idx/{bwt2_name}"
+        "bwt2_idx/{bwt2_name}/{bwt2_prefix,[A-Za-z0-9]+}.{file}.bt2"
+    params:
+        ind = lambda w: f"{w.bwt2_prefix}.{w.file}.bt2"
     conda:
         "envs/portal.yaml"
     shell:
-        "unzip {input} -d {output.out_dir}"
+        "unzip {input} {params.ind} > {output}"
 
 rule idx_prefix_placeholder:
     """

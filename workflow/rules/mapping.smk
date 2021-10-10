@@ -2,7 +2,7 @@
 Read mapping
 """
 
-def get_mapping_idx(w):
+def get_idx_prefix(w):
     genome = sample_config[w.sample]["genome"]
     entry = config["genome"][genome]
     return os.path.join("bwt2_idx", entry["bwt2_idx_name"], entry["bwt2_idx_prefix"])
@@ -22,7 +22,7 @@ rule bowtie2:
     input:
         fastq1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
         fastq2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
-        idx = get_mapping_idx,
+        prefix = get_idx_prefix,
         files = get_idx_files
     output:
         bam_raw = temp("temp/{sample}/mapping/raw.bam")
