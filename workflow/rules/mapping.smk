@@ -113,8 +113,8 @@ rule samstats_raw:
         "../envs/mapping.yaml"
     group: 
         "mapping"
-    shadow: 
-        "minimal"
+    # shadow: 
+    #     "minimal"
     shell:
         "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
