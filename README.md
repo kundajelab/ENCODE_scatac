@@ -64,3 +64,33 @@ This pipeline has been tested locally and on the cloud via Kubernetes. However, 
 [Documentation on cluster execution](https://snakemake.readthedocs.io/en/stable/executing/cluster.html)
 
 [Documentation on cloud execution](https://snakemake.readthedocs.io/en/stable/executing/cloud.html)
+
+# Authors
+
+**Austin Wang**  
+Primary developer  
+atwang@stanford.edu
+
+**Surag Nair**  
+Secondary developer and advisor  
+surag@stanford.edu
+
+**Ben Parks**  
+Secondary developer and advisor
+bparks@stanford.edu
+
+**Laksshman Sundaram**  
+Advisor  
+lakss@stanford.edu
+
+**Caleb Lareau**  
+Advisor  
+clareau@stanford.edu
+
+**William Greenleaf**  
+Supervisor  
+wjg@stanford.edu
+
+**Anshul Kundaje**
+Supervisor  
+akundaje@stanford.edu

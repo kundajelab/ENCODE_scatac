@@ -15,6 +15,8 @@ Per-sample configuration is stored in `samples.tsv`, where each row is a single 
 
 **Genome** specifies the target genome for alignment and analysis. The pipeline currently supports **GRCh38** (human) and **mm10** (mouse).
 
+Note: Lines starting with `#` will be ignored.
+
 ## Global Configuration
 
 Global configuration parameters are stored in `config.yaml`. (Visit [here](https://quickref.me/yaml) for a YAML cheat sheet.)
