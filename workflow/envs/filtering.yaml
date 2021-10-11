@@ -4,6 +4,8 @@ channels:
   - nodefaults
 dependencies:
   - bioconda::samtools=1.13
+  - bioconda::htslib=1.13
+  - bioconda::pysam=0.16.0
   - bioconda::picard-slim=2.25.7
   - conda-forge::python=3.9.6
   - conda-forge::libcurl-static=7.78.0

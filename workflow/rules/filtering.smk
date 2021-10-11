@@ -3,58 +3,21 @@
 Alignment filtering
 """
 
-rule count_mito:
+rule filter_mito:
     """
-    Count mitochondrial reads
-    """
-    input: 
-        bam = "results/{sample}/mapping/raw.bam",
-        bai = "results/{sample}/mapping/raw.bam.bai"
-    output: 
-        temp("temp/{sample}/filtering/count_mito.txt"),
-    conda:
-        "../envs/filtering.yaml"
-    group: 
-        "filtering"
-    shell: 
-        "samtools view -F 264 -c -b -o {output} {input.bam} chrM "
-
-rule remove_mito:
-    """
-    Keep and count non-mitochondrial reads
+    Filter and count mitochondrial reads
     """
     input: 
-        bam = "results/{sample}/mapping/raw.bam",
-        bai = "results/{sample}/mapping/raw.bam.bai"
+        "results/{sample}/mapping/raw_unsorted.bam",
     output: 
         bam = temp("temp/{sample}/filtering/no_mito.bam"),
-        count_no_mito = temp("temp/{sample}/filtering/count_no_mito.txt")
+        qc = "results/{sample}/filtering/frac_mito.tsv"
     conda:
         "../envs/filtering.yaml"
     group: 
         "filtering"
-    shell: 
-        "samtools idxstats {input.bam} | cut -f 1 | grep -v chrM | "
-        "xargs samtools view -b {input.bam} | "
-        "tee {output.bam} | samtools view -F 264 -c -o {output.count_no_mito} -"
-
-rule frac_mito:
-    """
-    Calculate fraction of mitochondrial reads
-    """
-    input: 
-        count_mito = "temp/{sample}/filtering/count_mito.txt",
-        count_no_mito = "temp/{sample}/filtering/count_no_mito.txt"
-    output: 
-        "results/{sample}/filtering/frac_mito.tsv"
-    conda:
-        "../envs/filtering.yaml"
-    group: 
-        "filtering"
-    shell: 
-        "rm=$(<{input.count_mito}); "
-        "rn=$(<{input.count_no_mito}); "
-        "printf \"Non-Mitochondrial\\tMitochondrial\\n%d\\t%d\" \"$rn\" \"$rm\" > {output}"
+    script:
+        "../scripts/filter_mito.py"
 
 rule filter_multimappers:
     """
@@ -76,12 +39,31 @@ rule filter_multimappers:
         "python {params.mmp_path} --paired-end -k {params.multimapping} | "
         "samtools fixmate -r - {output}"
 
+rule sort_filtered_alignments:
+    """
+    Sort filtered alignments
+    """
+    input: 
+        "temp/{sample}/filtering/primary_align.bam"
+    output: 
+        "temp/{sample}/filtering/primary_align_sorted.bam"
+    log:
+        "logs/{sample}/filtering/sort.log"
+    threads:
+        max_threads
+    conda:
+        "../envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell: 
+        "samtools sort -T . -@ {threads} -o {output} {input} 2> {log} "
+
 rule remove_duplicates:
     """
     Mark and remove PCR duplicates
     """
     input:
-        "temp/{sample}/filtering/primary_align.bam"
+        "temp/{sample}/filtering/primary_align_sorted.bam"
     output:
         bam_markdup = temp("temp/{sample}/filtering/markdup.bam"),
         bam_nodup = "results/{sample}/filtering/filtered.bam",

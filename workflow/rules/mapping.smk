@@ -25,7 +25,7 @@ rule bowtie2:
         prefix = get_idx_prefix,
         files = get_idx_files
     output:
-        bam_raw = temp("temp/{sample}/mapping/raw.bam")
+        bam_raw = "results/{sample}/mapping/raw_unsorted.bam"
     params:
         k = 1 + config["multimapping"]
     log:
@@ -46,7 +46,7 @@ rule sort_alignments:
     Sort alignments
     """
     input: 
-        "temp/{sample}/mapping/raw.bam"
+        "results/{sample}/mapping/raw_unsorted.bam"
     output: 
         "results/{sample}/mapping/raw.bam"
     log:
@@ -82,7 +82,7 @@ rule samstats_raw:
     Run SAMStats on raw alignments
     """
     input:
-        "results/{sample}/mapping/raw.bam"
+        "results/{sample}/mapping/raw_unsorted.bam"
     output:
         "results/{sample}/mapping/samstats_raw.txt"
     log:

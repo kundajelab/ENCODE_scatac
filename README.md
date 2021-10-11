@@ -1,8 +1,8 @@
-# ENCODE scATAC Pipeline
+# 🏭 ENCODE sc/snATAC Automated Processing
 
 **Note: This pipeline is currently a work in progress.**
 
-A pipeline for processing raw single-cell ATAC datasets on the ENCODE portal.
+This is the automated portion of the ENCODE single-cell/single-nucleus ATAC-Seq pipeline.
 
 Information on the specific analysis steps can be found in the [pipeline specification document](https://docs.google.com/document/u/2/d/e/2PACX-1vTlgtT4WeXbvRicybUHXnhZs8RKyB4EkTbcWooQ6qBxxQ_zIHpFEVHy38D5lC_s8_YDGfUTsyomJcs3/pub).
 
@@ -36,7 +36,7 @@ All other dependencies are handled by the pipeline itself
 4. Configure the pipeline in the `/config` directory. Detailed information can be found [here](config/README.md).
 5. Run the pipeline:
     ```
-    snakemake --use-conda --cores $NCORES 
+    snakemake -k --use-conda --cores $NCORES 
     ```
     Here, `$NCORES` is the number of cores to utilize
 
@@ -49,7 +49,7 @@ Note: When run for the first time, the pipeline will take some time to install c
 3. Configure remote storage. Instructions for each provider can be found [here](https://snakemake.readthedocs.io/en/stable/snakefiles/remote_files.html). For our purpose, only the environment variables and command line configuration are needed.
 4. Run the pipeline:
     ```
-    snakemake --kubernetes --use-conda --default-remote-provider $REMOTE --default-remote-prefix $PREFIX --jobs $NJOBS --envvars $VARS
+    snakemake -k --kubernetes --use-conda --default-remote-provider $REMOTE --default-remote-prefix $PREFIX --jobs $NJOBS --envvars $VARS
     ```
     Here:
     - `$REMOTE` is the cloud storage provider, and should be one of `{S3,GS,FTP,SFTP,S3Mocked,gfal,gridftp,iRODS,AzBlob,XRootD}`
