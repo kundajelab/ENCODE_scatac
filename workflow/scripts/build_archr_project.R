@@ -183,7 +183,7 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
         cutOff = "FDR <= 0.1 & Log2FC >= 0.5",
         logFile = log_paths[["enr_tf"]]
     )
-    enrich_tf_path <- file.path(enrichments_dir, "cisbp_tf_enrichments.rds")
+    enrich_tf_path <- file.path(enrichments_dir, "encode_tfbs_enrichments.rds")
     saveRDS(enrichTF, enrich_tf_path)
 
     saveArchRProject(

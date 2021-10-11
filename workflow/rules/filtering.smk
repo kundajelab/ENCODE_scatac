@@ -69,7 +69,7 @@ rule assign_primary:
     group: 
         "filtering"
     shell:
-        "samtools view -F 1804 -f 2 -b -o {output} {input} "
+        "samtools view -F 524 -f 2 -b {input} | samtools fixmate -r - {output}"
 
 rule remove_duplicates:
     """
@@ -91,7 +91,7 @@ rule remove_duplicates:
         "picard MarkDuplicates --INPUT {input} --OUTPUT /dev/stdout --METRICS_FILE {output.markdup_stats} "
         "--VALIDATION_STRINGENCY LENIENT --ASSUME_SORTED true --REMOVE_DUPLICATES false --BARCODE_TAG CB 2> {log} | "
         "tee {output.bam_markdup} | "
-        "samtools view -F 1024 -f 2 -b -o {output.bam_nodup} -"
+        "samtools view -F 1804 -f 2 -b -o {output.bam_nodup} -"
 
 rule library_complexity:
     """

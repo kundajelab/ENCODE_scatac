@@ -45,8 +45,8 @@ rule archr_build:
         "../envs/analyses.yaml"
     group:
         "analyses"
-    shadow: 
-        "shallow"
+    # shadow: 
+    #     "shallow"
     script:
         "../scripts/build_archr_project.R"
 
