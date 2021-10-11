@@ -91,6 +91,6 @@ clareau@stanford.edu
 Supervisor  
 wjg@stanford.edu
 
-**Anshul Kundaje**
+**Anshul Kundaje**  
 Supervisor  
 akundaje@stanford.edu
