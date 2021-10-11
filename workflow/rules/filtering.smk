@@ -56,20 +56,25 @@ rule frac_mito:
         "rn=$(<{input.count_no_mito}); "
         "printf \"Non-Mitochondrial\\tMitochondrial\\n%d\\t%d\" \"$rn\" \"$rm\" > {output}"
 
-rule assign_primary:
+rule filter_multimappers:
     """
-    Assign multimapping reads to primary alignment
+    Remove or assign multimapping reads
     """
     input:
         "temp/{sample}/filtering/no_mito.bam"
     output:
         temp("temp/{sample}/filtering/primary_align.bam")
+    params:
+        multimapping = config["multimapping"],
+        mmp_path = script_path("scripts/assign_multimappers.py")
     conda:
         "../envs/filtering.yaml"
     group: 
         "filtering"
     shell:
-        "samtools view -F 524 -f 2 -b {input} | samtools fixmate -r - {output}"
+        "samtools view -F 524 -f 2 -u {input} |"
+        "python {params.mmp_path} --paired-end -k {params.multimapping} | "
+        "samtools fixmate -r - {output}"
 
 rule remove_duplicates:
     """

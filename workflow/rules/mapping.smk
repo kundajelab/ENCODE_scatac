@@ -41,32 +41,12 @@ rule bowtie2:
         "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
         "samtools view -b -S -o {output.bam_raw} -"
 
-rule filter_multimappers:
-    """
-    Remove multimapping reads above threshold
-    """
-    input:
-        "temp/{sample}/mapping/raw.bam"
-    output:
-        temp("temp/{sample}/mapping/de-multimap.bam")
-    params:
-        multimapping = config["multimapping"],
-        mmp_path = script_path("scripts/assign_multimappers.py")
-    conda:
-        "../envs/mapping.yaml"
-    group: 
-        "mapping"
-    shell:
-        "samtools view -h -f 2 {input} | "
-        "python {params.mmp_path} --paired-end -k {params.multimapping} | "
-        "samtools view -b -o {output} - "
-
 rule sort_alignments:
     """
     Sort alignments
     """
     input: 
-        "temp/{sample}/mapping/de-multimap.bam"
+        "temp/{sample}/mapping/raw.bam"
     output: 
         "results/{sample}/mapping/raw.bam"
     log:
@@ -75,8 +55,8 @@ rule sort_alignments:
         max_threads
     conda:
         "../envs/mapping.yaml"
-    shadow: 
-        "minimal"
+    # shadow: 
+    #     "minimal"
     group: 
         "mapping"
     shell: 
