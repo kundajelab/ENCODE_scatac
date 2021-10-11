@@ -161,49 +161,6 @@ rule trim_adapter:
         "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim}"
         " -h {log.html} -j {log.json} -G -Q -L -w {threads} 2> {output.stats}"
 
-rule metadata_fastq:
-    """
-    Write FASTQ metadata
-    """
-    input: 
-        r1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
-        r2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
-        input_data = "results/{sample}/input_data.json"
-    output: 
-        r1 = "results/{sample}/fastqs/R1_trim_metadata.json",
-        r2 = "results/{sample}/fastqs/R2_trim_metadata.json"
-    params:
-        output_group = "fastqs",
-        sample_data = lambda w: sample_data[w.sample]
-    conda:
-        "../envs/fastqs.yaml"
-    group: 
-        "fastqs"
-    script: 
-        "../scripts/write_file_metadata.py"
-
-rule metadata_qc_reads:
-    """
-    Write reads QC metadata
-    """
-    input: 
-        data_file = "results/{sample}/fastqs/R1_trim.fastq.gz",
-        barcode_matching = "results/{sample}/fastqs/barcode_matching.tsv",
-        adapter_trimming = "results/{sample}/fastqs/trim_adapters.txt",
-        barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
-        input_data = "results/{sample}/input_data.json"
-    output: 
-        read_stats = "results/{sample}/fastqs/reads_qc_metadata.json",
-    params:
-        output_group = "fastqs",
-        sample_data = lambda w: sample_data[w.sample]
-    conda:
-        "../envs/fastqs.yaml"
-    group: 
-        "fastqs"
-    script: 
-        "../scripts/write_qc_metadata.py"
-
 rule fastqs_done:
     """
     Touch flag file upon group completion
@@ -214,9 +171,6 @@ rule fastqs_done:
         "results/{sample}/fastqs/barcode_revcomp.txt",
         "results/{sample}/fastqs/barcode_matching.tsv", 
         "results/{sample}/fastqs/trim_adapters.txt",
-        "results/{sample}/fastqs/R1_trim_metadata.json", 
-        "results/{sample}/fastqs/R2_trim_metadata.json",
-        "results/{sample}/fastqs/reads_qc_metadata.json"
     output:
         touch("results/{sample}/fastqs/fastqs.done")
     group: 

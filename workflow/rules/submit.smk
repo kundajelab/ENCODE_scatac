@@ -9,9 +9,9 @@ rule submit_fastq_1:
     Submit FASTQ pair 1
     """
     input: 
-        json = "results/{sample}/fastqs/R1_trim_metadata.json"
+        json = "metadata/{sample}/R1_trim_metadata.json"
     output: 
-        touch("results/{sample}/submit/R1_trim_submit.done")
+        touch("submit/{sample}/R1_trim_submit.done")
     params:
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
@@ -30,10 +30,10 @@ rule submit_fastq_2:
     Submit FASTQ pair 2
     """
     input: 
-        json = "results/{sample}/fastqs/R2_trim_metadata.json",
-        fastq1 = "results/{sample}/submit/R1_trim_submit.done"
+        json = "metadata/{sample}/R2_trim_metadata.json",
+        fastq1 = "submit/{sample}/R1_trim_submit.done"
     output: 
-        touch("results/{sample}/submit/R2_trim_submit.done")
+        touch("submit/{sample}/R2_trim_submit.done")
     params:
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
@@ -52,10 +52,10 @@ rule submit_reads_qc:
     Submit reads QC
     """
     input: 
-        json = "results/{sample}/fastqs/reads_qc_metadata.json",
-        fastq1 = "results/{sample}/submit/R1_trim_submit.done"
+        json = "metadata/{sample}/reads_qc_metadata.json",
+        fastq1 = "submit/{sample}/R1_trim_submit.done"
     output: 
-        touch("results/{sample}/submit/reads_qc_metadata_submit.done")
+        touch("submit/{sample}/reads_qc_metadata_submit.done")
     params:
         schema = "file", #TODO
         dcc_api_key = os.environ["DCC_API_KEY"], 
@@ -74,11 +74,11 @@ rule submit_bam_raw:
     Submit raw BAM
     """
     input: 
-        json = "results/{sample}/mapping/raw_bam_metadata.json",
-        fastq1 = "results/{sample}/submit/R1_trim_submit.done",
-        fastq2 = "results/{sample}/submit/R2_trim_submit.done"
+        json = "metadata/{sample}/raw_bam_metadata.json",
+        fastq1 = "submit/{sample}/R1_trim_submit.done",
+        fastq2 = "submit/{sample}/R2_trim_submit.done"
     output: 
-        touch("results/{sample}/submit/raw_bam_submit.done")
+        touch("submit/{sample}/raw_bam_submit.done")
     params:
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
@@ -97,10 +97,10 @@ rule submit_alignments_raw_qc:
     Submit raw alignments QC
     """
     input: 
-        json = "results/{sample}/mapping/alignments_raw_qc_metadata.json",
-        raw_bam = "results/{sample}/submit/raw_bam_submit.done"
+        json = "metadata/{sample}/alignments_raw_qc_metadata.json",
+        raw_bam = "submit/{sample}/raw_bam_submit.done"
     output: 
-        touch("results/{sample}/submit/alignments_raw_qc_metadata_submit.done")
+        touch("submit/{sample}/alignments_raw_qc_metadata_submit.done")
     params:
         schema = "file", #TODO
         dcc_api_key = os.environ["DCC_API_KEY"], 
@@ -119,11 +119,11 @@ rule submit_bam_filtered:
     Submit filtered BAM
     """
     input: 
-        json = "results/{sample}/filtering/filtered_bam_metadata.json",
-        fastq1 = "results/{sample}/submit/R1_trim_submit.done",
-        fastq2 = "results/{sample}/submit/R2_trim_submit.done"
+        json = "metadata/{sample}/filtering/filtered_bam_metadata.json",
+        fastq1 = "submit/{sample}/R1_trim_submit.done",
+        fastq2 = "submit/{sample}/R2_trim_submit.done"
     output: 
-        touch("results/{sample}/submit/filtered_bam_submit.done")
+        touch("submit/{sample}/filtered_bam_submit.done")
     params:
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
@@ -142,10 +142,10 @@ rule submit_alignments_filtered_qc:
     Submit filtered alignments QC
     """
     input: 
-        json = "results/{sample}/filtering/alignments_filtered_qc_metadata.json",
-        filtered_bam = "results/{sample}/submit/filtered_bam_submit.done"
+        json = "metadata/{sample}/filtering/alignments_filtered_qc_metadata.json",
+        filtered_bam = "submit/{sample}/filtered_bam_submit.done"
     output: 
-        touch("results/{sample}/submit/alignments_filtered_qc_metadata_submit.done")
+        touch("submit/{sample}/alignments_filtered_qc_metadata_submit.done")
     params:
         schema = "file", #TODO
         dcc_api_key = os.environ["DCC_API_KEY"], 
@@ -164,10 +164,10 @@ rule submit_lib_comp_qc:
     Submit library complexity QC
     """
     input: 
-        json = "results/{sample}/filtering/alignments_lib_comp_qc_metadata.json",
-        filtered_bam = "results/{sample}/submit/filtered_bam_submit.done"
+        json = "metadata/{sample}/filtering/alignments_lib_comp_qc_metadata.json",
+        filtered_bam = "submit/{sample}/filtered_bam_submit.done"
     output: 
-        touch("results/{sample}/submit/alignments_lib_comp_qc_metadata_submit.done")
+        touch("submit/{sample}/alignments_lib_comp_qc_metadata_submit.done")
     params:
         schema = "file", #TODO
         dcc_api_key = os.environ["DCC_API_KEY"], 
@@ -186,10 +186,10 @@ rule submit_fragments:
     Submit fragment file
     """
     input: 
-        json = "results/{sample}/fragments/fragments_metadata.json",
-        bam = "results/{sample}/submit/filtered_bam_submit.done"
+        json = "metadata/{sample}/fragments/fragments_metadata.json",
+        bam = "submit/{sample}/filtered_bam_submit.done"
     output: 
-        touch("results/{sample}/submit/fragments_submit.done")
+        touch("submit/{sample}/fragments_submit.done")
     params:
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
@@ -208,13 +208,13 @@ rule submit_done:
     Touch flag file upon group completion
     """
     input: 
-        "results/{sample}/submit/R1_trim_submit.done",
-        "results/{sample}/submit/R2_trim_submit.done",
-        "results/{sample}/submit/reads_qc_metadata_submit.done",
-        "results/{sample}/submit/raw_bam_submit.done",
-        "results/{sample}/submit/filtered_bam_submit.done",
-        "results/{sample}/submit/fragments_submit.done"
+        "submit/{sample}/R1_trim_submit.done",
+        "submit/{sample}/R2_trim_submit.done",
+        "submit/{sample}/reads_qc_metadata_submit.done",
+        "submit/{sample}/raw_bam_submit.done",
+        "submit/{sample}/filtered_bam_submit.done",
+        "submit/{sample}/fragments_submit.done"
     output:
-        touch("results/{sample}/submit/submit.done")
+        touch("submit/{sample}/submit.done")
     group: 
         "submit"

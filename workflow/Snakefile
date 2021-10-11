@@ -58,6 +58,8 @@ include:
 include:
     "rules/analyses.smk"
 include:
+    "rules/metadata.smk"
+include:
     "rules/submit.smk"
 
 localrules: 

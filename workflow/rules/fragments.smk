@@ -86,49 +86,6 @@ rule tarball_fragments:
     shell:
         "tar -zcf {output} {input.frag} {input.frag_ind}"
 
-rule metadata_fragments:
-    """
-    Write fragment file metadata
-    """
-    input: 
-        fragments = "results/{sample}/fragments/fragments.tar.gz",
-        bam = "results/{sample}/filtering/filtered.bam",
-        input_data = "results/{sample}/input_data.json"
-    output: 
-        "results/{sample}/fragments/fragments_metadata.json"
-    params:
-        output_group = "fragments",
-        sample_data = lambda w: sample_data[w.sample]
-    conda:
-        "../envs/fragments.yaml"
-    group: 
-        "fragments"
-    script: 
-        "../scripts/write_file_metadata.py"
-
-rule metadata_qc_fragments:
-    """
-    Write fragments QC metadata
-    """
-    input: 
-        data_file = "results/{sample}/fragments/fragments.tar.gz",
-        barcode_pairs_strict = "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
-        barcode_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
-        barcodes_status = "results/{sample}/fragments/multiplet_barcodes_status.tsv",
-        multiplet_stats = "results/{sample}/fragments/multiplet_stats.txt",
-        multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
-    output: 
-        fragments_stats = "results/{sample}/fragments/fragments_qc_metadata.json"
-    params:
-        output_group = "fragments",
-        sample_data = lambda w: sample_data[w.sample]
-    conda:
-        "../envs/fragments.yaml"
-    group: 
-        "fragments"
-    script: 
-        "../scripts/write_qc_metadata.py"
-
 rule fragments_done:
     """
     Touch flag file upon group completion
@@ -141,9 +98,7 @@ rule fragments_done:
         "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
         "results/{sample}/fragments/multiplet_barcodes_status.tsv",
         "results/{sample}/fragments/multiplets_threshold_plot.png",
-        "results/{sample}/fragments/multiplet_stats.txt",
-        "results/{sample}/fragments/fragments_metadata.json",
-        "results/{sample}/fragments/fragments_qc_metadata.json"
+        "results/{sample}/fragments/multiplet_stats.txt"
     output:
         touch("results/{sample}/fragments/fragments.done")
     group: 

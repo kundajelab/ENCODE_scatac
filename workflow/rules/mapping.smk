@@ -99,47 +99,6 @@ rule samstats_raw:
         "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
-rule metadata_bam_raw:
-    """
-    Write raw BAM metadata
-    """
-    input: 
-        bam = "results/{sample}/mapping/raw.bam",
-        fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
-        fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
-        input_data = "results/{sample}/input_data.json"
-    output: 
-        "results/{sample}/mapping/raw_bam_metadata.json"
-    params:
-        output_group = "mapping",
-        sample_data = lambda w: sample_data[w.sample]
-    conda:
-        "../envs/mapping.yaml"
-    group: 
-        "mapping"
-    script: 
-        "../scripts/write_file_metadata.py"
-
-rule metadata_qc_alignments_raw:
-    """
-    Write raw alignments qc metadata
-    """
-    input: 
-        data_file = "results/{sample}/mapping/raw.bam",
-        samstats_raw = "results/{sample}/mapping/samstats_raw.txt",
-        input_data = "results/{sample}/input_data.json"
-    output: 
-        alignment_stats = "results/{sample}/mapping/alignments_raw_qc_metadata.json"
-    params:
-        output_group = "mapping",
-        sample_data = lambda w: sample_data[w.sample]
-    conda:
-        "../envs/mapping.yaml"
-    group: 
-        "mapping"
-    script: 
-        "../scripts/write_qc_metadata.py"
-
 rule mapping_done:
     """
     Touch flag file upon group completion
@@ -147,9 +106,7 @@ rule mapping_done:
     input: 
         "results/{sample}/mapping/raw.bam",
         "results/{sample}/mapping/raw.bam.bai", 
-        "results/{sample}/mapping/samstats_raw.txt", 
-        "results/{sample}/mapping/raw_bam_metadata.json",
-        "results/{sample}/mapping/alignments_raw_qc_metadata.json"
+        "results/{sample}/mapping/samstats_raw.txt"
     output:
         touch("results/{sample}/mapping/mapping.done")
     group: 
