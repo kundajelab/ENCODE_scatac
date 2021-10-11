@@ -76,7 +76,7 @@ Secondary developer and advisor
 surag@stanford.edu
 
 **Ben Parks**  
-Secondary developer and advisor
+Secondary developer and advisor  
 bparks@stanford.edu
 
 **Laksshman Sundaram**  
