@@ -1,5 +1,5 @@
 workdir: .
-max_threads_per_rule: 4
+max_threads_per_rule: 8
 
 dcc_lab: anshul-kundaje
 dcc_award: UM1HG009442
