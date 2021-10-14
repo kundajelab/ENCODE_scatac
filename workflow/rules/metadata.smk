@@ -359,29 +359,29 @@
 #     script: 
 #         "../scripts/collate_metadata.py"
 
-# rule metadata_qc_analyses:
-#     """
-#     Write filtered alignments qc metadata
-#     """
-#     input: 
-#         data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
-#         archr_doublet_summary_text = "results/{sample}/analyses/archr_doublet_summary.tsv",
-#         archr_doublet_summary_figure =  "results/{sample}/analyses/archr_doublet_summary.pdf",
-#         archr_fragment_size_distribution = "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
-#         archr_pre_filter_metadata = "results/{sample}/analyses/archr_pre_filter_metadata.tsv",
-#         archr_tss_by_unique_frags = "results/{sample}/analyses/archr_tss_by_unique_frags.pdf",
-#         input_data = "results/{sample}/input_data.json"
-#     output: 
-#         analyses_stats = "metadata/{sample}/analyses_qc_metadata.json",
-#     params:
-#         output_group = "analyses",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_qc_metadata.py"
+rule metadata_qc_analyses:
+    """
+    Write filtered alignments qc metadata
+    """
+    input: 
+        data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
+        archr_doublet_summary_text = "results/{sample}/analyses/archr_doublet_summary.tsv",
+        archr_doublet_summary_figure =  "results/{sample}/analyses/archr_doublet_summary.pdf",
+        archr_fragment_size_distribution = "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
+        archr_pre_filter_metadata = "results/{sample}/analyses/archr_pre_filter_metadata.tsv",
+        archr_tss_by_unique_frags = "results/{sample}/analyses/archr_tss_by_unique_frags.pdf",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        analyses_stats = "metadata/{sample}/analyses_qc_metadata.json",
+    params:
+        output_group = "analyses",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_qc_metadata.py"
 
 rule collate_qc_analyses:
     """
