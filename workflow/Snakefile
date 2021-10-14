@@ -81,6 +81,24 @@ rule all:
         expand("results/{sample}/fragments/fragments.done", sample=samples),
         expand("results/{sample}/analyses/analyses.done", sample=samples)
 
+rule build_metadata:
+    """
+    Build file and QC metadata for results
+    """
+    input: 
+        "metadata/R1_trim_metadata_all.tsv",
+        "metadata/R2_trim_metadata_all.tsv",
+        "metadata/reads_qc_metadata_all.tsv",
+        "metadata/raw_bam_metadata_all.tsv",
+        "metadata/alignments_raw_qc_metadata_all.tsv",
+        "metadata/filtered_bam_metadata_all.tsv",
+        "metadata/alignments_filtered_qc_metadata_all.tsv",
+        "metadata/alignments_lib_comp_qc_metadata_all.tsv",
+        "metadata/fragments_metadata_all.tsv",
+        "metadata/fragments_qc_metadata_all.tsv",
+        "metadata/analyses_metadata_all.tsv",
+        "metadata/analyses_qc_metadata_all.tsv"
+
 rule submit:
     """
     Submit outputs to ENCODE portal

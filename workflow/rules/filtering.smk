@@ -128,8 +128,6 @@ rule samstats_filtered:
         "../envs/filtering.yaml"
     group: 
         "filtering"
-    # shadow: 
-    #     "minimal"
     shell:
         "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"

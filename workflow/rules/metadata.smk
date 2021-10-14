@@ -19,6 +19,36 @@ rule metadata_fastq:
     script: 
         "../scripts/write_file_metadata.py"
 
+rule collate_R1_trim:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/R1_trim_metadata.json", sample=samples)
+    output:
+        "metadata/R1_trim_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
+
+rule collate_R2_trim:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/R2_trim_metadata.json", sample=samples)
+    output:
+        "metadata/R2_trim_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
+
 rule metadata_qc_reads:
     """
     Write reads QC metadata
@@ -41,6 +71,21 @@ rule metadata_qc_reads:
     script: 
         "../scripts/write_qc_metadata.py"
 
+rule collate_qc_reads:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/reads_qc_metadata.json", sample=samples)
+    output:
+        "metadata/reads_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
+
 rule metadata_bam_raw:
     """
     Write raw BAM metadata
@@ -62,6 +107,21 @@ rule metadata_bam_raw:
     script: 
         "../scripts/write_file_metadata.py"
 
+rule collate_bam_raw:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/raw_bam_metadata.json", sample=samples)
+    output:
+        "metadata/raw_bam_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
+
 rule metadata_qc_alignments_raw:
     """
     Write raw alignments qc metadata
@@ -81,6 +141,21 @@ rule metadata_qc_alignments_raw:
         "metadata"
     script: 
         "../scripts/write_qc_metadata.py"
+
+rule collate_qc_alignments_raw:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/alignments_raw_qc_metadata.json", sample=samples)
+    output:
+        "metadata/alignments_raw_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
 rule metadata_bam_filtered:
     """
@@ -102,6 +177,21 @@ rule metadata_bam_filtered:
         "metadata"
     script: 
         "../scripts/write_file_metadata.py"
+
+rule collate_bam_filtered:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/filtered_bam_metadata.json", sample=samples)
+    output:
+        "metadata/filtered_bam_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
 rule metadata_qc_alignments_filtered:
     """
@@ -127,6 +217,36 @@ rule metadata_qc_alignments_filtered:
     script: 
         "../scripts/write_qc_metadata.py"
 
+rule collate_qc_alignments_filtered:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/alignments_filtered_qc_metadata.json", sample=samples)
+    output:
+        "metadata/alignments_filtered_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
+
+rule collate_qc_lib_comp:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/alignments_lib_comp_qc_metadata.json", sample=samples)
+    output:
+        "metadata/alignments_lib_comp_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
+
 rule metadata_fragments:
     """
     Write fragment file metadata
@@ -146,6 +266,21 @@ rule metadata_fragments:
         "metadata"
     script: 
         "../scripts/write_file_metadata.py"
+
+rule collate_fragments:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/fragments_metadata.json", sample=samples)
+    output:
+        "metadata/fragments_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
 rule metadata_qc_fragments:
     """
@@ -170,6 +305,21 @@ rule metadata_qc_fragments:
     script: 
         "../scripts/write_qc_metadata.py"
 
+rule collate_qc_fragments:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/fragments_qc_metadata.json", sample=samples)
+    output:
+        "metadata/fragments_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
+
 rule metadata_analyses:
     """
     Write analyses metadata
@@ -189,6 +339,21 @@ rule metadata_analyses:
         "metadata"
     script: 
         "../scripts/write_file_metadata.py"
+
+rule collate_analyses:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/analyses_metadata.json", sample=samples)
+    output:
+        "metadata/analyses_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
 rule metadata_qc_analyses:
     """
@@ -213,3 +378,19 @@ rule metadata_qc_analyses:
         "metadata"
     script: 
         "../scripts/write_qc_metadata.py"
+
+rule collate_qc_analyses:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/analyses_qc_metadata.json", sample=samples)
+    output:
+        "metadata/analyses_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
+

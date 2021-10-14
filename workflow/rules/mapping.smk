@@ -26,6 +26,7 @@ rule bowtie2:
         files = get_idx_files
     output:
         bam_raw = "results/{sample}/mapping/raw_unsorted.bam"
+        qc = "results/{sample}/mapping/bwt2_stats.txt"
     params:
         k = 1 + config["multimapping"]
     log:
@@ -38,7 +39,7 @@ rule bowtie2:
         "mapping"
     shell:
         "bowtie2 -X 2000 --threads {threads} -x {input.prefix} "
-        "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {log} | "
+        "-1 {input.fastq1} -2 {input.fastq2} --sam-append-comment -k {params.k} 2> {output.qc} | "
         "samtools view -b -S -o {output.bam_raw} -"
 
 rule sort_alignments:
@@ -55,8 +56,6 @@ rule sort_alignments:
         max_threads
     conda:
         "../envs/mapping.yaml"
-    # shadow: 
-    #     "minimal"
     group: 
         "mapping"
     shell: 
@@ -93,8 +92,6 @@ rule samstats_raw:
         "../envs/mapping.yaml"
     group: 
         "mapping"
-    # shadow: 
-    #     "minimal"
     shell:
         "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
