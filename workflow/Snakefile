@@ -57,12 +57,10 @@ include:
     "rules/fragments.smk"
 include:
     "rules/analyses.smk"
-# include:
-#     "rules/metadata.smk"
-include:
-    "rules/submit.smk"
 include:
     "rules/metadata.smk"
+include:
+    "rules/submit.smk"
 
 localrules: 
     all, 
