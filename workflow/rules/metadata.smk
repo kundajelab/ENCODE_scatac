@@ -1,57 +1,57 @@
-# """
-# Metadata generation
-# """
+"""
+Metadata generation
+"""
 
-# rule metadata_fastq:
-#     """
-#     Write FASTQ metadata
-#     """
-#     input: 
-#         r1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
-#         r2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
-#         input_data = "results/{sample}/input_data.json"
-#     output: 
-#         r1 = "metadata/{sample}/R1_trim_metadata.json",
-#         r2 = "metadata/{sample}/R2_trim_metadata.json"
-#     params:
-#         output_group = "fastqs",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_file_metadata.py"
+rule metadata_fastq:
+    """
+    Write FASTQ metadata
+    """
+    input: 
+        r1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
+        r2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        r1 = "metadata/{sample}/R1_trim_metadata.json",
+        r2 = "metadata/{sample}/R2_trim_metadata.json"
+    params:
+        output_group = "fastqs",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_file_metadata.py"
 
-# rule collate_R1_trim:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/R1_trim_metadata.json", sample=samples)
-#     output:
-#         "metadata/R1_trim_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_R1_trim:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/R1_trim_metadata.json", sample=samples)
+    output:
+        "metadata/R1_trim_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
-# rule collate_R2_trim:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/R2_trim_metadata.json", sample=samples)
-#     output:
-#         "metadata/R2_trim_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_R2_trim:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/R2_trim_metadata.json", sample=samples)
+    output:
+        "metadata/R2_trim_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
 rule metadata_qc_reads:
     """
@@ -68,7 +68,7 @@ rule metadata_qc_reads:
     params:
         output_group = "fastqs",
         sample_data = lambda w: sample_data[w.sample]
-     conda:
+    conda:
         "../envs/portal.yaml"
     group: 
         "metadata"
