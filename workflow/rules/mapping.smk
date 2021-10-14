@@ -25,12 +25,10 @@ rule bowtie2:
         prefix = get_idx_prefix,
         files = get_idx_files
     output:
-        bam_raw = "results/{sample}/mapping/raw_unsorted.bam"
+        bam_raw = "results/{sample}/mapping/raw_unsorted.bam",
         qc = "results/{sample}/mapping/bwt2_stats.txt"
     params:
         k = 1 + config["multimapping"]
-    log:
-        "logs/{sample}/mapping/bwt2.log"
     threads:
         max_threads
     conda:
