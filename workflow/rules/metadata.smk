@@ -75,20 +75,20 @@
 #     script: 
 #         "../scripts/write_qc_metadata.py"
 
-# rule collate_qc_reads:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/reads_qc_metadata.json", sample=samples)
-#     output:
-#         "metadata/reads_qc_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_qc_reads:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/reads_qc_metadata.json", sample=samples)
+    output:
+        "metadata/reads_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
 rule metadata_bam_raw:
     """
