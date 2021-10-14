@@ -1,6 +1,7 @@
 """
 Metadata generation
 """
+# Note: these rules are not run by default
 
 rule metadata_fastq:
     """
