@@ -8,12 +8,12 @@ def collate(paths, out):
             j = json.load(f)
             if i == 0:
                 header = list(j.keys())
-                lines.append("\t".join(header))
+                lines.append(header)
             line = [json.dumps(j[col]) for col in header]
             lines.append(line)
 
     with open(out, 'w', newline='') as outf:
-        writer = csv.writer(outf, delimiter="\t")
+        writer = csv.writer(outf, delimiter="\t", lineterminator='\n', quotechar="'")
         writer.writerows(lines)
 
 if __name__ == '__main__':
