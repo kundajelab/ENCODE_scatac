@@ -53,134 +53,134 @@
 #     script: 
 #         "../scripts/collate_metadata.py"
 
-# rule metadata_qc_reads:
-#     """
-#     Write reads QC metadata
-#     """
-#     input: 
-#         data_file = "results/{sample}/fastqs/R1_trim.fastq.gz",
-#         barcode_matching = "results/{sample}/fastqs/barcode_matching.tsv",
-#         adapter_trimming = "results/{sample}/fastqs/trim_adapters.txt",
-#         barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
-#         input_data = "results/{sample}/input_data.json"
-#     output: 
-#         read_stats = "metadata/{sample}/reads_qc_metadata.json",
-#     params:
-#         output_group = "fastqs",
-#         sample_data = lambda w: sample_data[w.sample]
-#      conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_qc_metadata.py"
+rule metadata_qc_reads:
+    """
+    Write reads QC metadata
+    """
+    input: 
+        data_file = "results/{sample}/fastqs/R1_trim.fastq.gz",
+        barcode_matching = "results/{sample}/fastqs/barcode_matching.tsv",
+        adapter_trimming = "results/{sample}/fastqs/trim_adapters.txt",
+        barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        read_stats = "metadata/{sample}/reads_qc_metadata.json",
+    params:
+        output_group = "fastqs",
+        sample_data = lambda w: sample_data[w.sample]
+     conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_qc_metadata.py"
 
-# rule collate_qc_reads:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/reads_qc_metadata.json", sample=samples)
-#     output:
-#         "metadata/reads_qc_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_qc_reads:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/reads_qc_metadata.json", sample=samples)
+    output:
+        "metadata/reads_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
-# rule metadata_bam_raw:
-#     """
-#     Write raw BAM metadata
-#     """
-#     input: 
-#         bam = "results/{sample}/mapping/raw.bam",
-#         fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
-#         fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
-#         input_data = "results/{sample}/input_data.json"
-#     output: 
-#         "metadata/{sample}/raw_bam_metadata.json"
-#     params:
-#         output_group = "mapping",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_file_metadata.py"
+rule metadata_bam_raw:
+    """
+    Write raw BAM metadata
+    """
+    input: 
+        bam = "results/{sample}/mapping/raw.bam",
+        fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz",
+        fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        "metadata/{sample}/raw_bam_metadata.json"
+    params:
+        output_group = "mapping",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_file_metadata.py"
 
-# rule collate_bam_raw:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/raw_bam_metadata.json", sample=samples)
-#     output:
-#         "metadata/raw_bam_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_bam_raw:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/raw_bam_metadata.json", sample=samples)
+    output:
+        "metadata/raw_bam_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
-# rule metadata_qc_alignments_raw:
-#     """
-#     Write raw alignments qc metadata
-#     """
-#     input: 
-#         data_file = "results/{sample}/mapping/raw.bam",
-#         samstats_raw = "results/{sample}/mapping/samstats_raw.txt",
-#         input_data = "results/{sample}/input_data.json"
-#     output: 
-#         alignment_stats = "metadata/{sample}/alignments_raw_qc_metadata.json"
-#     params:
-#         output_group = "mapping",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_qc_metadata.py"
+rule metadata_qc_alignments_raw:
+    """
+    Write raw alignments qc metadata
+    """
+    input: 
+        data_file = "results/{sample}/mapping/raw.bam",
+        samstats_raw = "results/{sample}/mapping/samstats_raw.txt",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        alignment_stats = "metadata/{sample}/alignments_raw_qc_metadata.json"
+    params:
+        output_group = "mapping",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_qc_metadata.py"
 
-# rule collate_qc_alignments_raw:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/alignments_raw_qc_metadata.json", sample=samples)
-#     output:
-#         "metadata/alignments_raw_qc_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_qc_alignments_raw:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/alignments_raw_qc_metadata.json", sample=samples)
+    output:
+        "metadata/alignments_raw_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
-# rule metadata_bam_filtered:
-#     """
-#     Write filtered BAM metadata
-#     """
-#     input: 
-#         bam = "results/{sample}/filtering/filtered.bam",
-#         fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz", # attach to fastqs
-#         fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
-#         input_data = "results/{sample}/input_data.json"
-#     output: 
-#         "metadata/{sample}/filtered_bam_metadata.json",
-#     params:
-#         output_group = "filtering",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_file_metadata.py"
+rule metadata_bam_filtered:
+    """
+    Write filtered BAM metadata
+    """
+    input: 
+        bam = "results/{sample}/filtering/filtered.bam",
+        fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz", # attach to fastqs
+        fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        "metadata/{sample}/filtered_bam_metadata.json",
+    params:
+        output_group = "filtering",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_file_metadata.py"
 
 rule collate_bam_filtered:
     """
