@@ -182,182 +182,182 @@
 #     script: 
 #         "../scripts/write_file_metadata.py"
 
-# rule collate_bam_filtered:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/filtered_bam_metadata.json", sample=samples)
-#     output:
-#         "metadata/filtered_bam_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_bam_filtered:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/filtered_bam_metadata.json", sample=samples)
+    output:
+        "metadata/filtered_bam_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
-# rule metadata_qc_alignments_filtered:
-#     """
-#     Write filtered alignments qc metadata
-#     """
-#     input: 
-#         data_file = "results/{sample}/filtering/filtered.bam",
-#         samstats_filtered = "results/{sample}/filtering/samstats_filtered.txt",
-#         picard_markdup = "results/{sample}/filtering/markdup.txt",
-#         pbc_stats = "results/{sample}/filtering/pbc_stats.tsv",
-#         frac_mito = "results/{sample}/filtering/frac_mito.tsv",
-#         input_data = "results/{sample}/input_data.json"
-#     output: 
-#         alignment_stats = "metadata/{sample}/alignments_filtered_qc_metadata.json",
-#         lib_comp_stats = "metadata/{sample}/alignments_lib_comp_qc_metadata.json"
-#     params:
-#         output_group = "filtering",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_qc_metadata.py"
+rule metadata_qc_alignments_filtered:
+    """
+    Write filtered alignments qc metadata
+    """
+    input: 
+        data_file = "results/{sample}/filtering/filtered.bam",
+        samstats_filtered = "results/{sample}/filtering/samstats_filtered.txt",
+        picard_markdup = "results/{sample}/filtering/markdup.txt",
+        pbc_stats = "results/{sample}/filtering/pbc_stats.tsv",
+        frac_mito = "results/{sample}/filtering/frac_mito.tsv",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        alignment_stats = "metadata/{sample}/alignments_filtered_qc_metadata.json",
+        lib_comp_stats = "metadata/{sample}/alignments_lib_comp_qc_metadata.json"
+    params:
+        output_group = "filtering",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_qc_metadata.py"
 
-# rule collate_qc_alignments_filtered:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/alignments_filtered_qc_metadata.json", sample=samples)
-#     output:
-#         "metadata/alignments_filtered_qc_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_qc_alignments_filtered:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/alignments_filtered_qc_metadata.json", sample=samples)
+    output:
+        "metadata/alignments_filtered_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
-# rule collate_qc_lib_comp:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/alignments_lib_comp_qc_metadata.json", sample=samples)
-#     output:
-#         "metadata/alignments_lib_comp_qc_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_qc_lib_comp:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/alignments_lib_comp_qc_metadata.json", sample=samples)
+    output:
+        "metadata/alignments_lib_comp_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
-# rule metadata_fragments:
-#     """
-#     Write fragment file metadata
-#     """
-#     input: 
-#         fragments = "results/{sample}/fragments/fragments.tar.gz",
-#         bam = "results/{sample}/filtering/filtered.bam",
-#         input_data = "results/{sample}/input_data.json"
-#     output: 
-#         "metadata/{sample}/fragments_metadata.json"
-#     params:
-#         output_group = "fragments",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_file_metadata.py"
+rule metadata_fragments:
+    """
+    Write fragment file metadata
+    """
+    input: 
+        fragments = "results/{sample}/fragments/fragments.tar.gz",
+        bam = "results/{sample}/filtering/filtered.bam",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        "metadata/{sample}/fragments_metadata.json"
+    params:
+        output_group = "fragments",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_file_metadata.py"
 
-# rule collate_fragments:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/fragments_metadata.json", sample=samples)
-#     output:
-#         "metadata/fragments_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_fragments:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/fragments_metadata.json", sample=samples)
+    output:
+        "metadata/fragments_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
-# rule metadata_qc_fragments:
-#     """
-#     Write fragments QC metadata
-#     """
-#     input: 
-#         data_file = "results/{sample}/fragments/fragments.tar.gz",
-#         barcode_pairs_strict = "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
-#         barcode_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
-#         barcodes_status = "results/{sample}/fragments/multiplet_barcodes_status.tsv",
-#         multiplet_stats = "results/{sample}/fragments/multiplet_stats.txt",
-#         multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
-#     output: 
-#         fragments_stats = "metadata/{sample}/fragments_qc_metadata.json"
-#     params:
-#         output_group = "fragments",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_qc_metadata.py"
+rule metadata_qc_fragments:
+    """
+    Write fragments QC metadata
+    """
+    input: 
+        data_file = "results/{sample}/fragments/fragments.tar.gz",
+        barcode_pairs_strict = "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
+        barcode_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
+        barcodes_status = "results/{sample}/fragments/multiplet_barcodes_status.tsv",
+        multiplet_stats = "results/{sample}/fragments/multiplet_stats.txt",
+        multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
+    output: 
+        fragments_stats = "metadata/{sample}/fragments_qc_metadata.json"
+    params:
+        output_group = "fragments",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_qc_metadata.py"
 
-# rule collate_qc_fragments:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/fragments_qc_metadata.json", sample=samples)
-#     output:
-#         "metadata/fragments_qc_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_qc_fragments:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/fragments_qc_metadata.json", sample=samples)
+    output:
+        "metadata/fragments_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
-# rule metadata_analyses:
-#     """
-#     Write analyses metadata
-#     """
-#     input: 
-#         archr = "results/{sample}/analyses/archr_project.tar.gz",
-#         fragments = "results/{sample}/fragments/fragments.tar.gz",
-#         input_data = "results/{sample}/input_data.json"
-#     output: 
-#         "metadata/{sample}/analyses_metadata.json",
-#     params:
-#         output_group = "analyses",
-#         sample_data = lambda w: sample_data[w.sample]
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata"
-#     script: 
-#         "../scripts/write_file_metadata.py"
+rule metadata_analyses:
+    """
+    Write analyses metadata
+    """
+    input: 
+        archr = "results/{sample}/analyses/archr_project.tar.gz",
+        fragments = "results/{sample}/fragments/fragments.tar.gz",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        "metadata/{sample}/analyses_metadata.json",
+    params:
+        output_group = "analyses",
+        sample_data = lambda w: sample_data[w.sample]
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_file_metadata.py"
 
-# rule collate_analyses:
-#     """
-#     Collate metadata files across samples into tables
-#     """
-#     input: 
-#         expand("metadata/{sample}/analyses_metadata.json", sample=samples)
-#     output:
-#         "metadata/analyses_metadata_all.tsv"
-#     conda:
-#         "../envs/portal.yaml"
-#     group: 
-#         "metadata_collate"
-#     script: 
-#         "../scripts/collate_metadata.py"
+rule collate_analyses:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/analyses_metadata.json", sample=samples)
+    output:
+        "metadata/analyses_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
 
 rule metadata_qc_analyses:
     """
