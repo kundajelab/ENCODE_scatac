@@ -64,6 +64,7 @@ include:
 
 localrules: 
     all, 
+    build_metadata,
     submit, 
     query_portal,
     fetch_whitelist,
