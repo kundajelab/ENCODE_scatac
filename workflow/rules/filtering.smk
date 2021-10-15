@@ -37,7 +37,7 @@ rule filter_multimappers:
     shell:
         "samtools view -F 524 -f 2 -h {input} | "
         "python {params.mmp_path} --paired-end -k {params.multimapping} | "
-        "samtools view -u | "
+        "samtools view -u - | "
         "samtools fixmate -r - {output}"
 
 rule sort_filtered_alignments:
