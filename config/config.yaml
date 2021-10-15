@@ -14,12 +14,10 @@ bc_https: False
 genome:
   GRCh38:
     bwt2_idx: genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
-    bwt2_idx_name: GRCh38_noalt_as
     bwt2_idx_prefix: GRCh38_noalt_as
     archr_genome: hg38
   mm10:
     bwt2_idx: genome-idx.s3.amazonaws.com/bt/mm10.zip
-    bwt2_idx_name: mm10
     bwt2_idx_prefix: mm10
     archr_genome: mm10
 idx_https: True

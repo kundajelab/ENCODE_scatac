@@ -1,2 +1,4 @@
 Experiment	Replicate	Modality	Genome
-ENCSR690NZI	1	multiome	GRCh38
+ENCSR989MQQ	1	10x	GRCh38
+ENCSR916EDP	1	multiome	GRCh38
+ENCSR937PSF	2	ren	mm10

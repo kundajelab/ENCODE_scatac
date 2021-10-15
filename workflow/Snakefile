@@ -164,9 +164,9 @@ rule fetch_index:
     Fetch Bowtie2 index files
     """
     input:
-        lambda w: HTTP.remote(idx_urls[w.bwt2_prefix], insecure=(not config["idx_https"]))
+        lambda w: HTTP.remote(config["genome"][w.genome_name]["bwt2_idx"], insecure=(not config["idx_https"]))
     output:
-        "bwt2_idx/{bwt2_name}/{bwt2_prefix,[A-Za-z0-9]+}.{file}.bt2"
+        "bwt2_idx/{genome_name}/{bwt2_prefix,[A-Za-z0-9]+}.{file}.bt2"
     params:
         ind = lambda w: f"{w.bwt2_prefix}.{w.file}.bt2"
     conda:
@@ -179,4 +179,4 @@ rule idx_prefix_placeholder:
     Create Bowtie2 index prefix dummy file
     """
     output:
-        touch("bwt2_idx/{bwt2_name}/{bwt2_prefix,[A-Za-z0-9]+}")
+        touch("bwt2_idx/{genome_name}/{bwt2_prefix,[A-Za-z0-9]+}")
