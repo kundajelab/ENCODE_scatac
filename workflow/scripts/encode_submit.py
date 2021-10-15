@@ -1,16 +1,16 @@
 import os
 import json
-import collections
+from collections import Mapping
 import encode_utils as eu
 from encode_utils.connection import Connection
 
 def set_attachments(conn, payload):
     attachments = []
     for key, val in payload.items():
-        if isinstance(val, collections.Mapping) and ("path" in val):
+        if isinstance(val, Mapping) and ("path" in val):
             attachments.append(key)
 
-    for val in attachments:
+    for key in attachments:
         val = payload[key]
         attachment = conn.set_attachment(document=val["path"])
         payload[key] = attachment

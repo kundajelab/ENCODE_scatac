@@ -39,6 +39,8 @@ for f in files:
         continue
     if f["replicate"]["biological_replicate_number"] != replicate_num:
         continue
+    if "derived_from" in f:
+        continue
 
     p = f["platform"]["uuid"]
     if platform is not None and p != platform:
