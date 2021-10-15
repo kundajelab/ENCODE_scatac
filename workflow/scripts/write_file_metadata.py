@@ -55,10 +55,11 @@ def fragments_metadata(sample_data):
     })
     return d
 
-def analyses_metadata(sample_data): #TODO
+def analyses_metadata(sample_data):
     d = OrderedDict({
         "file_format": "tar",
         "assembly": sample_data["assembly"],
+        "output_type": "archr project"
     })
     return d
 
@@ -142,7 +143,8 @@ try:
         out, = snakemake.output
 
         h = file_header(sample_data, config, tarball, [pred], step_run)
-        s = h 
+        d = analyses_metadata(sample_data)
+        s = h | d
 
         write_json(s, out)
 
