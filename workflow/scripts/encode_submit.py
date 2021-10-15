@@ -1,12 +1,13 @@
 import os
 import json
+import collections
 import encode_utils as eu
 from encode_utils.connection import Connection
 
 def set_attachments(conn, payload):
     attachments = []
     for key, val in payload.items():
-        if "path" in val:
+        if isinstance(val, collections.Mapping) and ("path" in val):
             attachments.append(key)
 
     for val in attachments:
