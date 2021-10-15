@@ -34,9 +34,9 @@ def parse_barcode_matching_qc(txt):
     with open(txt, 'r') as f:
         words = f.readline().rstrip('\n').split(' ')
         passing, total = words[0].split('/')
-        result['num_reads_passing'] = to_int(passing)
+        result['num_reads_matched'] = to_int(passing)
         result['num_reads_total'] = to_int(total)
-        result['frac_reads_passing'] = result['num_reads_passing'] / result['num_reads_total']
+        result['frac_reads_matched'] = result['num_reads_matched'] / result['num_reads_total']
         next(f)
         next(f)
         for line in f:
