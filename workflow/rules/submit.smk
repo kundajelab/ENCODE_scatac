@@ -221,7 +221,7 @@ rule submit_fragments:
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
-        directory("logs/{sample}/submit/filtered_bam_submit")
+        directory("logs/{sample}/submit/fragments_submit")
     conda:
         "../envs/portal.yaml"
     group: 
