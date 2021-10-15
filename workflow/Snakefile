@@ -105,7 +105,7 @@ rule submit:
     Submit outputs to ENCODE portal
     """
     input: 
-        expand("results/{sample}/submit/submit.done", sample=samples)
+        expand("submit/{sample}/submit.done", sample=samples)
 
 checkpoint query_portal:
     """
