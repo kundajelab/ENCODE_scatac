@@ -322,7 +322,7 @@ rule submit_done:
         "submit/{sample}/fragments_submit.done",
         # "submit/{sample}/fragments_qc_metadata_submit.done",
         # "submit/{sample}/analyses_submit.done",
-        "submit/{sample}/analyses_qc_metadata_submit.done",
+        # "submit/{sample}/analyses_qc_metadata_submit.done",
     output:
         touch("submit/{sample}/submit.done")
     group: 
