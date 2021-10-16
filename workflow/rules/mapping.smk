@@ -79,7 +79,8 @@ rule samstats_raw:
     Run SAMStats on raw alignments
     """
     input:
-        "results/{sample}/mapping/raw_unsorted.bam"
+        bam = "results/{sample}/mapping/raw_unsorted.bam",
+        dep = "results/{sample}/mapping/raw.bam" # Force dependency
     output:
         "results/{sample}/mapping/samstats_raw.txt"
     log:
@@ -91,7 +92,7 @@ rule samstats_raw:
     group: 
         "mapping"
     shell:
-        "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
+        "samtools sort -T . -n -@ {threads} -O SAM {input.bam} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
 rule mapping_done:
