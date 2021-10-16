@@ -181,7 +181,7 @@ rule unzip_index:
     output:
         "bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}.{file}.bt2"
     params:
-        ind = lambda w: f"{w.bwt2_prefix}.{w.file}.bt2"
+        ind = lambda w: f"*{w.bwt2_prefix}.{w.file}.bt2"
     conda:
         "envs/portal.yaml"
     shell:
