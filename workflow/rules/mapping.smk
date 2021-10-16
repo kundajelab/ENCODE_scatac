@@ -5,13 +5,13 @@ Read mapping
 def get_idx_prefix(w):
     genome = sample_config[w.sample]["genome"]
     entry = config["genome"][genome]
-    return os.path.join("bwt2_idx", genome, entry["bwt2_idx_prefix"])
+    return os.path.join("bwt2_idx", "unpacked", genome, entry["bwt2_idx_prefix"])
 
 def get_idx_files(w):
     genome = sample_config[w.sample]["genome"]
     entry = config["genome"][genome]
     return [
-        os.path.join("bwt2_idx", genome, f"{entry['bwt2_idx_prefix']}.{s}.bt2") 
+        os.path.join("bwt2_idx", "unpacked", genome, f"{entry['bwt2_idx_prefix']}.{s}.bt2") 
         for s in ["1", "2", "3", "4", "rev.1", "rev.2"]
     ]
 

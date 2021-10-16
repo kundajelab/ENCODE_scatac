@@ -160,12 +160,25 @@ rule fetch_whitelist:
 
 rule fetch_index:
     """
-    Fetch Bowtie2 index files
+    Fetch Bowtie2 index archive
     """
     input:
         lambda w: HTTP.remote(config["genome"][w.genome_name]["bwt2_idx"], insecure=(not config["idx_https"]))
     output:
-        "bwt2_idx/{genome_name}/{bwt2_prefix,[^.]+}.{file}.bt2"
+        "bwt2_idx/zipped/{genome_name}.zip"
+    conda:
+        "envs/portal.yaml"
+    shell:
+        "mv {input} {output}"
+
+rule unzip_index:
+    """
+    Unzip Bowtie2 index files
+    """
+    input:
+        "bwt2_idx/zipped/{genome_name}.zip"
+    output:
+        "bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}.{file}.bt2"
     params:
         ind = lambda w: f"{w.bwt2_prefix}.{w.file}.bt2"
     conda:
@@ -178,4 +191,4 @@ rule idx_prefix_placeholder:
     Create Bowtie2 index prefix dummy file
     """
     output:
-        touch("bwt2_idx/{genome_name}/{bwt2_prefix,[^.]+}")
+        touch("bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}")
