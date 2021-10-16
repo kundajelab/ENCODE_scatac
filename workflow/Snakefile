@@ -69,6 +69,7 @@ localrules:
     query_portal,
     fetch_whitelist,
     fetch_index,
+    unzip_index,
     idx_prefix_placeholder
 
 rule all:
