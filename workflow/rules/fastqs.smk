@@ -22,32 +22,12 @@ rule strip_fastq:
         "curl --no-progress-meter -L -u {params.usr}:{params.pwd} {params.url} | "
         "zcat | sed 's/ .*//' | gzip > {output}"
 
-rule fetch_fastq_bc:
-    """
-    Fetch barcodes fastq
-    """
-    input:
-        ancient("results/{sample}/input_data.json")
-    output:
-        temp("temp/{sample}/fastqs/fastq_barcode.fastq")
-    params:
-        url = lambda w: sample_data[w.sample]["fastq"]["BC"][0],
-        usr = os.environ["DCC_API_KEY"],
-        pwd = os.environ["DCC_SECRET_KEY"]
-    conda:
-        "../envs/fastqs.yaml"
-    group: 
-        "fastqs"
-    shell:
-        "curl --no-progress-meter -L -u {params.usr}:{params.pwd} {params.url} | "
-        "zcat > {output} || true"
-
 rule detect_revcomp:
     """
     Auto-detect barcode complementation
     """
     input:
-        fastq = "temp/{sample}/fastqs/fastq_barcode.fastq",
+        fastq = "temp/{sample}/fastqs/stripped_BC.fastq.gz",
         whitelist_10x = "bc_whitelists/10x.txt.gz",
         whitelist_multiome = "bc_whitelists/multiome.txt.gz",
         input_data = "results/{sample}/input_data.json"

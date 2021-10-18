@@ -40,34 +40,15 @@ rule filter_multimappers:
         "samtools view -u - | "
         "samtools fixmate -r - {output}"
 
-rule sort_filtered_alignments:
-    """
-    Sort filtered alignments
-    """
-    input: 
-        "temp/{sample}/filtering/primary_align.bam"
-    output: 
-        "temp/{sample}/filtering/primary_align_sorted.bam"
-    log:
-        "logs/{sample}/filtering/sort.log"
-    threads:
-        max_threads
-    conda:
-        "../envs/filtering.yaml"
-    group: 
-        "filtering"
-    shell: 
-        "samtools sort -T . -@ {threads} -o {output} {input} 2> {log} "
-
 rule remove_duplicates:
     """
     Mark and remove PCR duplicates
     """
     input:
-        "temp/{sample}/filtering/primary_align_sorted.bam"
+        "temp/{sample}/filtering/primary_align.bam"
     output:
         bam_markdup = temp("temp/{sample}/filtering/markdup.bam"),
-        bam_nodup = "results/{sample}/filtering/filtered.bam",
+        bam_nodup = temp("temp/{sample}/filtering/dedup.bam"),
         markdup_stats = "results/{sample}/filtering/markdup.txt"
     log:
         "logs/{sample}/filtering/picard.log"
@@ -77,7 +58,7 @@ rule remove_duplicates:
         "filtering"
     shell:
         "picard MarkDuplicates --INPUT {input} --OUTPUT /dev/stdout --METRICS_FILE {output.markdup_stats} "
-        "--VALIDATION_STRINGENCY LENIENT --ASSUME_SORTED true --REMOVE_DUPLICATES false --BARCODE_TAG CB 2> {log} | "
+        "--VALIDATION_STRINGENCY LENIENT --ASSUME_SORT_ORDER queryname --REMOVE_DUPLICATES false --BARCODE_TAG CB 2> {log} | "
         "tee {output.bam_markdup} | "
         "samtools view -F 1804 -f 2 -b -o {output.bam_nodup} -"
 
@@ -97,6 +78,25 @@ rule library_complexity:
         "filtering"
     shell:
         "samtools view {input} | python {params.pbc_script} {output}"
+
+rule sort_filtered_alignments:
+    """
+    Sort filtered alignments
+    """
+    input: 
+        "temp/{sample}/filtering/dedup.bam"
+    output: 
+        "results/{sample}/filtering/filtered.bam.bai"
+    log:
+        "logs/{sample}/filtering/sort.log"
+    threads:
+        max_threads
+    conda:
+        "../envs/filtering.yaml"
+    group: 
+        "filtering"
+    shell: 
+        "samtools sort -T . -@ {threads} -o {output} {input} 2> {log} "
 
 rule index_bam_filtered:
     """
@@ -123,14 +123,12 @@ rule samstats_filtered:
         "results/{sample}/filtering/samstats_filtered.txt"
     log:
         "logs/{sample}/filtering/samstats_filtered.log"
-    threads:
-        max_threads
     conda:
         "../envs/filtering.yaml"
     group: 
         "filtering"
     shell:
-        "samtools sort -T . -n -@ {threads} -O SAM {input} | " 
+        "samtools view -o - {input} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
 rule filtering_done:

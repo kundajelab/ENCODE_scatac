@@ -59,41 +59,23 @@ rule sort_alignments:
     shell: 
         "samtools sort -T . -@ {threads} -o {output} {input} 2> {log} "
 
-rule index_bam_raw:
-    """
-    Index raw BAM
-    """
-    input: 
-        "results/{sample}/mapping/raw.bam"
-    output: 
-        "results/{sample}/mapping/raw.bam.bai"
-    conda:
-        "../envs/mapping.yaml"
-    group: 
-        "mapping"
-    shell: 
-        "samtools index {input}"
-
 rule samstats_raw:
     """
     Run SAMStats on raw alignments
     """
     input:
-        bam = "results/{sample}/mapping/raw_unsorted.bam",
-        dep = "results/{sample}/mapping/raw.bam" # Force dependency
+        "results/{sample}/mapping/raw_unsorted.bam"
     output:
         "results/{sample}/mapping/samstats_raw.txt"
     log:
         "logs/{sample}/mapping/samstats_raw.log"
-    threads:
-        max_threads
     conda:
         "../envs/mapping.yaml"
     group: 
         "mapping"
     shell:
-        "samtools sort -T . -n -@ {threads} -O SAM {input.bam} | " 
-        "SAMstats --sorted_sam_file -  --outf {output} > {log}"
+        "samtools view -o - {input} | " 
+        "SAMstats --sorted_sam_file - --outf {output} > {log}"
 
 rule mapping_done:
     """
@@ -101,7 +83,7 @@ rule mapping_done:
     """
     input: 
         "results/{sample}/mapping/raw.bam",
-        "results/{sample}/mapping/raw.bam.bai", 
+        "results/{sample}/mapping/raw_unsorted.bam", 
         "results/{sample}/mapping/samstats_raw.txt"
     output:
         touch("results/{sample}/mapping/mapping.done")

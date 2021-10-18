@@ -22,7 +22,7 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=10000, thresh=0.8):
     bc_match = 0
     bcrc_match = 0
     num_lines = num_reads * 4
-    with open(fastq, 'rt') as f:
+    with gzip.open(fastq, 'rt') as f:
         for lnum, line in enumerate(f):
             if lnum >= num_lines:
                 break
