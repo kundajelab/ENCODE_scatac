@@ -86,7 +86,7 @@ rule sort_filtered_alignments:
     input: 
         "temp/{sample}/filtering/dedup.bam"
     output: 
-        "results/{sample}/filtering/filtered.bam.bai"
+        "results/{sample}/filtering/filtered.bam"
     log:
         "logs/{sample}/filtering/sort.log"
     threads:
@@ -118,7 +118,8 @@ rule samstats_filtered:
     SAMstats on filtered alignments
     """
     input:
-        "results/{sample}/filtering/filtered.bam"
+        bam = "results/{sample}/filtering/dedup.bam",
+        dep = "results/{sample}/filtering/filtered.bam"
     output:
         "results/{sample}/filtering/samstats_filtered.txt"
     log:
@@ -128,7 +129,7 @@ rule samstats_filtered:
     group: 
         "filtering"
     shell:
-        "samtools view -o - {input} | " 
+        "samtools view -o - {input.bam} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
 rule filtering_done:
