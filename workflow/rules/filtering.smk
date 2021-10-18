@@ -118,7 +118,7 @@ rule samstats_filtered:
     SAMstats on filtered alignments
     """
     input:
-        bam = "results/{sample}/filtering/dedup.bam",
+        bam = "temp/{sample}/filtering/dedup.bam",
         dep = "results/{sample}/filtering/filtered.bam"
     output:
         "results/{sample}/filtering/samstats_filtered.txt"
