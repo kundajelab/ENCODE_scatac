@@ -8,7 +8,7 @@ rule filter_mito:
     Filter and count mitochondrial reads
     """
     input: 
-        "results/{sample}/mapping/raw_unsorted.bam",
+        "results/{sample}/mapping/raw_collated.bam",
     output: 
         bam = temp("temp/{sample}/filtering/no_mito.bam"),
         qc = "results/{sample}/filtering/frac_mito.tsv"
