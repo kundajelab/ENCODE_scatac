@@ -19,6 +19,12 @@ with open("config/samples.tsv") as sample_file:
     for line in sample_file:
         if line.startswith("#"):
             continue
+        if line.startswith("@"):
+            break
+        if line.startswith("$"):
+            sample_config.clear()
+            samples.clear()
+            continue
         entries = line.rstrip('\n').split('\t')
         exp = entries[exp_ind]
         rep = int(entries[rep_ind])
