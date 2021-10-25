@@ -45,7 +45,7 @@ def bc_detect(fastq, whitelist, out, qc, offset, num_reads=10000, thresh=0.8):
         f.write(f"Reverse-complement chosen: {not fc_chosen}\n")
 
     if not valid:
-        raise ValueError("Insufficient barcode match rate")
+        raise ValueError(f"Insufficient barcode match rate: {bc_match_prop}, {bcrc_match_prop}")
     with open(out, 'w') as f:
         if fc_chosen:
             f.write(f"{0}\n")
