@@ -36,6 +36,7 @@ def load_samples(sample_file):
                 gen
             ]
             samples.append(data)
+            print(data) ####
     return samples
 
 def check_config(sample_file, out_path, dcc_mode):
