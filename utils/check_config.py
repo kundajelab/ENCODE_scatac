@@ -6,7 +6,7 @@ def fetch_info(experiment, conn):
 
     lab = data["lab"]["name"]
     try:
-        multiome = data["related_series"]["accession"]
+        multiome = data["related_series"][0]["accession"]
     except AttributeError:
         multiome = None
     
