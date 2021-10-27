@@ -5,7 +5,10 @@ def fetch_info(experiment, conn):
     data = conn.get(experiment)
 
     lab = data["lab"]["name"]
-    multiome = data["related_series"].get("accession")
+    try:
+        multiome = data["related_series"]["accession"]
+    except AttributeError:
+        multiome = None
     
     return lab, multiome
 
