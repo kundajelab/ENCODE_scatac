@@ -36,7 +36,6 @@ def load_samples(sample_file):
                 gen
             ]
             samples.append(data)
-            print(data) ####
     return samples
 
 def check_config(sample_file, out_path, dcc_mode):
@@ -47,7 +46,7 @@ def check_config(sample_file, out_path, dcc_mode):
             lab, mult = fetch_info(s[0], conn)
             print(*(s + [lab, mult]), sep="\t", file=out_file)
 
-if __name__ == 'main':
+if __name__ == '__main__':
     sample_file = sys.argv[1]
     out_path = sys.argv[2]
     dcc_mode = "prod"
