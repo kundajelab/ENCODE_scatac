@@ -9,8 +9,8 @@ def fetch_info(experiment, conn):
     
     return lab, multiome
 
-def load_samples(sample_file):
-    with open("config/samples.tsv") as sample_file:
+def load_samples(sample_path):
+    with open(sample_path) as sample_file:
         h = sample_file.readline().rstrip('\n').split('\t')
         exp_ind = h.index("Experiment")
         rep_ind = h.index("Replicate")
@@ -38,16 +38,16 @@ def load_samples(sample_file):
             samples.append(data)
     return samples
 
-def check_config(sample_file, out_path, dcc_mode):
+def check_config(sample_path, out_path, dcc_mode):
     conn = Connection(dcc_mode)
-    samples = load_samples(sample_file)
+    samples = load_samples(sample_path)
     with open(out_path, "w") as out_file:
         for s in samples:
             lab, mult = fetch_info(s[0], conn)
             print(*(s + [lab, mult]), sep="\t", file=out_file)
 
 if __name__ == '__main__':
-    sample_file = sys.argv[1]
+    sample_path = sys.argv[1]
     out_path = sys.argv[2]
     dcc_mode = "prod"
-    check_config(sample_file, out_path, dcc_mode)
+    check_config(sample_path, out_path, dcc_mode)
