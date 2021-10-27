@@ -1,9 +1,7 @@
 import sys
 from encode_utils.connection import Connection
 
-def fetch_info(experiment, dcc_mode):
-
-    conn = Connection(dcc_mode)
+def fetch_info(experiment, conn):
     data = conn.get(experiment)
 
     lab = data["lab"]["name"]
@@ -41,10 +39,11 @@ def load_samples(sample_file):
     return samples
 
 def check_config(sample_file, out_path, dcc_mode):
+    conn = Connection(dcc_mode)
     samples = load_samples(sample_file)
     with open(out_path, "w") as out_file:
         for s in samples:
-            lab, mult = fetch_info(s[0], dcc_mode)
+            lab, mult = fetch_info(s[0], conn)
             print(*(s + [lab, mult]), sep="\t", file=out_file)
 
 if __name__ == 'main':
