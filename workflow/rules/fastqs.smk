@@ -153,5 +153,5 @@ rule fastqs_done:
         "results/{sample}/fastqs/trim_adapters.txt",
     output:
         touch("results/{sample}/fastqs/fastqs.done")
-    group: 
-        "fastqs"
+    # group: 
+    #     "fastqs"

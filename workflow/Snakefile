@@ -71,12 +71,18 @@ include:
 localrules: 
     all, 
     build_metadata, 
+    fetch_inputs,
     submit, 
     query_portal,
     fetch_whitelist,
     fetch_index,
     unzip_index,
-    idx_prefix_placeholder
+    idx_prefix_placeholder,
+    fastqs_done,
+    mapping_done,
+    filtering_done,
+    fragments_done,
+    analyses_done
 
 rule all:
     """
@@ -88,6 +94,13 @@ rule all:
         expand("results/{sample}/filtering/filtering.done", sample=samples),
         expand("results/{sample}/fragments/fragments.done", sample=samples),
         expand("results/{sample}/analyses/analyses.done", sample=samples)
+
+rule fetch_inputs:
+    """
+    Fetch input metadata from portal
+    """
+    input: 
+        expand("results/{sample}/input_data.json", sample=samples)
 
 rule build_metadata:
     """

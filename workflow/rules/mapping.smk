@@ -87,5 +87,5 @@ rule mapping_done:
         "results/{sample}/mapping/samstats_raw.txt"
     output:
         touch("results/{sample}/mapping/mapping.done")
-    group: 
-        "mapping"
+    # group: 
+    #     "mapping"

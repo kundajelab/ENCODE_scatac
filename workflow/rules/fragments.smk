@@ -101,5 +101,5 @@ rule fragments_done:
         "results/{sample}/fragments/multiplet_stats.txt"
     output:
         touch("results/{sample}/fragments/fragments.done")
-    group: 
-        "fragments"
+    # group: 
+    #     "fragments"

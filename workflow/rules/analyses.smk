@@ -101,5 +101,5 @@ rule analyses_done:
         "results/{sample}/analyses/archr_tss_by_unique_frags.pdf",
     output:
         touch("results/{sample}/analyses/analyses.done")
-    group: 
-        "analyses"
+    # group: 
+    #     "analyses"

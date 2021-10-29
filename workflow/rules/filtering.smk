@@ -145,5 +145,5 @@ rule filtering_done:
         "results/{sample}/filtering/samstats_filtered.txt",
     output:
         touch("results/{sample}/filtering/filtering.done")
-    group: 
-        "filtering"
+    # group: 
+    #     "filtering"
