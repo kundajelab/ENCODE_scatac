@@ -132,18 +132,18 @@ rule samstats_filtered:
         "samtools view -o - {input.bam} | " 
         "SAMstats --sorted_sam_file -  --outf {output} > {log}"
 
-rule filtering_done:
-    """
-    Touch flag file upon group completion
-    """
-    input: 
-        "results/{sample}/filtering/filtered.bam",
-        "results/{sample}/filtering/filtered.bam.bai", 
-        "results/{sample}/filtering/frac_mito.tsv", 
-        "results/{sample}/filtering/markdup.txt",
-        "results/{sample}/filtering/pbc_stats.tsv",
-        "results/{sample}/filtering/samstats_filtered.txt",
-    output:
-        touch("results/{sample}/filtering/filtering.done")
-    # group: 
-    #     "filtering"
+# rule filtering_done:
+#     """
+#     Touch flag file upon group completion
+#     """
+#     input: 
+#         "results/{sample}/filtering/filtered.bam",
+#         "results/{sample}/filtering/filtered.bam.bai", 
+#         "results/{sample}/filtering/frac_mito.tsv", 
+#         "results/{sample}/filtering/markdup.txt",
+#         "results/{sample}/filtering/pbc_stats.tsv",
+#         "results/{sample}/filtering/samstats_filtered.txt",
+#     output:
+#         touch("results/{sample}/filtering/filtering.done")
+#     # group: 
+#     #     "filtering"

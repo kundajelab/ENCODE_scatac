@@ -141,17 +141,17 @@ rule trim_adapter:
         "fastp -i {input.fastq1_bc} -I {input.fastq2_bc} -o {output.fastq1_trim} -O {output.fastq2_trim}"
         " -h {log.html} -j {log.json} -G -Q -L -w {threads} 2> {output.stats}"
 
-rule fastqs_done:
-    """
-    Touch flag file upon group completion
-    """
-    input: 
-        "results/{sample}/fastqs/R1_trim.fastq.gz",
-        "results/{sample}/fastqs/R2_trim.fastq.gz", 
-        "results/{sample}/fastqs/barcode_revcomp.txt",
-        "results/{sample}/fastqs/barcode_matching.tsv", 
-        "results/{sample}/fastqs/trim_adapters.txt",
-    output:
-        touch("results/{sample}/fastqs/fastqs.done")
-    # group: 
-    #     "fastqs"
+# rule fastqs_done:
+#     """
+#     Touch flag file upon group completion
+#     """
+#     input: 
+#         "results/{sample}/fastqs/R1_trim.fastq.gz",
+#         "results/{sample}/fastqs/R2_trim.fastq.gz", 
+#         "results/{sample}/fastqs/barcode_revcomp.txt",
+#         "results/{sample}/fastqs/barcode_matching.tsv", 
+#         "results/{sample}/fastqs/trim_adapters.txt",
+#     output:
+#         touch("results/{sample}/fastqs/fastqs.done")
+#     # group: 
+#     #     "fastqs"

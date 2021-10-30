@@ -86,20 +86,20 @@ rule tarball_fragments:
     shell:
         "tar -zcf {output} {input.frag} {input.frag_ind}"
 
-rule fragments_done:
-    """
-    Touch flag file upon group completion
-    """
-    input: 
-        "results/{sample}/fragments/fragments.tsv.gz",
-        "results/{sample}/fragments/fragments.tsv.gz.tbi",
-        "results/{sample}/fragments/fragments.tar.gz",
-        "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
-        "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
-        "results/{sample}/fragments/multiplet_barcodes_status.tsv",
-        "results/{sample}/fragments/multiplets_threshold_plot.png",
-        "results/{sample}/fragments/multiplet_stats.txt"
-    output:
-        touch("results/{sample}/fragments/fragments.done")
-    # group: 
-    #     "fragments"
+# rule fragments_done:
+#     """
+#     Touch flag file upon group completion
+#     """
+#     input: 
+#         "results/{sample}/fragments/fragments.tsv.gz",
+#         "results/{sample}/fragments/fragments.tsv.gz.tbi",
+#         "results/{sample}/fragments/fragments.tar.gz",
+#         "results/{sample}/fragments/barcode_pairs_multiplets.tsv",
+#         "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
+#         "results/{sample}/fragments/multiplet_barcodes_status.tsv",
+#         "results/{sample}/fragments/multiplets_threshold_plot.png",
+#         "results/{sample}/fragments/multiplet_stats.txt"
+#     output:
+#         touch("results/{sample}/fragments/fragments.done")
+#     # group: 
+#     #     "fragments"

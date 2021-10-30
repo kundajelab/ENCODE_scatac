@@ -77,15 +77,15 @@ rule samstats_raw:
         "samtools view -o - {input} | " 
         "SAMstats --sorted_sam_file - --outf {output} > {log}"
 
-rule mapping_done:
-    """
-    Touch flag file upon group completion
-    """
-    input: 
-        "results/{sample}/mapping/raw.bam",
-        "results/{sample}/mapping/raw_collated.bam", 
-        "results/{sample}/mapping/samstats_raw.txt"
-    output:
-        touch("results/{sample}/mapping/mapping.done")
-    # group: 
-    #     "mapping"
+# rule mapping_done:
+#     """
+#     Touch flag file upon group completion
+#     """
+#     input: 
+#         "results/{sample}/mapping/raw.bam",
+#         "results/{sample}/mapping/raw_collated.bam", 
+#         "results/{sample}/mapping/samstats_raw.txt"
+#     output:
+#         touch("results/{sample}/mapping/mapping.done")
+#     # group: 
+#     #     "mapping"

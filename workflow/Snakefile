@@ -78,22 +78,41 @@ localrules:
     fetch_index,
     unzip_index,
     idx_prefix_placeholder,
-    fastqs_done,
-    mapping_done,
-    filtering_done,
-    fragments_done,
-    analyses_done
 
 rule all:
     """
     Generate all outputs (default)
     """
     input: 
-        expand("results/{sample}/fastqs/fastqs.done", sample=samples),
-        expand("results/{sample}/mapping/mapping.done", sample=samples),
-        expand("results/{sample}/filtering/filtering.done", sample=samples),
-        expand("results/{sample}/fragments/fragments.done", sample=samples),
-        expand("results/{sample}/analyses/analyses.done", sample=samples)
+        expand("results/{sample}/fastqs/R1_trim.fastq.gz", sample=samples),
+        expand("results/{sample}/fastqs/R2_trim.fastq.gz", sample=samples),
+        expand("results/{sample}/fastqs/barcode_revcomp.txt", sample=samples),
+        expand("results/{sample}/fastqs/barcode_matching.tsv", sample=samples), 
+        expand("results/{sample}/fastqs/trim_adapters.txt", sample=samples),
+        expand("results/{sample}/mapping/raw.bam", sample=samples),
+        expand("results/{sample}/mapping/raw_collated.bam", sample=samples),
+        expand("results/{sample}/mapping/samstats_raw.txt", sample=samples),
+        expand("results/{sample}/filtering/filtered.bam", sample=samples),
+        expand("results/{sample}/filtering/filtered.bam.bai", sample=samples),
+        expand("results/{sample}/filtering/frac_mito.tsv", sample=samples),
+        expand("results/{sample}/filtering/markdup.txt", sample=samples),
+        expand("results/{sample}/filtering/pbc_stats.tsv", sample=samples),
+        expand("results/{sample}/filtering/samstats_filtered.txt", sample=samples),
+        expand("results/{sample}/fragments/fragments.tsv.gz", sample=samples),
+        expand("results/{sample}/fragments/fragments.tsv.gz.tbi", sample=samples),
+        expand("results/{sample}/fragments/fragments.tar.gz", sample=samples),
+        expand("results/{sample}/fragments/barcode_pairs_multiplets.tsv", sample=samples),
+        expand("results/{sample}/fragments/barcode_pairs_expanded.tsv.gz", sample=samples),
+        expand("results/{sample}/fragments/multiplet_barcodes_status.tsv", sample=samples),
+        expand("results/{sample}/fragments/multiplets_threshold_plot.png", sample=samples),
+        expand("results/{sample}/fragments/multiplet_stats.txt", sample=samples),
+        expand("results/{sample}/analyses/archr_project.tar.gz", sample=samples),
+        expand("results/{sample}/analyses/archr_doublet_summary.pdf", sample=samples),
+        expand("results/{sample}/analyses/archr_doublet_summary.tsv", sample=samples),
+        expand("results/{sample}/analyses/archr_fragment_size_distribution.pdf", sample=samples),
+        expand("results/{sample}/analyses/archr_pre_filter_metadata.tsv", sample=samples),
+        expand("results/{sample}/analyses/archr_tss_by_unique_frags.pdf", sample=samples)
+
 
 rule fetch_inputs:
     """
