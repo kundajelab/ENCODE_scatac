@@ -88,18 +88,18 @@ rule parse_archr_qc:
         "../scripts/parse_archr_qc.R"
 
 
-rule analyses_done:
-    """
-    Touch flag file upon group completion
-    """
-    input: 
-        "results/{sample}/analyses/archr_project.tar.gz",
-        "results/{sample}/analyses/archr_doublet_summary.pdf",
-        "results/{sample}/analyses/archr_doublet_summary.tsv", 
-        "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
-        "results/{sample}/analyses/archr_pre_filter_metadata.tsv",
-        "results/{sample}/analyses/archr_tss_by_unique_frags.pdf",
-    output:
-        touch("results/{sample}/analyses/analyses.done")
+# rule analyses_done:
+#     """
+#     Touch flag file upon group completion
+#     """
+#     input: 
+#         "results/{sample}/analyses/archr_project.tar.gz",
+#         "results/{sample}/analyses/archr_doublet_summary.pdf",
+#         "results/{sample}/analyses/archr_doublet_summary.tsv", 
+#         "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
+#         "results/{sample}/analyses/archr_pre_filter_metadata.tsv",
+#         "results/{sample}/analyses/archr_tss_by_unique_frags.pdf",
+#     output:
+#         touch("results/{sample}/analyses/analyses.done")
     # group: 
     #     "analyses"
