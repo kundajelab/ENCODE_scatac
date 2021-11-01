@@ -452,7 +452,7 @@ def parse_archr_qc(dt, df, fs, pf, tu):
                 entries = line.rstrip('\n').split('\t')
                 lens.append(to_int(entries[len_ind]))
                 enrs.append(to_float(entries[enr_ind]))
-        result["num_barcodes_considered"] = len(lens)
+        result["_num_barcodes_considered"] = len(lens)
         result["median_fragment_count"] = median(lens)
         result["median_tss_enrichment"] = median(enrs)
 
@@ -484,7 +484,7 @@ def parse_counts_summary_qc(rd, ar, af, lc, nl, an):
         result['barcodes_non_multiplet'] = d['final_barcode_count']
     with open(an, 'r') as f:
         d = json.load(f)
-        result['barcodes_archr'] = d['num_barcodes_considered']
+        result['barcodes_archr'] = d['_num_barcodes_considered']
 
     return result
 
