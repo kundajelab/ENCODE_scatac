@@ -217,11 +217,11 @@ def parse_flagstat_qc(txt):
                 and 'NA' not in mapped_pct:
             if '%' in mapped_pct:
                 mapped_pct = mapped_pct.replace('%', '')
-                result['pct_mapped_reads'] = float(mapped_pct)
+                result['frac_mapped_reads'] = float(mapped_pct) / 100.
             else:
-                result['pct_mapped_reads'] = 100.0 * float(mapped_pct)
+                result['frac_mapped_reads'] = float(mapped_pct)
         else:
-            result['pct_mapped_reads'] = 0.0
+            result['frac_mapped_reads'] = 0.0
     if paired:
         result['paired_reads'] = int(paired)
     if paired_qc_failed:
@@ -245,13 +245,12 @@ def parse_flagstat_qc(txt):
                 and 'NA' not in paired_properly_pct:
             if '%' in paired_properly_pct:
                 paired_properly_pct = paired_properly_pct.replace('%', '')
-                result['pct_properly_paired_reads'] = float(
-                    paired_properly_pct)
+                result['frac_properly_paired_reads'] = float(paired_properly_pct) / 100.
             else:
-                result['pct_properly_paired_reads'] = 100.0 * \
-                    float(paired_properly_pct)
+                result['frac_properly_paired_reads'] = float(paired_properly_pct)
+                    
         else:
-            result['pct_properly_paired_reads'] = 0.0
+            result['frac_properly_paired_reads'] = 0.0
     if with_itself:
         result['with_itself'] = int(with_itself)
     if with_itself_qc_failed:
@@ -265,11 +264,11 @@ def parse_flagstat_qc(txt):
                 and 'NA' not in singletons_pct:
             if '%' in singletons_pct:
                 singletons_pct = singletons_pct.replace('%', '')
-                result['pct_singletons'] = float(singletons_pct)
+                result['frac_singletons'] = float(singletons_pct) / 1000.
             else:
-                result['pct_singletons'] = 100.0 * float(singletons_pct)
+                result['frac_singletons'] = float(singletons_pct)
         else:
-            result['pct_singletons'] = 0.0
+            result['frac_singletons'] = 0.0
     if diff_chroms:
         result['diff_chroms'] = int(diff_chroms)
     if diff_chroms_qc_failed:
@@ -355,7 +354,7 @@ def parse_dup_qc(txt):
     if paired_opt_dupes:
         result['paired_optical_duplicate_reads'] = int(paired_opt_dupes)
     if dupes_pct:
-        result['pct_duplicate_reads'] = float(dupes_pct)*100.0
+        result['frac_duplicate_reads'] = float(dupes_pct)
     return result
 
 
@@ -453,11 +452,39 @@ def parse_archr_qc(dt, df, fs, pf, tu):
                 entries = line.rstrip('\n').split('\t')
                 lens.append(to_int(entries[len_ind]))
                 enrs.append(to_float(entries[enr_ind]))
+        result["num_barcodes_considered"] = len(lens)
         result["median_fragment_count"] = median(lens)
         result["median_tss_enrichment"] = median(enrs)
 
     if os.path.getsize(tu) > 0:
         result["archr_tss_by_unique_frags"] = {"path": os.path.abspath(tu)}
+
+    return result
+
+
+def parse_counts_summary_qc(rd, ar, af, lc, nl, an):
+    result = OrderedDict()
+    with open(rd, 'r') as f:
+        d = json.load(f)
+        result['reads_original'] = d['num_reads_total']
+        result['reads_barcode_matched'] = d['num_reads_matched']
+    with open(ar, 'r') as f:
+        d = json.load(f)
+        result['reads_mapped'] = d['mapped_reads']
+    with open(af, 'r') as f:
+        d = json.load(f)
+        result['reads_non_mito'] = d['non_mito_reads']
+        result['reads_nodup'] = d['mapped_reads']
+    with open(lc, 'r') as f:
+        d = json.load(f)
+        result['reads_primary_align'] = d['paired_reads']
+    with open(nl, 'r') as f:
+        d = json.load(f)
+        result['barcodes_fragments'] = d['original_barcode_count']
+        result['barcodes_non_multiplet'] = d['final_barcode_count']
+    with open(an, 'r') as f:
+        d = json.load(f)
+        result['barcodes_archr'] = d['num_barcodes_considered']
 
     return result
 
