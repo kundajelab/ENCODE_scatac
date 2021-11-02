@@ -16,7 +16,8 @@ rule metadata_fastq:
         r2 = "metadata/{sample}/R2_trim_metadata.json"
     params:
         output_group = "fastqs",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 
@@ -38,7 +39,8 @@ rule metadata_qc_reads:
         read_stats = "metadata/{sample}/reads_qc_metadata.json",
     params:
         output_group = "fastqs",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 
@@ -59,7 +61,8 @@ rule metadata_bam_raw:
         "metadata/{sample}/raw_bam_metadata.json"
     params:
         output_group = "mapping",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 
@@ -79,7 +82,8 @@ rule metadata_qc_alignments_raw:
         alignment_stats = "metadata/{sample}/alignments_raw_qc_metadata.json"
     params:
         output_group = "mapping",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 
@@ -100,7 +104,8 @@ rule metadata_bam_filtered:
         "metadata/{sample}/filtered_bam_metadata.json",
     params:
         output_group = "filtering",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 
@@ -124,7 +129,8 @@ rule metadata_qc_alignments_filtered:
         lib_comp_stats = "metadata/{sample}/alignments_lib_comp_qc_metadata.json"
     params:
         output_group = "filtering",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 
@@ -144,7 +150,8 @@ rule metadata_fragments:
         "metadata/{sample}/fragments_metadata.json"
     params:
         output_group = "fragments",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 
@@ -167,7 +174,8 @@ rule metadata_qc_fragments:
         fragments_stats = "metadata/{sample}/fragments_qc_metadata.json"
     params:
         output_group = "fragments",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 
@@ -187,7 +195,8 @@ rule metadata_analyses:
         "metadata/{sample}/analyses_metadata.json",
     params:
         output_group = "analyses",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 
@@ -211,7 +220,8 @@ rule metadata_qc_analyses:
         analyses_stats = "metadata/{sample}/analyses_qc_metadata.json",
     params:
         output_group = "analyses",
-        sample_data = lambda w: sample_data[w.sample]
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
     conda:
         "../envs/portal.yaml"
     group: 

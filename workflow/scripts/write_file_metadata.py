@@ -3,7 +3,7 @@ import json
 import os
 
 
-def file_header(sample_data, config, out_path, preds, step_run, parse_preds=True):
+def file_header(sample_data, sample_name, config, out_path, preds, step_run, parse_preds=True):
     lab = config["dcc_lab"]
     experiment = sample_data["experiment"]
     replicate = sample_data["replicate_num"]
@@ -13,6 +13,7 @@ def file_header(sample_data, config, out_path, preds, step_run, parse_preds=True
     else:
         pred_ids = preds
     h = OrderedDict({
+        "_sample": sample_name,
         "lab": lab,
         "award": config["dcc_award"],
         "dataset": experiment,
@@ -70,6 +71,7 @@ def write_json(data, out_path):
 try:
     out_group = snakemake.params['output_group']
     sample_data = snakemake.params['sample_data']
+    sample_name = snakemake.params['sample']
     config = snakemake.config
 
     if out_group == "fastqs":
@@ -82,8 +84,8 @@ try:
 
         preds = [i for j in sample_data["accessions"].values() for i in j]
         
-        h1 = file_header(sample_data, config, r1, preds, step_run, parse_preds=False)
-        h2 = file_header(sample_data, config, r2, preds, step_run, parse_preds=False)
+        h1 = file_header(sample_data, sample_name, config, r1, preds, step_run, parse_preds=False)
+        h2 = file_header(sample_data, sample_name, config, r2, preds, step_run, parse_preds=False)
 
         d1 = fastq_metadata(sample_data, "1", h2["aliases"][0])
         d2 = fastq_metadata(sample_data, "2", h1["aliases"][0])
@@ -102,7 +104,7 @@ try:
         r2_pred = snakemake.input['fq_R2']
         out, = snakemake.output
 
-        h = file_header(sample_data, config, bam, [r1_pred, r2_pred], step_run)
+        h = file_header(sample_data, sample_name, config, bam, [r1_pred, r2_pred], step_run)
         d = bam_metadata(sample_data)
         s = h | d
 
@@ -116,7 +118,7 @@ try:
         r2_pred = snakemake.input['fq_R2']
         out, = snakemake.output
 
-        h = file_header(sample_data, config, bam, [r1_pred, r2_pred], step_run)
+        h = file_header(sample_data, sample_name, config, bam, [r1_pred, r2_pred], step_run)
         d = bam_metadata(sample_data)
         s = h | d
 
@@ -129,7 +131,7 @@ try:
         pred = snakemake.input['bam']
         out, = snakemake.output
 
-        h = file_header(sample_data, config, fragments, [pred], step_run)
+        h = file_header(sample_data, sample_name, config, fragments, [pred], step_run)
         d = fragments_metadata(sample_data)
         s = h | d
 
@@ -142,7 +144,7 @@ try:
         pred = snakemake.input['fragments']
         out, = snakemake.output
 
-        h = file_header(sample_data, config, tarball, [pred], step_run)
+        h = file_header(sample_data, sample_name, config, tarball, [pred], step_run)
         d = analyses_metadata(sample_data)
         s = h | d
 

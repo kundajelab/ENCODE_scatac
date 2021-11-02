@@ -1,5 +1,6 @@
 import os
 import json
+import statistics
 from urllib.parse import urljoin
 import encode_utils as eu
 from encode_utils.connection import Connection
@@ -31,7 +32,7 @@ for rep in data["replicates"]:
         replicate_id = rep["uuid"]
 
 platform = None
-read_length = None
+read_lengths = []
 files = data["files"]
 for f in files:
     id = f["@id"]
@@ -52,14 +53,17 @@ for f in files:
         continue
     
     l = f["read_length"]
-    if read_length is not None and l != read_length:
-        raise ValueError("Multiple read lengths detected in input")
-    read_length = l
+    read_lengths.append(l)
 
     if f["paired_end"] == "1":
         r1[id] = f
     elif f["paired_end"] == "2":
         r2[id] = f
+
+if max(read_lengths) - min(read_lengths) > 4:
+    raise ValueError("Inconsistent read lengths in input FASTQs")
+
+read_length = statistics.median_low(read_lengths)
 
 out_data = {
     "experiment": experiment,

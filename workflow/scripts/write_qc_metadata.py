@@ -489,13 +489,14 @@ def parse_counts_summary_qc(rd, ar, af, lc, nl, an):
     return result
 
 
-def build_quality_metric_header(sample_data, config, data_paths, out_path, step_run):
+def build_quality_metric_header(sample_data, sample_name, config, data_paths, out_path, step_run):
     lab = config["dcc_lab"]
     experiment = sample_data["experiment"]
     replicate = sample_data["replicate_num"]
     data_aliases = [f"{lab}:{experiment}${replicate}${os.path.basename(p)}" for p in data_paths]
     alias = f"{lab}:{experiment}${replicate}${os.path.basename(out_path)}"
     h = OrderedDict({
+        "_sample": sample_name,
         "lab": lab,
         "award": config["dcc_award"],
         "quality_metric_of": data_aliases,
@@ -513,6 +514,7 @@ def write_json(data, out_path):
 try:
     out_group = snakemake.params['output_group']
     sample_data = snakemake.params['sample_data']
+    sample_name = snakemake.params['sample']
     config = snakemake.config
 
     if out_group == "fastqs":
@@ -527,7 +529,7 @@ try:
         m = parse_barcode_matching_qc(barcode_matching)
         a = parse_adapter_trimming_qc(adapter_trimming)
         r = parse_barcode_revcomp_qc(barcode_revcomp)
-        h = build_quality_metric_header(sample_data, config, data_paths, read_stats_out, step_run)
+        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, read_stats_out, step_run)
         read_stats = h | m | a | r
 
         write_json(read_stats, read_stats_out)
@@ -540,7 +542,7 @@ try:
         data_paths = [snakemake.input['data_file']]
 
         a = parse_flagstat_qc(samstats_raw)
-        h = build_quality_metric_header(sample_data, config, data_paths, alignment_stats_out, step_run)
+        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, alignment_stats_out, step_run)
         alignment_stats = h | a
 
         write_json(alignment_stats, alignment_stats_out)
@@ -560,8 +562,8 @@ try:
         p = parse_dup_qc(picard_markdup)
         l = parse_lib_complexity_qc(pbc_stats)
         m = parse_frac_mito_qc(frac_mito)
-        ha = build_quality_metric_header(sample_data, config, data_paths, alignment_stats_out, step_run)
-        hl = ha = build_quality_metric_header(sample_data, config, data_paths, lib_comp_stats_out, step_run)
+        ha = build_quality_metric_header(sample_data, sample_name, config, data_paths, alignment_stats_out, step_run)
+        hl = ha = build_quality_metric_header(sample_data, sample_name, config, data_paths, lib_comp_stats_out, step_run)
         alignment_stats = ha | s | m
         lib_comp_stats = hl | p | l
 
@@ -587,7 +589,7 @@ try:
             multiplets_thresh
         )
 
-        h = build_quality_metric_header(sample_data, config, data_paths, fragments_stats_out, step_run)
+        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, fragments_stats_out, step_run)
         fragments_stats = h | m
 
         write_json(fragments_stats, fragments_stats_out)
@@ -610,7 +612,7 @@ try:
             archr_pre_filter_metadata, 
             archr_tss_by_unique_frags
         )
-        h = build_quality_metric_header(sample_data, config, data_paths, analyses_stats_out, step_run)
+        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, analyses_stats_out, step_run)
         analyses_stats = h | f
 
         write_json(analyses_stats, analyses_stats_out)
