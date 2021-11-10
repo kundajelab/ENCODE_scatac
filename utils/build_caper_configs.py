@@ -17,6 +17,7 @@ TEMPLATE = {
 
 def build_caper_config(sample, genome, bucket, out_dir):
     config = TEMPLATE.copy()
+    config["title"] = sample
     config["atac.nodup_bams"] = [f"gs://{bucket}/results/{sample}/filtering/filtered.bam"]
     config["atac.genome_tsv"] = GENOME_PATHS[genome]
     
