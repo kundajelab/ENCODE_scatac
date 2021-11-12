@@ -63,6 +63,7 @@ def read_completed(completed_path):
 def build_configs(sample_path, bucket, out_dir, completed_path):
     os.makedirs(out_dir, exist_ok=True)
     completed = read_completed(completed_path)
+    print(completed)
     samples = load_samples(sample_path)
     for s in samples:
         exp, rep, _, gen = s
