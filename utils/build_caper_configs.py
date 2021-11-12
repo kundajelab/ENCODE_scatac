@@ -53,16 +53,27 @@ def load_samples(sample_path):
             samples.append(data)
     return samples
 
-def build_configs(sample_path, bucket, out_dir):
+def read_completed(completed_path):
+    completed = set()
+    with open(completed_path) as f:
+        for line in f:
+            completed.add(line)
+    return completed
+
+def build_configs(sample_path, bucket, out_dir, completed_path):
     os.makedirs(out_dir, exist_ok=True)
+    completed = read_completed(completed_path)
     samples = load_samples(sample_path)
     for s in samples:
         exp, rep, _, gen = s
         name = f"{exp}-{rep}"
+        if name in completed:
+            continue
         build_caper_config(name, gen, bucket, out_dir)
 
 if __name__ == '__main__':
     sample_path = sys.argv[1]
     bucket = sys.argv[2]
     out_dir = sys.argv[3]
-    build_configs(sample_path, bucket, out_dir)
+    completed = sys.argv[4]
+    build_configs(sample_path, bucket, out_dir, completed)
