@@ -82,6 +82,8 @@ localrules:
     idx_prefix_placeholder,
     move_index_files
 
+ruleorder: extract_index > idx_prefix_placeholder
+
 rule all:
     """
     Generate all outputs (default)
