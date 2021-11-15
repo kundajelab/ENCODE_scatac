@@ -235,10 +235,12 @@ rule fetch_index:
         lambda w: HTTP.remote(config["genome"][w.genome_name]["bwt2_idx"], insecure=(not config["idx_https"]))
     output:
         "bwt2_idx/zipped/{genome_name}.tar.gz"
+    params:
+        url = lambda w: HTTP.remote(config["genome"][w.genome_name]["bwt2_idx"], insecure=(not config["idx_https"]))
     conda:
         "envs/portal.yaml"
     shell:
-        "mv {input} {output}"
+        "curl --no-progress-meter -L {params.url} > {output}"
 
 rule decompress_index:
     """
