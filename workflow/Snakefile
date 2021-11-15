@@ -234,7 +234,7 @@ rule fetch_index:
     input:
         lambda w: HTTP.remote(config["genome"][w.genome_name]["bwt2_idx"], insecure=(not config["idx_https"]))
     output:
-        "bwt2_idx/zipped/{genome_name}.zip"
+        "bwt2_idx/zipped/{genome_name}.tar.gz"
     conda:
         "envs/portal.yaml"
     shell:
