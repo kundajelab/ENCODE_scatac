@@ -80,6 +80,7 @@ localrules:
     decompress_index,
     extract_index,
     idx_prefix_placeholder,
+    move_index_files
 
 rule all:
     """
@@ -288,3 +289,17 @@ rule idx_prefix_placeholder:
     """
     output:
         touch("bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}")
+
+def get_idx_files_all(w):
+    return [
+        os.path.join("bwt2_idx", "unpacked", k, f"{v['bwt2_idx_prefix']}.{s}.bt2") 
+        for s in ["1", "2", "3", "4", "rev.1", "rev.2"]
+        for k, v in config["genome"].items()
+    ]
+
+rule move_index_files:
+    """
+    Move index files to final location
+    """
+    input:
+        get_idx_files_all
