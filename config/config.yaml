@@ -13,12 +13,12 @@ bc_https: False
 
 genome:
   GRCh38:
-    bwt2_idx: genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
-    bwt2_idx_prefix: GRCh38_noalt_as
+    bwt2_idx: www.encodeproject.org/files/ENCFF110MCL/@@download/ENCFF110MCL.tar.gz
+    bwt2_idx_prefix: GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta
     archr_genome: hg38
   mm10:
-    bwt2_idx: genome-idx.s3.amazonaws.com/bt/mm10.zip
-    bwt2_idx_prefix: mm10
+    bwt2_idx: www.encodeproject.org/files/ENCFF309GLL/@@download/ENCFF309GLL.tar.gz
+    bwt2_idx_prefix: mm10_no_alt_analysis_set_ENCODE.fasta
     archr_genome: mm10
 idx_https: True
 multimapping: 4

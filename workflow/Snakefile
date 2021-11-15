@@ -113,6 +113,33 @@ rule all:
         expand("results/{sample}/analyses/archr_pre_filter_metadata.tsv", sample=samples),
         expand("results/{sample}/analyses/archr_tss_by_unique_frags.pdf", sample=samples)
 
+rule fragments:
+    """
+    Generate all outputs up to fragment files
+    """
+    input: 
+        expand("results/{sample}/fastqs/R1_trim.fastq.gz", sample=samples),
+        expand("results/{sample}/fastqs/R2_trim.fastq.gz", sample=samples),
+        expand("results/{sample}/fastqs/barcode_revcomp.txt", sample=samples),
+        expand("results/{sample}/fastqs/barcode_matching.tsv", sample=samples), 
+        expand("results/{sample}/fastqs/trim_adapters.txt", sample=samples),
+        expand("results/{sample}/mapping/raw.bam", sample=samples),
+        expand("results/{sample}/mapping/raw_collated.bam", sample=samples),
+        expand("results/{sample}/mapping/samstats_raw.txt", sample=samples),
+        expand("results/{sample}/filtering/filtered.bam", sample=samples),
+        expand("results/{sample}/filtering/filtered.bam.bai", sample=samples),
+        expand("results/{sample}/filtering/frac_mito.tsv", sample=samples),
+        expand("results/{sample}/filtering/markdup.txt", sample=samples),
+        expand("results/{sample}/filtering/pbc_stats.tsv", sample=samples),
+        expand("results/{sample}/filtering/samstats_filtered.txt", sample=samples),
+        expand("results/{sample}/fragments/fragments.tsv.gz", sample=samples),
+        expand("results/{sample}/fragments/fragments.tsv.gz.tbi", sample=samples),
+        expand("results/{sample}/fragments/fragments.tar.gz", sample=samples),
+        expand("results/{sample}/fragments/barcode_pairs_multiplets.tsv", sample=samples),
+        expand("results/{sample}/fragments/barcode_pairs_expanded.tsv.gz", sample=samples),
+        expand("results/{sample}/fragments/multiplet_barcodes_status.tsv", sample=samples),
+        expand("results/{sample}/fragments/multiplets_threshold_plot.png", sample=samples),
+        expand("results/{sample}/fragments/multiplet_stats.txt", sample=samples)
 
 rule fetch_inputs:
     """
@@ -210,20 +237,48 @@ rule fetch_index:
     shell:
         "mv {input} {output}"
 
-rule unzip_index:
+rule decompress_index:
     """
-    Unzip Bowtie2 index files
+    Decompress Bowtie2 index archive
     """
     input:
-        "bwt2_idx/zipped/{genome_name}.zip"
+        "bwt2_idx/zipped/{genome_name}.tar.gz"
     output:
-        "bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}.{file}.bt2"
-    params:
-        ind = lambda w: f"*{w.bwt2_prefix}.{w.file}.bt2"
+        "bwt2_idx/zipped/{genome_name}.tar"
     conda:
         "envs/portal.yaml"
     shell:
-        "unzip -p {input} '{params.ind}' > {output}"
+        "gunzip -c {input} > {output}"
+
+rule extract_index:
+    """
+    Extract index files from tarball
+    """
+    input:
+        "bwt2_idx/zipped/{genome_name}.tar"
+    output:
+        "bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}.{file}.bt2"
+    params:
+        ind = lambda w: f"{w.bwt2_prefix}.{w.file}.bt2"
+    conda:
+        "envs/portal.yaml"
+    shell:
+        "tar -xOf {input} '{params.ind}' > {output}"
+
+# rule unzip_index:
+#     """
+#     Unzip Bowtie2 index files
+#     """
+#     input:
+#         "bwt2_idx/zipped/{genome_name}.zip"
+#     output:
+#         "bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}.{file}.bt2"
+#     params:
+#         ind = lambda w: f"*{w.bwt2_prefix}.{w.file}.bt2"
+#     conda:
+#         "envs/portal.yaml"
+#     shell:
+#         "unzip -p {input} '{params.ind}' > {output}"
 
 rule idx_prefix_placeholder:
     """
