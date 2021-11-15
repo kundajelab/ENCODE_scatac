@@ -231,12 +231,10 @@ rule fetch_index:
     """
     Fetch Bowtie2 index archive
     """
-    input:
-        lambda w: HTTP.remote(config["genome"][w.genome_name]["bwt2_idx"], insecure=(not config["idx_https"]))
     output:
         "bwt2_idx/zipped/{genome_name}.tar.gz"
     params:
-        url = lambda w: HTTP.remote(config["genome"][w.genome_name]["bwt2_idx"], insecure=(not config["idx_https"]))
+        url = lambda w: config["genome"][w.genome_name]["bwt2_idx"]
     conda:
         "envs/portal.yaml"
     shell:
