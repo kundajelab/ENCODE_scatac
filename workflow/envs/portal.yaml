@@ -9,7 +9,7 @@ dependencies:
   - conda-forge::jsonschema=3.2.0
   - conda-forge::requests=2.26.0
   - conda-forge::urllib3=1.26.6
-  - conda-forge::unzip=6.0
+  - conda-forge::curl=7.79.1
   - conda-forge::pip=21.2.3
   - pip:
      - encode-utils==2.10.0
