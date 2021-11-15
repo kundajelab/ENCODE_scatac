@@ -260,7 +260,7 @@ rule extract_index:
     input:
         "bwt2_idx/zipped/{genome_name}.tar"
     output:
-        "bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}.{file}.bt2"
+        "bwt2_idx/unpacked/{genome_name}/{bwt2_prefix}.{file}.bt2"
     params:
         ind = lambda w: f"{w.bwt2_prefix}.{w.file}.bt2"
     conda:
@@ -288,7 +288,7 @@ rule idx_prefix_placeholder:
     Create Bowtie2 index prefix dummy file
     """
     output:
-        touch("bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}")
+        touch("bwt2_idx/unpacked/{genome_name}/{bwt2_prefix}")
 
 def get_idx_files_all(w):
     return [
