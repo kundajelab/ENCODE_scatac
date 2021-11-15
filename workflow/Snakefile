@@ -70,13 +70,15 @@ include:
 
 localrules: 
     all, 
+    fragments,
     build_metadata, 
     fetch_inputs,
     submit, 
     query_portal,
     fetch_whitelist,
     fetch_index,
-    unzip_index,
+    decompress_index,
+    extract_index,
     idx_prefix_placeholder,
 
 rule all:
