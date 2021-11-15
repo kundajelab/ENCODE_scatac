@@ -76,6 +76,7 @@ localrules:
     submit, 
     query_portal,
     fetch_whitelist,
+    move_whitelist,
     fetch_index,
     decompress_index,
     extract_index,
@@ -228,6 +229,13 @@ rule fetch_whitelist:
         "envs/portal.yaml"
     shell:
         "mv {input} {output}"
+
+rule move_whitelist:
+    """
+    Move barcode whitelist files to final location
+    """
+    input:
+        lambda w: [f"bc_whitelists/{k}.txt.gz" for k in config["bc_whitelist"].keys()]
 
 rule fetch_index:
     """
