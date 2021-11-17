@@ -21,7 +21,7 @@ addArchRVerbose(verbose = FALSE)
 Sys.setenv("HDF5_USE_FILE_LOCKING" = "FALSE")
 Sys.setenv("RHDF5_USE_FILE_LOCKING" = "FALSE")
 
-build_archr_project <- function(arrow_sample_name, input_paths, output_paths, threads, log_paths, bsgenome_name, seed) {
+build_archr_project <- function(arrow_sample_name, input_paths, output_paths, threads, log_paths, bsgenome_name, gene_anno_name, seed) {
     set.seed(seed)
 
     blacklist_path <- input_paths[["blacklist"]]
@@ -44,7 +44,8 @@ build_archr_project <- function(arrow_sample_name, input_paths, output_paths, th
     )
 
     gene_anno_path <- input_paths[["gene_anno"]]
-    gene_annotation <- load(gene_anno_path)
+    load(gene_anno_path)
+    gene_annotation <- get(gene_anno_name)
 
     addArchRThreads(threads = threads)
     # addArchRGenome(genome)
@@ -218,7 +219,7 @@ build_archr_project <- function(arrow_sample_name, input_paths, output_paths, th
 
 }
 
-build_archr_project(snakemake@params[["sample_name"]], snakemake@input, snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["bsgenome"]], snakemake@params[["seed"]])
+build_archr_project(snakemake@params[["sample_name"]], snakemake@input, snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["bsgenome"]], snakemake@params[["gene_anno"]], snakemake@params[["seed"]])
 
 sink(type = "message")
 sink()
