@@ -17,14 +17,14 @@ genome:
     bwt2_idx_prefix: GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta
     blacklist: https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz
     bsgenome: http://mitra.stanford.edu/kundaje/surag/ENCODE_scatac/BSgenome/BSgenome.Hsapiens.ENCODE.GRCh38/BSgenome.Hsapiens.ENCODE.GRCh38_1.0.0.tar.gz
-    bsgenome_name: BSgenome.Hsapiens.ENCODE.GRCh38_1.0.0
+    bsgenome_name: BSgenome.Hsapiens.ENCODE.GRCh38
     archr_gene_anno: https://github.com/GreenleafLab/ArchR/raw/v1.0.1/data/geneAnnoHg38.rda
   mm10:
     bwt2_idx: https://www.encodeproject.org/files/ENCFF309GLL/@@download/ENCFF309GLL.tar.gz
     bwt2_idx_prefix: mm10_no_alt_analysis_set_ENCODE.fasta
     blacklist: https://www.encodeproject.org/files/ENCFF547MET/@@download/ENCFF547MET.bed.gz
     bsgenome: http://mitra.stanford.edu/kundaje/surag/ENCODE_scatac/BSgenome/BSgenome.Mmusculus.ENCODE.mm10/BSgenome.Mmusculus.ENCODE.mm10_1.0.0.tar.gz
-    bsgenome_name: BSgenome.Mmusculus.ENCODE.mm10_1.0.0
+    bsgenome_name: BSgenome.Mmusculus.ENCODE.mm10
     archr_gene_anno: https://github.com/GreenleafLab/ArchR/raw/v1.0.1/data/geneAnnoMm10.rda
 multimapping: 4
 

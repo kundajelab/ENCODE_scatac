@@ -30,7 +30,7 @@ build_archr_project <- function(arrow_sample_name, input_paths, output_paths, th
     blacklist <- GRanges(regions)
 
     bsgenome_path <- input_paths[["bsgenome"]]
-    install.packages(bsgenome_path, repos = NULL, type= "source")
+    install.packages(bsgenome_path, repos = NULL, type = "source")
     library(bsgenome_name, character.only = TRUE)
     genome_annotation <- createGenomeAnnotation(
         genome = get(bsgenome_name),
