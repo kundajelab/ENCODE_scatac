@@ -325,7 +325,7 @@ rule fetch_blacklist:
     output:
         "blacklists/{genome_name}.bed"
     params:
-        url = lambda w: config["genome"][w.genome_name]["bwt2_idx"]
+        url = lambda w: config["genome"][w.genome_name]["blacklist"]
     conda:
         "envs/portal.yaml"
     shell:

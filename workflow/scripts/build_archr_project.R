@@ -25,13 +25,13 @@ build_archr_project <- function(arrow_sample_name, input_paths, output_paths, th
     set.seed(seed)
 
     blacklist_path <- input_paths[["blacklist"]]
-    regions <- read.table(blacklist_path, sep='\t', header=F)
+    regions <- read.table(blacklist_path, sep = '\t', header = FALSE)
     colnames(regions) <- c('chr','start','end')
     blacklist <- GRanges(regions)
 
     bsgenome_path <- input_paths[["bsgenome"]]
     install.packages(bsgenome_path, repos = NULL, type= "source")
-    library(bsgenome_name, character.only=TRUE)
+    library(bsgenome_name, character.only = TRUE)
     genome_annotation <- createGenomeAnnotation(
         genome = get(bsgenome_name),
         blacklist = blacklist
