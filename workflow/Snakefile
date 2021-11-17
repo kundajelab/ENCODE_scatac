@@ -349,7 +349,7 @@ rule fetch_gene_anno:
     Fetch ArchR gene annotations
     """
     output:
-        "gene_anno/{genome_name}.rda"
+        "gene_anno/{genome_name}/{gene_anno}.rda"
     params:
         url = lambda w: config["genome"][w.genome_name]["archr_gene_anno"]
     conda:
@@ -363,7 +363,7 @@ def get_archr_files_all(w):
         p.extend([
             f"blacklists/{k}.bed",
             f"bsgenome/{k}/{config['genome'][k]['bsgenome_name']}.tar.gz",
-            f"gene_anno/{k}.rda"
+            f"gene_anno/{k}/{config['genome'][k]['gene_anno_name']}.rda"
         ])
     return p
 

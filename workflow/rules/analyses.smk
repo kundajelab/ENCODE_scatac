@@ -7,6 +7,11 @@ def get_bsgenome(w):
     bsgenome = config["genome"][genome]["bsgenome_name"]
     return f"bsgenome/{genome}/{bsgenome}.tar.gz"
 
+def get_gene_anno(w):
+    genome = sample_config[w.sample]["genome"]
+    gene_anno = config["genome"][genome]["gene_anno_name"]
+    return f"bsgenome/{genome}/{gene_anno}.rda"
+
 rule archr_build:
     """
     ArchR analyses
@@ -29,6 +34,7 @@ rule archr_build:
     params:
         sample_name = lambda w: w.sample,
         bsgenome = lambda w: config["genome"][sample_config[w.sample]["genome"]]["bsgenome_name"],
+        gene_anno = lambda w: config["genome"][sample_config[w.sample]["genome"]]["gene_anno_name"],
         seed = config["archr_seed"],
     log:
         console = "logs/{sample}/analyses/archr/console.log",

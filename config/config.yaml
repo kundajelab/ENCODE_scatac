@@ -19,6 +19,7 @@ genome:
     bsgenome: http://mitra.stanford.edu/kundaje/surag/ENCODE_scatac/BSgenome/BSgenome.Hsapiens.ENCODE.GRCh38/BSgenome.Hsapiens.ENCODE.GRCh38_1.0.0.tar.gz
     bsgenome_name: BSgenome.Hsapiens.ENCODE.GRCh38
     archr_gene_anno: https://github.com/GreenleafLab/ArchR/raw/v1.0.1/data/geneAnnoHg38.rda
+    gene_anno_name: geneAnnoHg38
   mm10:
     bwt2_idx: https://www.encodeproject.org/files/ENCFF309GLL/@@download/ENCFF309GLL.tar.gz
     bwt2_idx_prefix: mm10_no_alt_analysis_set_ENCODE.fasta
@@ -26,6 +27,7 @@ genome:
     bsgenome: http://mitra.stanford.edu/kundaje/surag/ENCODE_scatac/BSgenome/BSgenome.Mmusculus.ENCODE.mm10/BSgenome.Mmusculus.ENCODE.mm10_1.0.0.tar.gz
     bsgenome_name: BSgenome.Mmusculus.ENCODE.mm10
     archr_gene_anno: https://github.com/GreenleafLab/ArchR/raw/v1.0.1/data/geneAnnoMm10.rda
+    gene_anno_name: geneAnnoMm10
 multimapping: 4
 
 tn5_shift_plus: 4
