@@ -32,13 +32,19 @@ build_archr_project <- function(arrow_sample_name, input_paths, output_paths, th
     bsgenome_path <- input_paths[["bsgenome"]]
     install.packages(bsgenome_path, repos = NULL, type = "source")
     library(bsgenome_name, character.only = TRUE)
+    bsgenome <- get(bsgenome_name)
+
+    chromSizes <- GRanges(names(seqlengths(bsgenome)), IRanges(1, seqlengths(bsgenome)))
+    seqlengths(chromSizes) <- end(chromSizes)
+
     genome_annotation <- createGenomeAnnotation(
-        genome = get(bsgenome_name),
+        genome = bsgenome,
+        chromSizes = chromSizes,
         blacklist = blacklist
     )
 
     gene_anno_path <- input_paths[["gene_anno"]]
-    gene_annotation <- readRDS(gene_anno_path)
+    gene_annotation <- load(gene_anno_path)
 
     addArchRThreads(threads = threads)
     # addArchRGenome(genome)

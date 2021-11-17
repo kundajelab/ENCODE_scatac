@@ -13,6 +13,7 @@ dependencies:
   - conda-forge::r-rio=0.5.27
   - bioconda::bioconductor-genomicranges=1.46.0
   - bioconda::bioconductor-bsgenome=1.62.0
+  - bioconda::bioconductor-iranges=2.28.0
   - bioconda::r-harmony=0.1
   - bioconda::macs2=2.2.7.1
   - austintwang::r-archr
