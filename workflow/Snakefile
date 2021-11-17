@@ -362,7 +362,7 @@ def get_archr_files_all(w):
     for k in config["genome"].keys():
         p.extend([
             f"blacklists/{k}.bed",
-            f"gene_anno/{k}/{config['genome'][k]['bsgenome_name']}.tar.gz",
+            f"bsgenome/{k}/{config['genome'][k]['bsgenome_name']}.tar.gz",
             f"gene_anno/{k}.rda"
         ])
     return p
