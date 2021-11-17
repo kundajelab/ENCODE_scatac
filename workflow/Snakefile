@@ -329,7 +329,7 @@ rule fetch_blacklist:
     conda:
         "envs/portal.yaml"
     shell:
-        "curl --no-progress-meter -L {params.url} | zcat | sort -k1,1V -k2,2n -k3,3n > {output}" 
+        "curl --no-progress-meter -L {params.url} | zcat | cat - <(echo chrX$'\\t'0$'\\t'1) | sort -k1,1V -k2,2n -k3,3n > {output}" 
 
 rule fetch_bsgenome:
     """
