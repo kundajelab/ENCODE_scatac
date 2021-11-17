@@ -10,7 +10,7 @@ def get_bsgenome(w):
 def get_gene_anno(w):
     genome = sample_config[w.sample]["genome"]
     gene_anno = config["genome"][genome]["gene_anno_name"]
-    return f"bsgenome/{genome}/{gene_anno}.rda"
+    return f"gene_anno/{genome}/{gene_anno}.rda"
 
 rule archr_build:
     """
