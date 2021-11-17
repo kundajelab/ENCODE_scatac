@@ -21,7 +21,7 @@ rule archr_build:
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi",
         blacklist = lambda w: f"blacklists/{sample_config[w.sample]['genome']}.bed",
         bsgenome = get_bsgenome,
-        gene_anno = lambda w: f"gene_anno/{sample_config[w.sample]['genome']}.rda",
+        gene_anno = get_gene_anno,
     output:
         project_tar = "results/{sample}/analyses/archr_project.tar.gz",
         qc_dir = temp(directory("temp/{sample}/analyses/qc")),
