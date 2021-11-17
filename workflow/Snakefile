@@ -81,7 +81,7 @@ localrules:
     decompress_index,
     extract_index,
     idx_prefix_placeholder,
-    move_index_file,
+    move_index_files,
     fetch_blacklist,
     fetch_bsgenome,
     fetch_gene_anno,
