@@ -9,6 +9,7 @@ sink(console_log, type = "message")
 # devtools::install_github("GreenleafLab/ArchR@2be1294eb1fbff364fb538d71f4f545ee4384d09", ref="master", repos = BiocManager::repositories(), dependencies = FALSE, INSTALL_opts = '--no-lock')
 # devtools::install_github("GreenleafLab/chromVARmotifs@38bed559c1f4770b6c91c80bf3f8ea965da26076", ref="master", repos = BiocManager::repositories(), dependencies = FALSE, INSTALL_opts = '--no-lock')
 
+library(GRanges)
 library(ArchR)
 library(chromVARmotifs)
 
@@ -20,26 +21,39 @@ addArchRVerbose(verbose = FALSE)
 Sys.setenv("HDF5_USE_FILE_LOCKING" = "FALSE")
 Sys.setenv("RHDF5_USE_FILE_LOCKING" = "FALSE")
 
-build_archr_project <- function(arrow_sample_name, input_path, output_paths, threads, log_paths, genome, seed) {
+build_archr_project <- function(arrow_sample_name, input_paths, output_paths, threads, log_paths, bsgenome_name, seed) {
     set.seed(seed)
 
-    addArchRThreads(threads = threads)
-    addArchRGenome(genome)
+    blacklist_path <- input_paths[["blacklist"]]
+    regions <- read.table(blacklist_path, sep='\t', header=F)
+    colnames(regions) <- c('chr','start','end')
+    blacklist <- GRanges(regions)
 
-    # input_paths = unlist(input_paths)]
-    # print(output_paths) ####
-    # print(output_paths[["arrows_temp_dir"]]) ####
+    bsgenome_path <- input_paths[["bsgenome"]]
+    install.packages(bsgenome_path, repos = NULL, type= "source")
+    library(bsgenome_name, character.only=TRUE)
+    genome_annotation <- createGenomeAnnotation(
+        genome = get(bsgenome_name),
+        blacklist = blacklist
+    )
+
+    gene_anno_path <- input_paths[["gene_anno"]]
+    gene_annotation <- readRDS(gene_anno_path)
+
+    addArchRThreads(threads = threads)
+    # addArchRGenome(genome)
+
+    frag_path <- input_paths[["frag"]]
+
     arrow_output_dir = "arrowtmp/"
     arrow_output_name = paste(arrow_output_dir, "/", arrow_sample_name,  sep = "")
     dir.create(arrow_output_dir)
-    # print(input_paths) ####
-    # print(arrow_output_names) ####
     arrows <- createArrowFiles(
-        inputFiles = c(input_path),
+        inputFiles = c(frag_path),
         sampleNames = c(arrow_sample_name),
         outputNames = c(arrow_output_name),
-        # minTSS = 1, ####
-        # minFrags = 1, ####
+        geneAnnotation = gene_annotation,
+        genomeAnnotation = genome_annotation,
         offsetPlus = 0,
         offsetMinus = 0,
         addTileMat = TRUE,
@@ -198,7 +212,7 @@ build_archr_project <- function(arrow_sample_name, input_path, output_paths, thr
 
 }
 
-build_archr_project(snakemake@params[["sample_name"]], snakemake@input[["frag"]], snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["genome"]], snakemake@params[["seed"]])
+build_archr_project(snakemake@params[["sample_name"]], snakemake@input, snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["bsgenome"]], snakemake@params[["seed"]])
 
 sink(type = "message")
 sink()

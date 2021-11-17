@@ -81,7 +81,11 @@ localrules:
     decompress_index,
     extract_index,
     idx_prefix_placeholder,
-    move_index_files
+    move_index_file,
+    fetch_blacklist,
+    fetch_bsgenome,
+    fetch_gene_anno,
+    move_archr_files
 
 ruleorder: extract_index > idx_prefix_placeholder
 
@@ -313,3 +317,59 @@ rule move_index_files:
     """
     input:
         get_idx_files_all
+
+rule fetch_blacklist:
+    """
+    Fetch genome blacklist
+    """
+    output:
+        "blacklists/{genome_name}.bed"
+    params:
+        url = lambda w: config["genome"][w.genome_name]["bwt2_idx"]
+    conda:
+        "envs/portal.yaml"
+    shell:
+        "curl --no-progress-meter -L {params.url} | zcat > {output}" 
+
+rule fetch_bsgenome:
+    """
+    Fetch BSGenome R packages
+    """
+    output:
+        "bsgenome/{genome_name}/{bsgenome}.tar.gz"
+    params:
+        url = lambda w: config["genome"][w.genome_name]["bsgenome"]
+    conda:
+        "envs/portal.yaml"
+    shell:
+        "curl --no-progress-meter -L {params.url} > {output}" 
+
+rule fetch_gene_anno:
+    """
+    Fetch ArchR gene annotations
+    """
+    output:
+        "gene_anno/{genome_name}.rda"
+    params:
+        url = lambda w: config["genome"][w.genome_name]["archr_gene_anno"]
+    conda:
+        "envs/portal.yaml"
+    shell:
+        "curl --no-progress-meter -L {params.url} > {output}" 
+
+def get_archr_files_all(w):
+    p = []
+    for k in config["genome"].keys():
+        p.extend([
+            f"blacklists/{k}.bed",
+            f"gene_anno/{k}/{config['genome'][k]['bsgenome_name']}.tar.gz",
+            f"gene_anno/{k}.rda"
+        ])
+    return p
+
+rule move_archr_files:
+    """
+    Move ArchR data files to final location
+    """
+    input:
+        get_archr_files_all

@@ -11,8 +11,8 @@ dependencies:
   - conda-forge::r-rhandsontable=0.3.8
   - conda-forge::r-shinythemes=1.2.0
   - conda-forge::r-rio=0.5.27
-  - bioconda::bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.3 
-  - bioconda::bioconductor-bsgenome.mmusculus.ucsc.mm10=1.4.0
+  - bioconda::bioconductor-genomicranges=1.46.0
+  - bioconda::bioconductor-bsgenome=1.62.0
   - bioconda::r-harmony=0.1
   - bioconda::macs2=2.2.7.1
   - austintwang::r-archr

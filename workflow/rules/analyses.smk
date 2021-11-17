@@ -2,13 +2,21 @@
 First-pass analyses
 """
 
+def get_bsgenome(w):
+    genome = sample_config[w.sample]["genome"]
+    bsgenome = config["genome"][genome]["bsgenome_name"]
+    return f"bsgenome/{genome}/{bsgenome}.tar.gz"
+
 rule archr_build:
     """
     ArchR analyses
     """
     input:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
-        frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi"
+        frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi",
+        blacklist = lambda w: f"blacklists/{sample_config[w.sample]['genome']}.bed",
+        bsgenome = get_bsgenome,
+        gene_anno = lambda w: f"gene_anno/{sample_config[w.sample]['genome']}.rda",
     output:
         project_tar = "results/{sample}/analyses/archr_project.tar.gz",
         qc_dir = temp(directory("temp/{sample}/analyses/qc")),
@@ -20,7 +28,7 @@ rule archr_build:
         qc_tss = temp("temp/{sample}/analyses/qc/{sample}/{sample}-TSS_by_Unique_Frags.pdf")
     params:
         sample_name = lambda w: w.sample,
-        genome = lambda w: config["genome"][sample_config[w.sample]["genome"]]["archr_genome"],
+        bsgenome = lambda w: config["genome"][sample_config[w.sample]["genome"]]["bsgenome_name"],
         seed = config["archr_seed"],
     log:
         console = "logs/{sample}/analyses/archr/console.log",
