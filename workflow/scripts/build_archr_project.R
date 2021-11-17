@@ -35,6 +35,7 @@ build_archr_project <- function(arrow_sample_name, input_paths, output_paths, th
     bsgenome <- get(bsgenome_name)
 
     chromSizes <- GRanges(names(seqlengths(bsgenome)), IRanges(1, seqlengths(bsgenome)))
+    chromSizes <- filterChrGR(chromSizes, remove = filterChr)
     seqlengths(chromSizes) <- end(chromSizes)
 
     genome_annotation <- createGenomeAnnotation(
