@@ -86,7 +86,9 @@ build_archr_project <- function(arrow_sample_name, input_paths, output_paths, th
     proj <- ArchRProject(
         ArrowFiles = arrows, 
         outputDirectory = output_paths[["project_dir"]],
-        copyArrows = FALSE 
+        copyArrows = FALSE,
+        geneAnnotation = gene_annotation,
+        genomeAnnotation = genome_annotation,
     )
     markers_dir = file.path(output_paths[["project_dir"]], "Markers")
     dir.create(markers_dir)
