@@ -4,10 +4,7 @@ console_log <- file(snakemake@log[["console"]], open = "wt")
 sink(console_log)
 sink(console_log, type = "message")
 
-# library(devtools)
-
-# devtools::install_github("GreenleafLab/ArchR@2be1294eb1fbff364fb538d71f4f545ee4384d09", ref="master", repos = BiocManager::repositories(), dependencies = FALSE, INSTALL_opts = '--no-lock')
-# devtools::install_github("GreenleafLab/chromVARmotifs@38bed559c1f4770b6c91c80bf3f8ea965da26076", ref="master", repos = BiocManager::repositories(), dependencies = FALSE, INSTALL_opts = '--no-lock')
+library(parallel)
 
 library(GenomicRanges)
 library(ArchR)
