@@ -5,12 +5,17 @@ First-pass analyses
 def get_bsgenome(w):
     genome = sample_config[w.sample]["genome"]
     bsgenome = config["genome"][genome]["bsgenome_name"]
-    return f"bsgenome/{genome}/{bsgenome}.tar.gz"
+    return f"archr_genome/{genome}/{bsgenome}.tar.gz"
 
 def get_gene_anno(w):
     genome = sample_config[w.sample]["genome"]
     gene_anno = config["genome"][genome]["gene_anno_name"]
-    return f"gene_anno/{genome}/{gene_anno}.rda"
+    return f"archr_genome/{genome}/{gene_anno}.rda"
+
+def get_peak_anno(w):
+    genome = sample_config[w.sample]["genome"]
+    peak_anno = config["genome"][genome]["peak_anno_name"]
+    return f"archr_genome/{genome}/{peak_anno}.Anno"
 
 rule archr_build:
     """
@@ -19,9 +24,10 @@ rule archr_build:
     input:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi",
-        blacklist = lambda w: f"blacklists/{sample_config[w.sample]['genome']}.bed",
+        blacklist = lambda w: f"blacklists/{sample_config[w.sample]['genome']}/blacklist.bed",
         bsgenome = get_bsgenome,
         gene_anno = get_gene_anno,
+        peak_anno = get_peak_anno
     output:
         project_tar = "results/{sample}/analyses/archr_project.tar.gz",
         qc_dir = temp(directory("temp/{sample}/analyses/qc")),
@@ -36,6 +42,7 @@ rule archr_build:
         bsgenome = lambda w: config["genome"][sample_config[w.sample]["genome"]]["bsgenome_name"],
         gene_anno = lambda w: config["genome"][sample_config[w.sample]["genome"]]["gene_anno_name"],
         genome_size = lambda w: float(config["genome"][sample_config[w.sample]["genome"]]["macs_genome_size"]),
+        species = lambda w: config["genome"][sample_config[w.sample]["genome"]]["species"],
         seed = config["archr_seed"],
     log:
         console = "logs/{sample}/analyses/archr/console.log",

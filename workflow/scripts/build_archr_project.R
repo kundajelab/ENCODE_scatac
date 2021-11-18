@@ -23,6 +23,7 @@ build_archr_project <- function(params, input_paths, output_paths, threads, log_
     bsgenome_name <- params[["bsgenome"]]
     gene_anno_name <- params[["gene_anno"]]
     genome_size <- params[["genome_size"]]
+    species <- params[["species"]]
     seed <- params[["seed"]]
 
     set.seed(seed)
@@ -184,6 +185,7 @@ build_archr_project <- function(params, input_paths, output_paths, threads, log_
     proj <- addMotifAnnotations(
         ArchRProj = proj, 
         motifSet = "cisbp", 
+        species = species,
         name = "Motif",
         logFile = log_paths[["fetch_motif"]]
     )
@@ -198,9 +200,10 @@ build_archr_project <- function(params, input_paths, output_paths, threads, log_
     saveRDS(enrichMotifs, enrich_motif_path)
 
     # Calculate ENCODE TF binding site enrichment
+    peak_anno_path <- input_paths[["peak_anno"]]
     proj <- addArchRAnnotations(
         ArchRProj = proj,
-        db = "LOLA",
+        db = peak_anno_path,
         collection = "EncodeTFBS",
         logFile = log_paths[["fetch_tf"]]
     )

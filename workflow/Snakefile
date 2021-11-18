@@ -85,6 +85,7 @@ localrules:
     fetch_blacklist,
     fetch_bsgenome,
     fetch_gene_anno,
+    fetch_peak_anno,
     move_archr_files
 
 ruleorder: extract_index > idx_prefix_placeholder
@@ -323,7 +324,7 @@ rule fetch_blacklist:
     Fetch genome blacklist
     """
     output:
-        "blacklists/{genome_name}.bed"
+        "archr_genome/{genome_name}/blacklist.bed"
     params:
         url = lambda w: config["genome"][w.genome_name]["blacklist"]
     conda:
@@ -336,7 +337,7 @@ rule fetch_bsgenome:
     Fetch BSGenome R packages
     """
     output:
-        "bsgenome/{genome_name}/{bsgenome}.tar.gz"
+        "archr_genome/{genome_name}/{bsgenome}.tar.gz"
     params:
         url = lambda w: config["genome"][w.genome_name]["bsgenome"]
     conda:
@@ -349,7 +350,20 @@ rule fetch_gene_anno:
     Fetch ArchR gene annotations
     """
     output:
-        "gene_anno/{genome_name}/{gene_anno}.rda"
+        "archr_genome/{genome_name}/{gene_anno}.rda"
+    params:
+        url = lambda w: config["genome"][w.genome_name]["archr_gene_anno"]
+    conda:
+        "envs/portal.yaml"
+    shell:
+        "curl --no-progress-meter -L {params.url} > {output}" 
+
+rule fetch_peak_anno:
+    """
+    Fetch ArchR peak annotations
+    """
+    output:
+        "archr_genome/{genome_name}/{peak_anno}.Anno"
     params:
         url = lambda w: config["genome"][w.genome_name]["archr_gene_anno"]
     conda:
@@ -361,9 +375,10 @@ def get_archr_files_all(w):
     p = []
     for k in config["genome"].keys():
         p.extend([
-            f"blacklists/{k}.bed",
-            f"bsgenome/{k}/{config['genome'][k]['bsgenome_name']}.tar.gz",
-            f"gene_anno/{k}/{config['genome'][k]['gene_anno_name']}.rda"
+            f"archr_genome/{k}/{k}_blacklist.bed",
+            f"archr_genome/{k}/{config['genome'][k]['bsgenome_name']}.tar.gz",
+            f"archr_genome/{k}/{config['genome'][k]['gene_anno_name']}.rda",
+            f"archr_genome/{k}/{config['genome'][k]['peak_anno_name']}.Anno"
         ])
     return p
 

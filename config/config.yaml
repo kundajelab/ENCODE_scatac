@@ -20,7 +20,10 @@ genome:
     bsgenome_name: BSgenome.Hsapiens.ENCODE.GRCh38
     archr_gene_anno: https://github.com/GreenleafLab/ArchR/raw/v1.0.1/data/geneAnnoHg38.rda
     gene_anno_name: geneAnnoHg38
+    archr_peak_anno: https://jeffgranja.s3.amazonaws.com/ArchR/Annotations/LOLA-Hg38-v1.Anno
+    peak_anno_name: LOLA-Hg38
     macs_genome_size: 2.7e9
+    species: Homo sapiens
   mm10:
     bwt2_idx: https://www.encodeproject.org/files/ENCFF309GLL/@@download/ENCFF309GLL.tar.gz
     bwt2_idx_prefix: mm10_no_alt_analysis_set_ENCODE.fasta
@@ -29,7 +32,10 @@ genome:
     bsgenome_name: BSgenome.Mmusculus.ENCODE.mm10
     archr_gene_anno: https://github.com/GreenleafLab/ArchR/raw/v1.0.1/data/geneAnnoMm10.rda
     gene_anno_name: geneAnnoMm10
+    archr_peak_anno: https://jeffgranja.s3.amazonaws.com/ArchR/Annotations/LOLA-Mm10-v1.Anno
+    peak_anno_name: LOLA-Mm10
     macs_genome_size: 1.87e9
+    species: Mus musculus
 multimapping: 4
 
 tn5_shift_plus: 4
