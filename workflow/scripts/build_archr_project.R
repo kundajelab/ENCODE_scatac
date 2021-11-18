@@ -18,7 +18,13 @@ addArchRVerbose(verbose = FALSE)
 Sys.setenv("HDF5_USE_FILE_LOCKING" = "FALSE")
 Sys.setenv("RHDF5_USE_FILE_LOCKING" = "FALSE")
 
-build_archr_project <- function(arrow_sample_name, input_paths, output_paths, threads, log_paths, bsgenome_name, gene_anno_name, seed) {
+build_archr_project <- function(params, input_paths, output_paths, threads, log_paths) {
+    arrow_sample_name <- params[["sample_name"]]
+    bsgenome_name <- params[["bsgenome"]]
+    gene_anno_name <- params[["gene_anno"]]
+    genome_size <- params[["genome_size"]]
+    seed <- params[["seed"]]
+
     set.seed(seed)
 
     blacklist_path <- input_paths[["blacklist"]]
@@ -151,6 +157,7 @@ build_archr_project <- function(arrow_sample_name, input_paths, output_paths, th
         ArchRProj = proj, 
         groupBy = "Clusters", 
         pathToMacs2 = findMacs2(),
+        genomeSize = genome_size,
         logFile = log_paths[["peak_call"]]
     )
 
@@ -219,7 +226,7 @@ build_archr_project <- function(arrow_sample_name, input_paths, output_paths, th
 
 }
 
-build_archr_project(snakemake@params[["sample_name"]], snakemake@input, snakemake@output, snakemake@threads, snakemake@log, snakemake@params[["bsgenome"]], snakemake@params[["gene_anno"]], snakemake@params[["seed"]])
+build_archr_project(snakemake@params, snakemake@input, snakemake@output, snakemake@threads, snakemake@log)
 
 sink(type = "message")
 sink()

@@ -35,6 +35,7 @@ rule archr_build:
         sample_name = lambda w: w.sample,
         bsgenome = lambda w: config["genome"][sample_config[w.sample]["genome"]]["bsgenome_name"],
         gene_anno = lambda w: config["genome"][sample_config[w.sample]["genome"]]["gene_anno_name"],
+        genome_size = lambda w: float(config["genome"][sample_config[w.sample]["genome"]]["macs_genome_size"]),
         seed = config["archr_seed"],
     log:
         console = "logs/{sample}/analyses/archr/console.log",
