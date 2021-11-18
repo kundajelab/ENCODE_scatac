@@ -365,7 +365,7 @@ rule fetch_peak_anno:
     output:
         "archr_genome/{genome_name}/{peak_anno}.Anno"
     params:
-        url = lambda w: config["genome"][w.genome_name]["archr_gene_anno"]
+        url = lambda w: config["genome"][w.genome_name]["archr_peak_anno"]
     conda:
         "envs/portal.yaml"
     shell:
