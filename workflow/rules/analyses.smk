@@ -24,7 +24,7 @@ rule archr_build:
     input:
         frag = "results/{sample}/fragments/fragments.tsv.gz",
         frag_ind = "results/{sample}/fragments/fragments.tsv.gz.tbi",
-        blacklist = lambda w: f"blacklists/{sample_config[w.sample]['genome']}/blacklist.bed",
+        blacklist = lambda w: f"archr_genome/{sample_config[w.sample]['genome']}/blacklist.bed",
         bsgenome = get_bsgenome,
         gene_anno = get_gene_anno,
         peak_anno = get_peak_anno
