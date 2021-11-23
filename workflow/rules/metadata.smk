@@ -270,7 +270,7 @@ rule collate_R1_trim:
     input: 
         expand("metadata/{sample}/R1_trim_metadata.json", sample=samples)
     output:
-        "metadata/R1_trim_metadata_all.tsv"
+        "metadata_collate/R1_trim_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -285,7 +285,7 @@ rule collate_R2_trim:
     input: 
         expand("metadata/{sample}/R2_trim_metadata.json", sample=samples)
     output:
-        "metadata/R2_trim_metadata_all.tsv"
+        "metadata_collate/R2_trim_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -300,7 +300,7 @@ rule collate_qc_reads:
     input: 
         expand("metadata/{sample}/reads_qc_metadata.json", sample=samples)
     output:
-        "metadata/reads_qc_metadata_all.tsv"
+        "metadata_collate/reads_qc_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -315,7 +315,7 @@ rule collate_bam_raw:
     input: 
         expand("metadata/{sample}/raw_bam_metadata.json", sample=samples)
     output:
-        "metadata/raw_bam_metadata_all.tsv"
+        "metadata_collate/raw_bam_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -330,7 +330,7 @@ rule collate_qc_alignments_raw:
     input: 
         expand("metadata/{sample}/alignments_raw_qc_metadata.json", sample=samples)
     output:
-        "metadata/alignments_raw_qc_metadata_all.tsv"
+        "metadata_collate/alignments_raw_qc_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -345,7 +345,7 @@ rule collate_bam_filtered:
     input: 
         expand("metadata/{sample}/filtered_bam_metadata.json", sample=samples)
     output:
-        "metadata/filtered_bam_metadata_all.tsv"
+        "metadata_collate/filtered_bam_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -360,7 +360,7 @@ rule collate_qc_alignments_filtered:
     input: 
         expand("metadata/{sample}/alignments_filtered_qc_metadata.json", sample=samples)
     output:
-        "metadata/alignments_filtered_qc_metadata_all.tsv"
+        "metadata_collate/alignments_filtered_qc_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -375,7 +375,7 @@ rule collate_qc_lib_comp:
     input: 
         expand("metadata/{sample}/alignments_lib_comp_qc_metadata.json", sample=samples)
     output:
-        "metadata/alignments_lib_comp_qc_metadata_all.tsv"
+        "metadata_collate/alignments_lib_comp_qc_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -390,7 +390,7 @@ rule collate_fragments:
     input: 
         expand("metadata/{sample}/fragments_metadata.json", sample=samples)
     output:
-        "metadata/fragments_metadata_all.tsv"
+        "metadata_collate/fragments_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -405,7 +405,7 @@ rule collate_qc_fragments:
     input: 
         expand("metadata/{sample}/fragments_qc_metadata.json", sample=samples)
     output:
-        "metadata/fragments_qc_metadata_all.tsv"
+        "metadata_collate/fragments_qc_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -420,7 +420,7 @@ rule collate_analyses:
     input: 
         expand("metadata/{sample}/analyses_metadata.json", sample=samples)
     output:
-        "metadata/analyses_metadata_all.tsv"
+        "metadata_collate/analyses_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -435,7 +435,7 @@ rule collate_qc_analyses:
     input: 
         expand("metadata/{sample}/analyses_qc_metadata.json", sample=samples)
     output:
-        "metadata/analyses_qc_metadata_all.tsv"
+        "metadata_collate/analyses_qc_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
@@ -450,7 +450,7 @@ rule collate_qc_summary:
     input: 
         expand("metadata/{sample}/summary_qc_metadata.json", sample=samples)
     output:
-        "metadata/summary_qc_metadata_all.tsv"
+        "metadata_collate/summary_qc_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 
