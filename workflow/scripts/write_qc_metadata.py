@@ -523,7 +523,7 @@ def write_json(data, out_path):
 try:
     out_group = snakemake.params['output_group']
     sample_data = snakemake.params['sample_data']
-    sample_name = snakemake.params['sample']
+    sample_name = snakemake.params['sample_name']
     config = snakemake.config
 
     if out_group == "fastqs":        
