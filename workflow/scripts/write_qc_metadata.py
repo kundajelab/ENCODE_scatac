@@ -468,23 +468,30 @@ def parse_counts_summary_qc(rd, ar, af, lc, nl, an):
         d = json.load(f)
         result['reads_original'] = d['num_reads_total']
         result['reads_barcode_matched'] = d['num_reads_matched']
+        result['_frac_reads_barcode_matched'] = d['num_reads_matched'] / result['reads_original']
     with open(ar, 'r') as f:
         d = json.load(f)
         result['reads_mapped'] = d['mapped_reads']
+        result['_frac_reads_mapped'] = d['mapped_reads'] / result['reads_original']
     with open(af, 'r') as f:
         d = json.load(f)
         result['reads_non_mito'] = d['non_mito_reads']
+        result['_frac_reads_non_mito'] = d['non_mito_reads'] / result['reads_original']
         result['reads_nodup'] = d['mapped_reads']
+        result['_frac_reads_nodup'] = d['mapped_reads'] / result['reads_original']
     with open(lc, 'r') as f:
         d = json.load(f)
         result['reads_primary_align'] = d['paired_reads']
+        result['_frac_reads_primary_align'] = d['paired_reads'] / result['reads_original']
     with open(nl, 'r') as f:
         d = json.load(f)
         result['barcodes_fragments'] = d['original_barcode_count']
         result['barcodes_non_multiplet'] = d['final_barcode_count']
+        result['_frac_barcodes_non_multiplet'] = d['final_barcode_count'] / result['barcodes_fragments']
     with open(an, 'r') as f:
         d = json.load(f)
         result['barcodes_archr'] = d['_num_barcodes_considered']
+        result['_frac_barcodes_archr'] = d['_num_barcodes_considered'] / result['barcodes_fragments']
 
     return result
 
@@ -493,10 +500,12 @@ def build_quality_metric_header(sample_data, sample_name, config, data_paths, ou
     lab = config["dcc_lab"]
     experiment = sample_data["experiment"]
     replicate = sample_data["replicate_num"]
+    modality = sample_data["modality"]
     data_aliases = [f"{lab}:{experiment}${replicate}${os.path.basename(p)}" for p in data_paths]
     alias = f"{lab}:{experiment}${replicate}${os.path.basename(out_path)}"
     h = OrderedDict({
         "_sample": sample_name,
+        "_modality": modality,
         "lab": lab,
         "award": config["dcc_award"],
         "quality_metric_of": data_aliases,
