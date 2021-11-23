@@ -34,7 +34,9 @@ rule metadata_qc_reads:
         barcode_matching = "results/{sample}/fastqs/barcode_matching.tsv",
         adapter_trimming = "results/{sample}/fastqs/trim_adapters.txt",
         barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
-        input_data = "results/{sample}/input_data.json"
+        input_data = "results/{sample}/input_data.json",
+        dep1 = "metadata/{sample}/R1_trim_metadata.json",
+        dep2 = "metadata/{sample}/R2_trim_metadata.json"
     output: 
         read_stats = "metadata/{sample}/reads_qc_metadata.json"
     params:
@@ -77,7 +79,8 @@ rule metadata_qc_alignments_raw:
     input: 
         data_file = "results/{sample}/mapping/raw.bam",
         samstats_raw = "results/{sample}/mapping/samstats_raw.txt",
-        input_data = "results/{sample}/input_data.json"
+        input_data = "results/{sample}/input_data.json",
+        dep = "metadata/{sample}/raw_bam_metadata.json"
     output: 
         alignment_stats = "metadata/{sample}/alignments_raw_qc_metadata.json"
     params:
@@ -123,7 +126,8 @@ rule metadata_qc_alignments_filtered:
         picard_markdup = "results/{sample}/filtering/markdup.txt",
         pbc_stats = "results/{sample}/filtering/pbc_stats.tsv",
         frac_mito = "results/{sample}/filtering/frac_mito.tsv",
-        input_data = "results/{sample}/input_data.json"
+        input_data = "results/{sample}/input_data.json",
+        dep = "metadata/{sample}/filtered_bam_metadata.json"
     output: 
         alignment_stats = "metadata/{sample}/alignments_filtered_qc_metadata.json",
         lib_comp_stats = "metadata/{sample}/alignments_lib_comp_qc_metadata.json"
@@ -169,7 +173,9 @@ rule metadata_qc_fragments:
         barcode_pairs_expanded = "results/{sample}/fragments/barcode_pairs_expanded.tsv.gz",
         barcodes_status = "results/{sample}/fragments/multiplet_barcodes_status.tsv",
         multiplet_stats = "results/{sample}/fragments/multiplet_stats.txt",
-        multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png"
+        multiplets_thresh = "results/{sample}/fragments/multiplets_threshold_plot.png",
+        input_data = "results/{sample}/input_data.json",
+        dep = "metadata/{sample}/fragments_metadata.json"
     output: 
         fragments_stats = "metadata/{sample}/fragments_qc_metadata.json"
     params:
@@ -215,7 +221,8 @@ rule metadata_qc_analyses:
         archr_fragment_size_distribution = "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
         archr_pre_filter_metadata = "results/{sample}/analyses/archr_pre_filter_metadata.tsv",
         archr_tss_by_unique_frags = "results/{sample}/analyses/archr_tss_by_unique_frags.pdf",
-        input_data = "results/{sample}/input_data.json"
+        input_data = "results/{sample}/input_data.json",
+        dep = "metadata/{sample}/analyses_metadata.json"
     output: 
         analyses_stats = "metadata/{sample}/analyses_qc_metadata.json"
     params:
