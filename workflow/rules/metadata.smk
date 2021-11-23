@@ -229,7 +229,7 @@ rule metadata_qc_analyses:
     script: 
         "../scripts/write_qc_metadata.py"
 
-rule metadata_qc_summary
+rule metadata_qc_summary:
     """
     Write counts summary QC metadata
     """
