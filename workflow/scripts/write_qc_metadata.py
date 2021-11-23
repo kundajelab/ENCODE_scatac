@@ -84,13 +84,14 @@ def parse_bwt2_qc(txt):
 
     with open(txt, 'r') as f:
         a = next(f)
-        result["_bwt2_num_reads"] = to_int(a.split(" ")[0])
+        result["_bwt2_num_reads"] = to_int(a.split(" ")[0]) * 2
+        next(f)
         b = next(f)
-        result["_bwt2_num_unaligned"] = to_int(b.lstrip().split(" ")[0])
+        result["_bwt2_num_unaligned"] = to_int(b.lstrip().split(" ")[0]) * 2
         c = next(f)
-        result["_bwt2_num_single"] = to_int(c.lstrip().split(" ")[0])
+        result["_bwt2_num_single"] = to_int(c.lstrip().split(" ")[0]) * 2
         d = next(f)
-        result["_bwt2_num_multi"] = to_int(d.lstrip().split(" ")[0])
+        result["_bwt2_num_multi"] = to_int(d.lstrip().split(" ")[0]) * 2
     return result
 
 def parse_frac_mito_qc(txt):
