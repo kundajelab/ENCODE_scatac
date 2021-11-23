@@ -79,6 +79,7 @@ rule metadata_qc_alignments_raw:
     input: 
         data_file = "results/{sample}/mapping/raw.bam",
         samstats_raw = "results/{sample}/mapping/samstats_raw.txt",
+        bwt2_stats = "results/{sample}/mapping/bwt2_stats.txt",
         input_data = "results/{sample}/input_data.json",
         dep = "metadata/{sample}/raw_bam_metadata.json"
     output: 

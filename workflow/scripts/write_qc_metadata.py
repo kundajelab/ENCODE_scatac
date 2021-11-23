@@ -76,6 +76,22 @@ def parse_barcode_revcomp_qc(txt):
                 result['barcode_reverse_complement'] = to_bool(v.strip())
     return result
 
+def parse_bwt2_qc(txt):
+    result = OrderedDict()
+    if os.path.getsize(txt) == 0:
+        return result
+    result["_bwt2_stats"] = {"path": os.path.abspath(txt)}
+
+    with open(txt, 'r') as f:
+        a = next(f)
+        result["_bwt2_num_reads"] = to_int(a.split(" ")[0])
+        b = next(f)
+        result["_bwt2_num_unaligned"] = to_int(b.lstrip().split(" ")[0])
+        c = next(f)
+        result["_bwt2_num_single"] = to_int(c.lstrip().split(" ")[0])
+        d = next(f)
+        result["_bwt2_num_multi"] = to_int(d.lstrip().split(" ")[0])
+    return result
 
 def parse_frac_mito_qc(txt):
     result = OrderedDict()
@@ -466,23 +482,30 @@ def parse_counts_summary_qc(rd, ar, af, lc, nl, an):
     result = OrderedDict()
     with open(rd, 'r') as f:
         d = json.load(f)
-        result['reads_original'] = d['num_reads_total']
-        result['reads_barcode_matched'] = d['num_reads_matched']
-        result['_frac_reads_barcode_matched'] = d['num_reads_matched'] / result['reads_original']
+        has_nrt = False
+        has_nrm = False
+        if 'num_reads_total' in d:
+            has_nrt = True
+            result['reads_original'] = d['num_reads_total']
+        if 'num_reads_matched' in d:
+            has_nrm = True
+            result['reads_barcode_matched'] = d['num_reads_matched']
+        if has_nrt and has_nrm:
+            result['_frac_reads_barcode_matched'] = d['num_reads_matched'] / result['reads_original']
     with open(ar, 'r') as f:
         d = json.load(f)
         result['reads_mapped'] = d['mapped_reads']
-        result['_frac_reads_mapped'] = d['mapped_reads'] / result['reads_original']
+        result['_frac_reads_mapped'] = d['mapped_reads'] / d['_bwt2_num_reads']
     with open(af, 'r') as f:
         d = json.load(f)
         result['reads_non_mito'] = d['non_mito_reads']
-        result['_frac_reads_non_mito'] = d['non_mito_reads'] / result['reads_original']
+        result['_frac_reads_non_mito'] = d['non_mito_reads'] / result['reads_mapped']
         result['reads_nodup'] = d['mapped_reads']
-        result['_frac_reads_nodup'] = d['mapped_reads'] / result['reads_original']
+        result['_frac_reads_nodup'] = d['mapped_reads'] / result['reads_non_mito']
     with open(lc, 'r') as f:
         d = json.load(f)
         result['reads_primary_align'] = d['paired_reads']
-        result['_frac_reads_primary_align'] = d['paired_reads'] / result['reads_original']
+        result['_frac_reads_primary_align'] = d['paired_reads'] / result['reads_nodup']
     with open(nl, 'r') as f:
         d = json.load(f)
         result['barcodes_fragments'] = d['original_barcode_count']
@@ -544,11 +567,13 @@ try:
     elif out_group == "mapping":
         alignment_stats_out = snakemake.output['alignment_stats']
         samstats_raw = snakemake.input['samstats_raw']
+        bwt2_stats = snakemake.input['bwt2_stats']
         data_paths = [snakemake.input['data_file']]
 
         a = parse_flagstat_qc(samstats_raw)
+        b = parse_bwt2_qc(bwt2_stats)
         h = build_quality_metric_header(sample_data, sample_name, config, data_paths, alignment_stats_out)
-        alignment_stats = h | a
+        alignment_stats = h | a | b
 
         write_json(alignment_stats, alignment_stats_out)
 
