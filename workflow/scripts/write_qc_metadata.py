@@ -619,7 +619,7 @@ try:
     elif out_group == "summary":
         summary_stats_out = snakemake.output['summary_stats']
         read_stats = snakemake.input['read_stats']
-        alignment_stats_raw = snakemake.input['alignment_stats_unfiltered']
+        alignment_stats_raw = snakemake.input['alignment_stats_raw']
         alignment_stats_filtered = snakemake.input['alignment_stats_filtered']
         lib_comp_stats = snakemake.input['lib_comp_stats']
         fragments_stats = snakemake.input['fragments_stats']
