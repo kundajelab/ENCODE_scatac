@@ -36,7 +36,7 @@ rule metadata_qc_reads:
         barcode_revcomp = "results/{sample}/fastqs/barcode_revcomp.txt",
         input_data = "results/{sample}/input_data.json"
     output: 
-        read_stats = "metadata/{sample}/reads_qc_metadata.json",
+        read_stats = "metadata/{sample}/reads_qc_metadata.json"
     params:
         output_group = "fastqs",
         sample_data = lambda w: sample_data[w.sample],
@@ -101,7 +101,7 @@ rule metadata_bam_filtered:
         fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
         input_data = "results/{sample}/input_data.json"
     output: 
-        "metadata/{sample}/filtered_bam_metadata.json",
+        "metadata/{sample}/filtered_bam_metadata.json"
     params:
         output_group = "filtering",
         sample_data = lambda w: sample_data[w.sample],
@@ -192,7 +192,7 @@ rule metadata_analyses:
         fragments = "results/{sample}/fragments/fragments.tar.gz",
         input_data = "results/{sample}/input_data.json"
     output: 
-        "metadata/{sample}/analyses_metadata.json",
+        "metadata/{sample}/analyses_metadata.json"
     params:
         output_group = "analyses",
         sample_data = lambda w: sample_data[w.sample],
@@ -206,7 +206,7 @@ rule metadata_analyses:
 
 rule metadata_qc_analyses:
     """
-    Write filtered alignments qc metadata
+    Write filtered alignments QC metadata
     """
     input: 
         data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
@@ -217,9 +217,35 @@ rule metadata_qc_analyses:
         archr_tss_by_unique_frags = "results/{sample}/analyses/archr_tss_by_unique_frags.pdf",
         input_data = "results/{sample}/input_data.json"
     output: 
-        analyses_stats = "metadata/{sample}/analyses_qc_metadata.json",
+        analyses_stats = "metadata/{sample}/analyses_qc_metadata.json"
     params:
         output_group = "analyses",
+        sample_data = lambda w: sample_data[w.sample],
+        sample_name = lambda w: w.sample
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata"
+    script: 
+        "../scripts/write_qc_metadata.py"
+
+rule metadata_qc_summary
+    """
+    Write counts summary QC metadata
+    """
+    input: 
+        data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
+        read_stats = "metadata/{sample}/reads_qc_metadata.json",
+        alignment_stats_raw = "metadata/{sample}/alignments_raw_qc_metadata.json",
+        alignment_stats_filtered = "metadata/{sample}/alignments_filtered_qc_metadata.json",
+        lib_comp_stats = "metadata/{sample}/alignments_lib_comp_qc_metadata.json",
+        fragments_stats = "metadata/{sample}/fragments_qc_metadata.json",
+        analyses_stats = "metadata/{sample}/analyses_qc_metadata.json",
+        input_data = "results/{sample}/input_data.json"
+    output: 
+        summary_stats = "metadata/{sample}/summary_qc_metadata.json",
+    params:
+        output_group = "summary",
         sample_data = lambda w: sample_data[w.sample],
         sample_name = lambda w: w.sample
     conda:
@@ -402,6 +428,21 @@ rule collate_qc_analyses:
         expand("metadata/{sample}/analyses_qc_metadata.json", sample=samples)
     output:
         "metadata/analyses_qc_metadata_all.tsv"
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "metadata_collate"
+    script: 
+        "../scripts/collate_metadata.py"
+
+rule collate_qc_summary:
+    """
+    Collate metadata files across samples into tables
+    """
+    input: 
+        expand("metadata/{sample}/summary_qc_metadata.json", sample=samples)
+    output:
+        "metadata/summary_qc_metadata_all.tsv"
     conda:
         "../envs/portal.yaml"
     group: 

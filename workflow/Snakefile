@@ -175,7 +175,8 @@ rule build_metadata:
         "metadata/fragments_metadata_all.tsv",
         "metadata/fragments_qc_metadata_all.tsv",
         "metadata/analyses_metadata_all.tsv",
-        "metadata/analyses_qc_metadata_all.tsv"
+        "metadata/analyses_qc_metadata_all.tsv",
+        "metadata/summary_qc_metadata_all.tsv"
 
 rule submit:
     """

@@ -496,7 +496,7 @@ def parse_counts_summary_qc(rd, ar, af, lc, nl, an):
     return result
 
 
-def build_quality_metric_header(sample_data, sample_name, config, data_paths, out_path, step_run):
+def build_quality_metric_header(sample_data, sample_name, config, data_paths, out_path):
     lab = config["dcc_lab"]
     experiment = sample_data["experiment"]
     replicate = sample_data["replicate_num"]
@@ -510,7 +510,7 @@ def build_quality_metric_header(sample_data, sample_name, config, data_paths, ou
         "award": config["dcc_award"],
         "quality_metric_of": data_aliases,
         "aliases": [alias],
-        "step_run": step_run
+        # "step_run": step_run
     })
     return h
 
@@ -526,9 +526,7 @@ try:
     sample_name = snakemake.params['sample']
     config = snakemake.config
 
-    if out_group == "fastqs":
-        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
-        
+    if out_group == "fastqs":        
         read_stats_out = snakemake.output['read_stats']
         barcode_matching = snakemake.input['barcode_matching']
         adapter_trimming = snakemake.input['adapter_trimming']
@@ -538,27 +536,23 @@ try:
         m = parse_barcode_matching_qc(barcode_matching)
         a = parse_adapter_trimming_qc(adapter_trimming)
         r = parse_barcode_revcomp_qc(barcode_revcomp)
-        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, read_stats_out, step_run)
+        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, read_stats_out)
         read_stats = h | m | a | r
 
         write_json(read_stats, read_stats_out)
 
     elif out_group == "mapping":
-        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
-
         alignment_stats_out = snakemake.output['alignment_stats']
         samstats_raw = snakemake.input['samstats_raw']
         data_paths = [snakemake.input['data_file']]
 
         a = parse_flagstat_qc(samstats_raw)
-        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, alignment_stats_out, step_run)
+        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, alignment_stats_out)
         alignment_stats = h | a
 
         write_json(alignment_stats, alignment_stats_out)
 
     elif out_group == "filtering":
-        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
-
         alignment_stats_out = snakemake.output['alignment_stats']
         lib_comp_stats_out = snakemake.output['lib_comp_stats']
         samstats_filtered = snakemake.input['samstats_filtered']
@@ -571,8 +565,8 @@ try:
         p = parse_dup_qc(picard_markdup)
         l = parse_lib_complexity_qc(pbc_stats)
         m = parse_frac_mito_qc(frac_mito)
-        ha = build_quality_metric_header(sample_data, sample_name, config, data_paths, alignment_stats_out, step_run)
-        hl = ha = build_quality_metric_header(sample_data, sample_name, config, data_paths, lib_comp_stats_out, step_run)
+        ha = build_quality_metric_header(sample_data, sample_name, config, data_paths, alignment_stats_out)
+        hl = ha = build_quality_metric_header(sample_data, sample_name, config, data_paths, lib_comp_stats_out)
         alignment_stats = ha | s | m
         lib_comp_stats = hl | p | l
 
@@ -580,8 +574,6 @@ try:
         write_json(lib_comp_stats, lib_comp_stats_out)
 
     elif out_group == "fragments": 
-        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
-
         fragments_stats_out = snakemake.output['fragments_stats']
         multiplet_stats = snakemake.input['multiplet_stats']
         barcodes_pairs_strict = snakemake.input['barcode_pairs_strict']
@@ -598,14 +590,12 @@ try:
             multiplets_thresh
         )
 
-        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, fragments_stats_out, step_run)
+        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, fragments_stats_out)
         fragments_stats = h | m
 
         write_json(fragments_stats, fragments_stats_out)
 
     elif out_group == "analyses":
-        step_run = "7f3f3341-e03f-40ce-b962-44851b80aa88" #TODO Replace with final value
-
         analyses_stats_out = snakemake.output['analyses_stats']
         archr_doublet_summary_text = snakemake.input['archr_doublet_summary_text']
         archr_doublet_summary_figure = snakemake.input['archr_doublet_summary_figure']
@@ -621,10 +611,33 @@ try:
             archr_pre_filter_metadata, 
             archr_tss_by_unique_frags
         )
-        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, analyses_stats_out, step_run)
+        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, analyses_stats_out)
         analyses_stats = h | f
 
         write_json(analyses_stats, analyses_stats_out)
+
+    elif out_group == "summary":
+        summary_stats_out = snakemake.output['summary_stats']
+        read_stats = snakemake.input['read_stats']
+        alignment_stats_raw = snakemake.input['alignment_stats_unfiltered']
+        alignment_stats_filtered = snakemake.input['alignment_stats_filtered']
+        lib_comp_stats = snakemake.input['lib_comp_stats']
+        fragments_stats = snakemake.input['fragments_stats']
+        analyses_stats = snakemake.input['analyses_stats']
+        data_paths = [snakemake.input['data_file']]
+
+        s = parse_counts_summary_qc(
+            read_stats, 
+            alignment_stats_raw, 
+            alignment_stats_filtered, 
+            lib_comp_stats, 
+            fragments_stats, 
+            analyses_stats
+        )
+        h = build_quality_metric_header(sample_data, sample_name, config, data_paths, summary_stats_out)
+        summary_stats = h | s
+
+        write_json(summary_stats, summary_stats_out)
 
 
 except NameError:
