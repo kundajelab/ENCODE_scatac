@@ -10,7 +10,7 @@ def collate(paths, out):
 
     cols = set()
     for e in entries:
-        cols |= entries.keys()
+        cols |= e.keys()
     
     cols = list(cols)
     lines = [cols]
