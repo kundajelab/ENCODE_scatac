@@ -487,10 +487,10 @@ def parse_counts_summary_qc(rd, ar, af, lc, nl, an):
         has_nrm = False
         if 'num_reads_total' in d:
             has_nrt = True
-            result['reads_original'] = d['num_reads_total']
+            result['reads_original'] = d['num_reads_total'] * 2
         if 'num_reads_matched' in d:
             has_nrm = True
-            result['reads_barcode_matched'] = d['num_reads_matched']
+            result['reads_barcode_matched'] = d['num_reads_matched'] * 2
         if has_nrt and has_nrm:
             result['_frac_reads_barcode_matched'] = d['num_reads_matched'] / result['reads_original']
     with open(ar, 'r') as f:
