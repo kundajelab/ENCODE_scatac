@@ -501,12 +501,14 @@ def parse_counts_summary_qc(rd, ar, af, lc, nl, an):
         d = json.load(f)
         result['reads_non_mito'] = d['non_mito_reads']
         result['_frac_reads_non_mito'] = d['non_mito_reads'] / result['reads_mapped']
-        result['reads_nodup'] = d['mapped_reads']
-        result['_frac_reads_nodup'] = d['mapped_reads'] / result['reads_non_mito']
     with open(lc, 'r') as f:
         d = json.load(f)
-        result['reads_primary_align'] = d['paired_reads']
-        result['_frac_reads_primary_align'] = d['paired_reads'] / result['reads_nodup']
+        result['reads_primary_align'] = d['paired_reads'] * 2
+        result['_frac_reads_primary_align'] = d['paired_reads'] * 2 / result['reads_non_mito']
+    with open(af, 'r') as f:
+        d = json.load(f)
+        result['reads_nodup'] = d['mapped_reads']
+        result['_frac_reads_nodup'] = d['mapped_reads'] / result['reads_primary_align']
     with open(nl, 'r') as f:
         d = json.load(f)
         result['barcodes_fragments'] = d['original_barcode_count']
