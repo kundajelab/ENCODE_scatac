@@ -5,7 +5,22 @@ import pandas as pd
 import plotly.express as px
 
 def load_tsv(tsv_path):
-    df = pd.read_csv(tsv_path, sep='\t', header=0, index_col=False)
+    with open(tsv_path) as f:
+        head = [next(f) for _ in range(4)]
+        header_data = []
+        for l in head:
+            curr = None
+            entries = []
+            for i in l.rstrip("\n").split("\t"):
+                if i == "":
+                    entries.append(curr)
+                else:
+                    entries.append(i)
+                    curr = i
+            header_data.append(entries)
+        header = [":".join(i) for i in zip(*header_data)]
+        df = pd.read_csv(f, sep='\t', names=header, index_col=False)
+
     cols_to_use = [i for i, v in df.dtypes.items() if np.issubdtype(v, np.number)]
     return df, cols_to_use
 
