@@ -461,16 +461,20 @@ def parse_archr_qc(dt, df, fs, pf, tu):
         result["archr_pre_filter_metadata"] = {"path": os.path.abspath(pf)}
         with open(pf, 'r') as f:
             cols = f.readline().rstrip('\n').split('\t')
-            len_ind = cols.index('nFrags')
+            frg_ind = cols.index('nFrags')
             enr_ind = cols.index('TSSEnrichment')
-            lens = []
+            frgs = []
             enrs = []
             for line in f:
                 entries = line.rstrip('\n').split('\t')
-                lens.append(to_int(entries[len_ind]))
-                enrs.append(to_float(entries[enr_ind]))
-        result["_num_barcodes_considered"] = len(lens)
-        result["median_fragment_count"] = median(lens)
+                frg = to_int(entries[frg_ind])
+                enr = to_float(entries[enr_ind])
+                if enr >= 4:
+                    frgs.append(frg)
+                    enrs.append(enr)
+
+        result["_num_barcodes_considered"] = len(frgs)
+        result["median_fragment_count"] = median(frgs)
         result["median_tss_enrichment"] = median(enrs)
 
     if os.path.getsize(tu) > 0:
