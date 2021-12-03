@@ -473,7 +473,7 @@ def parse_archr_qc(dt, df, fs, pf, tu):
                     frgs.append(frg)
                     enrs.append(enr)
 
-        result["num_barcodes_considered"] = len(frgs)
+        result["_num_barcodes_considered"] = len(frgs)
         result["median_fragment_count"] = median(frgs)
         result["median_tss_enrichment"] = median(enrs)
 
