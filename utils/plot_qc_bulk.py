@@ -6,7 +6,7 @@ import plotly.express as px
 
 def load_tsv(tsv_path):
     with open(tsv_path) as f:
-        head = [next(f) for _ in range(4)]
+        head = [next(f) for _ in range(5)]
         header_data = []
         for l in head:
             curr = ""
@@ -19,7 +19,7 @@ def load_tsv(tsv_path):
                     curr = i
             header_data.append(entries)
         header = [":".join(i) for i in zip(*header_data)]
-        print(header) ####
+        # print(header) ####
         df = pd.read_csv(f, sep='\t', names=header, index_col=False)
 
     cols_to_use = [i for i, v in df.dtypes.items() if np.issubdtype(v, np.number)]
