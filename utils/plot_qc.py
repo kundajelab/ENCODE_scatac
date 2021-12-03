@@ -15,7 +15,7 @@ def plot_hist(df, col):
 
 def plot_qc(tsv_path, out_path):
     df, cols = load_tsv(tsv_path)
-    with open(out_path, 'a') as f:
+    with open(out_path, 'w') as f:
         for col in cols:
             h = plot_hist(df, col)
             f.write(h.to_html(full_html=False, include_plotlyjs='cdn'))
