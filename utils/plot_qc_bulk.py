@@ -9,7 +9,7 @@ def load_tsv(tsv_path):
         head = [next(f) for _ in range(4)]
         header_data = []
         for l in head:
-            curr = None
+            curr = ""
             entries = []
             for i in l.rstrip("\n").split("\t"):
                 if i == "":
