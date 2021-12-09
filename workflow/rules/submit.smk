@@ -14,6 +14,7 @@ rule submit_fastq_1:
     output: 
         touch("submit/{sample}/R1_trim_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-fastq-filtering-step-v-1-0-run",
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -37,6 +38,7 @@ rule submit_fastq_2:
     output: 
         touch("submit/{sample}/R2_trim_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-fastq-filtering-step-v-1-0-run",
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -63,6 +65,7 @@ rule submit_reads_qc:
     output: 
         touch("submit/{sample}/reads_qc_metadata_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-fastq-filtering-step-v-1-0-run",
         schema = "sc_atac_read_quality_metric",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -89,6 +92,7 @@ rule submit_bam_raw:
     output: 
         touch("submit/{sample}/raw_bam_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-filtered-fastq-mapping-step-v-1-0-run",
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -113,6 +117,7 @@ rule submit_alignments_raw_qc:
     output: 
         touch("submit/{sample}/alignments_raw_qc_metadata_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-filtered-fastq-mapping-step-v-1-0-run",
         schema = "sc_atac_alignment_quality_metric",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -139,6 +144,7 @@ rule submit_bam_filtered:
     output: 
         touch("submit/{sample}/filtered_bam_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-bam-filtering-step-v-1-0-run",
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -166,6 +172,7 @@ rule submit_alignments_filtered_qc:
     output: 
         touch("submit/{sample}/alignments_filtered_qc_metadata_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-bam-filtering-step-v-1-0-run",
         schema = "sc_atac_alignment_quality_metric",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -193,6 +200,7 @@ rule submit_lib_comp_qc:
     output: 
         touch("submit/{sample}/alignments_lib_comp_qc_metadata_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-bam-filtering-step-v-1-0-run",
         schema = "sc_atac_library_complexity_quality_metric", 
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -217,6 +225,7 @@ rule submit_fragments:
     output: 
         touch("submit/{sample}/fragments_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-fragments-generation-step-v-1-0-run",
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -245,6 +254,7 @@ rule submit_fragments_qc:
     output: 
         touch("submit/{sample}/fragments_qc_metadata_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-fragments-generation-step-v-1-0-run",
         schema = "sc_atac_multiplet_quality_metric", 
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -269,6 +279,7 @@ rule submit_analyses:
     output: 
         touch("submit/{sample}/analyses_submit.done")
     params:
+        step_run = "anshul-kundaje:scatac-seq-archr-generation-step-v-1-0-run",
         schema = "file",
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
@@ -297,7 +308,32 @@ rule submit_analyses_qc:
     output: 
         touch("submit/{sample}/analyses_qc_metadata_submit.done")
     params:
-        schema = "sc_atac_analysis_quality_metric", #TODO
+        step_run = "anshul-kundaje:scatac-seq-archr-generation-step-v-1-0-run",
+        schema = "sc_atac_analysis_quality_metric", 
+        dcc_api_key = os.environ["DCC_API_KEY"], 
+        dcc_secret_key = os.environ["DCC_SECRET_KEY"]
+    log:
+        directory("logs/{sample}/submit/analyses_qc_metadata_submit")
+    conda:
+        "../envs/portal.yaml"
+    group: 
+        "submit"
+    script: 
+        "../scripts/encode_submit.py"
+
+rule submit_summary_qc: 
+    """
+    Submit summary QC
+    """
+    input: 
+        json = "metadata/{sample}/summary_qc_metadata.json",
+        prev = "submit/{sample}/analyses_submit.done",
+        data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
+    output: 
+        touch("submit/{sample}/summary_qc_metadata_submit.done")
+    params:
+        step_run = "anshul-kundaje:scatac-seq-archr-generation-step-v-1-0-run",
+        schema = "sc_atac_analysis_quality_metric", 
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
@@ -323,7 +359,7 @@ rule submit_done:
         "submit/{sample}/alignments_filtered_qc_metadata_submit.done",
         "submit/{sample}/alignments_lib_comp_qc_metadata_submit.done",
         "submit/{sample}/fragments_submit.done",
-        # "submit/{sample}/fragments_qc_metadata_submit.done",
+        "submit/{sample}/fragments_qc_metadata_submit.done",
         "submit/{sample}/analyses_submit.done",
         "submit/{sample}/analyses_qc_metadata_submit.done",
     output:

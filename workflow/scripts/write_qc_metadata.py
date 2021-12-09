@@ -496,7 +496,7 @@ def parse_counts_summary_qc(rd, ar, af, lc, nl, an):
             has_nrm = True
             result['reads_barcode_matched'] = d['num_reads_matched'] * 2
         if has_nrt and has_nrm:
-            result['_frac_reads_barcode_matched'] = d['num_reads_matched'] / (result['reads_original'] * 2)
+            result['_frac_reads_barcode_matched'] = d['num_reads_matched'] * 2 / result['reads_original']
     with open(ar, 'r') as f:
         d = json.load(f)
         result['reads_mapped'] = d['mapped_reads']
