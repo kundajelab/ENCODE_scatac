@@ -337,7 +337,7 @@ rule submit_summary_qc:
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
-        directory("logs/{sample}/submit/analyses_qc_metadata_submit")
+        directory("logs/{sample}/submit/summary_qc_metadata_submit")
     conda:
         "../envs/portal.yaml"
     group: 
