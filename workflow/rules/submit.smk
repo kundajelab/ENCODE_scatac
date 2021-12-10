@@ -333,7 +333,7 @@ rule submit_summary_qc:
         touch("submit/{sample}/summary_qc_metadata_submit.done")
     params:
         step_run = "anshul-kundaje:scatac-seq-archr-generation-step-v-1-0-run",
-        schema = "sc_atac_summary_quality_metric", 
+        schema = "sc_atac_counts_summary_quality_metric", 
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
