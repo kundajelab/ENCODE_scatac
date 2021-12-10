@@ -136,11 +136,14 @@ rule submit_bam_filtered:
     """
     input: 
         json = "metadata/{sample}/filtered_bam_metadata.json",
-        prev1 = "submit/{sample}/R1_trim_submit.done",
-        prev2 = "submit/{sample}/R2_trim_submit.done",
+        # prev1 = "submit/{sample}/R1_trim_submit.done",
+        # prev2 = "submit/{sample}/R2_trim_submit.done",
+        prev = "submit/{sample}/raw_bam_submit.done", # ALT
         bam = "results/{sample}/filtering/filtered.bam",
-        fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz", # attach to fastqs
-        fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        # fq_R1 = "results/{sample}/fastqs/R1_trim.fastq.gz", # attach to fastqs
+        # fq_R2 = "results/{sample}/fastqs/R2_trim.fastq.gz",
+        bam_raw = "results/{sample}/mapping/raw.bam" # ALT
+        
     output: 
         touch("submit/{sample}/filtered_bam_submit.done")
     params:
@@ -299,7 +302,8 @@ rule submit_analyses_qc:
     input: 
         json = "metadata/{sample}/analyses_qc_metadata.json",
         prev = "submit/{sample}/analyses_submit.done",
-        data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
+        # data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
+        data_file = "results/{sample}/analyses/archr_project.tar.gz", # ALT
         archr_doublet_summary_text = "results/{sample}/analyses/archr_doublet_summary.tsv",
         archr_doublet_summary_figure =  "results/{sample}/analyses/archr_doublet_summary.pdf",
         archr_fragment_size_distribution = "results/{sample}/analyses/archr_fragment_size_distribution.pdf",
@@ -328,7 +332,8 @@ rule submit_summary_qc:
     input: 
         json = "metadata/{sample}/summary_qc_metadata.json",
         prev = "submit/{sample}/analyses_submit.done",
-        data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
+        # data_file = "results/{sample}/fragments/fragments.tar.gz", # attach to fragments
+        data_file = "results/{sample}/analyses/archr_project.tar.gz" # ALT
     output: 
         touch("submit/{sample}/summary_qc_metadata_submit.done")
     params:

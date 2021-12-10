@@ -24,7 +24,7 @@ def apply_patches(metadata, schema):
 
         alias_entries = metadata["aliases"][0].split("$")
         if alias_entries[-1] == "alignments_lib_comp_qc_metadata.json":
-            alias_new = "$".join(alias_entries[:-1] + ["alignments_filtered_qc_metadata"])
+            alias_new = "$".join(alias_entries[:-1] + ["alignments_filtered_qc_metadata.json"])
             metadata["aliases"] = [alias_new]
 
     elif schema == "sc_atac_library_complexity_quality_metric":
@@ -41,6 +41,17 @@ def apply_patches(metadata, schema):
                 "type": type
             }
             metadata["barcode_pairs_expanded"] = entry
+
+    elif schema == "file": # ALT
+        alias_entries = metadata["aliases"][0].split("$")
+        if alias_entries[-1] == "filtered.bam":
+            deriv_from_new = "$".join(alias_entries[:-1] + ["raw.bam"])
+            metadata["derived_from"] = [deriv_from_new]
+
+    elif schema in ["sc_atac_analysis_quality_metric", "sc_atac_counts_summary_quality_metric"]: # ALT
+        metric_of_entries = metadata["quality_metric_of"][0].split("$")
+        metric_of_new = "$".join(metric_of_entries[:-1] + ["archr_project.tar.gz"])
+        metadata["quality_metric_of"] = [metric_of_new]
 
 
 def set_attachments(conn, payload):
