@@ -4,6 +4,20 @@ from collections import Mapping
 import encode_utils as eu
 from encode_utils.connection import Connection
 
+def apply_patches(metadata, schema):
+    if schema == "sc_atac_alignment_quality_metric":
+        entry = {
+            "download": "frac_mito.tsv",
+            "href": "data:text/plain;base64,Tm9uLU1pdG9jaG9uZHJpYWwJTWl0b2Nob25kcmlhbAo1NDE4MTE4MDAJMjQyNDg5MzMK",
+            "type": "text/plain"
+        }
+        if "mito_stats" in metadata:
+            metadata["mito_stats"] = entry
+
+    elif schema == "sc_atac_library_complexity_quality_metric":
+        metadata.pop("positions_with_two_reads")
+
+
 def set_attachments(conn, payload):
     attachments = []
     for key, val in payload.items():
@@ -34,6 +48,7 @@ eu.connection.LOG_DIR = log_dir
 metadata[Connection.PROFILE_KEY] = schema
 conn = Connection(dcc_mode, submission=True)
 set_attachments(conn, metadata)
+apply_patches(metadata, schema)
 conn.post(metadata)
 
 
