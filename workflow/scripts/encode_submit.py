@@ -22,6 +22,11 @@ def apply_patches(metadata, schema):
             }
             metadata["mito_stats"] = entry
 
+        alias_entries = metadata["alias"][0].split("$")
+        if alias_entries[-1] == "alignments_lib_comp_qc_metadata.json":
+            alias_new = "$".join(alias_entries[:-1] + ["alignments_filtered_qc_metadata"])
+            metadata["alias"] = [alias_new]
+
     elif schema == "sc_atac_library_complexity_quality_metric":
         metadata.pop("positions_with_two_reads")
 

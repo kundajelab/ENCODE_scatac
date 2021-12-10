@@ -598,7 +598,7 @@ try:
         l = parse_lib_complexity_qc(pbc_stats)
         m = parse_frac_mito_qc(frac_mito)
         ha = build_quality_metric_header(sample_data, sample_name, config, data_paths, alignment_stats_out)
-        hl = ha = build_quality_metric_header(sample_data, sample_name, config, data_paths, lib_comp_stats_out)
+        hl = build_quality_metric_header(sample_data, sample_name, config, data_paths, lib_comp_stats_out)
         alignment_stats = ha | s | m
         lib_comp_stats = hl | p | l
 
