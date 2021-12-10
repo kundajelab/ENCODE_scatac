@@ -35,8 +35,7 @@ def apply_patches(metadata, schema):
                 "href": href_new,
                 "type": type
             }
-            if "mito_stats" in metadata:
-                metadata["barcode_pairs_expanded"] = entry
+            metadata["barcode_pairs_expanded"] = entry
 
 
 def set_attachments(conn, payload):
