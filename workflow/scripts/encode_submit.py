@@ -4,18 +4,39 @@ from collections import Mapping
 import encode_utils as eu
 from encode_utils.connection import Connection
 
+def retype_href(href, type):
+    data = href.split(";", 1)[1]
+    return f"data:{type};{data}"
+
+
 def apply_patches(metadata, schema):
     if schema == "sc_atac_alignment_quality_metric":
-        entry = {
-            "download": "frac_mito.tsv",
-            "href": "data:text/plain;base64,Tm9uLU1pdG9jaG9uZHJpYWwJTWl0b2Nob25kcmlhbAo1NDE4MTE4MDAJMjQyNDg5MzMK",
-            "type": "text/plain"
-        }
         if "mito_stats" in metadata:
+            type = "text/plain"
+            href = metadata["mito_stats"]["href"]
+            href_new = retype_href(href, type)
+            entry = {
+                "download": "frac_mito.tsv",
+                "href": href_new,
+                "type": type
+            }
             metadata["mito_stats"] = entry
 
     elif schema == "sc_atac_library_complexity_quality_metric":
         metadata.pop("positions_with_two_reads")
+
+    elif schema == "sc_atac_multiplet_quality_metric":
+        if "barcode_pairs_expanded" in metadata:
+            type = "application/gzip"
+            href = metadata["barcode_pairs_expanded"]["href"]
+            href_new = retype_href(href, type)
+            entry = {
+                "download": "barcode_pairs_expanded.tsv.gz",
+                "href": href_new,
+                "type": type
+            }
+            if "mito_stats" in metadata:
+                metadata["barcode_pairs_expanded"] = entry
 
 
 def set_attachments(conn, payload):
