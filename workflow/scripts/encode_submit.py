@@ -53,6 +53,9 @@ def apply_patches(metadata, schema):
         metric_of_new = "$".join(metric_of_entries[:-1] + ["archr_project.tar.gz"])
         metadata["quality_metric_of"] = [metric_of_new]
 
+        if schema == "sc_atac_analysis_quality_metric":
+            metadata["median_fragment_count"] = int(metadata["median_fragment_count"])
+
 
 def set_attachments(conn, payload):
     attachments = []
