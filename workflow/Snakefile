@@ -86,7 +86,8 @@ localrules:
     fetch_bsgenome,
     fetch_gene_anno,
     fetch_peak_anno,
-    move_archr_files
+    move_archr_files,
+    build_bulk_caper_config
 
 ruleorder: extract_index > idx_prefix_placeholder
 
@@ -284,21 +285,6 @@ rule extract_index:
     shell:
         "tar -xOf {input} '{params.ind}' > {output}"
 
-# rule unzip_index:
-#     """
-#     Unzip Bowtie2 index files
-#     """
-#     input:
-#         "bwt2_idx/zipped/{genome_name}.zip"
-#     output:
-#         "bwt2_idx/unpacked/{genome_name}/{bwt2_prefix,[^.]+}.{file}.bt2"
-#     params:
-#         ind = lambda w: f"*{w.bwt2_prefix}.{w.file}.bt2"
-#     conda:
-#         "envs/portal.yaml"
-#     shell:
-#         "unzip -p {input} '{params.ind}' > {output}"
-
 rule idx_prefix_placeholder:
     """
     Create Bowtie2 index prefix dummy file
@@ -389,3 +375,21 @@ rule move_archr_files:
     """
     input:
         get_archr_files_all
+
+rule build_bulk_caper_config:
+    """
+    Build input json for bulk pipeline integration
+    """
+    input:
+        ancient("results/{sample}/input_data.json")
+    output:
+        expand("bulk_configs/{sample}.json", sample=samples)
+    params:
+        sample = lambda w: w.sample,
+        bucket = config["bucket"],
+        genome = lambda w: sample_data[w.sample]["genome"],
+        read_length = lambda w: sample_data[w.sample]["read_length"]
+    conda:
+        "envs/portal.yaml"
+    script:
+        "scripts/build_bulk_caper_config.py" 
