@@ -376,20 +376,20 @@ rule move_archr_files:
     input:
         get_archr_files_all
 
-rule build_bulk_caper_config:
-    """
-    Build input json for bulk pipeline integration
-    """
-    input:
-        ancient("results/{sample}/input_data.json")
-    output:
-        expand("bulk_configs/{sample}.json", sample=samples)
-    params:
-        sample = lambda w: w.sample,
-        bucket = config["bucket"],
-        genome = lambda w: sample_data[w.sample]["genome"],
-        read_length = lambda w: sample_data[w.sample]["read_length"]
-    conda:
-        "envs/portal.yaml"
-    script:
-        "scripts/build_bulk_caper_config.py" 
+# rule build_bulk_caper_config:
+#     """
+#     Build input json for bulk pipeline integration
+#     """
+#     input:
+#         ancient("results/{sample}/input_data.json")
+#     output:
+#         expand("bulk_configs/{sample}.json", sample=samples)
+#     params:
+#         sample = lambda w: w.sample,
+#         bucket = config["bucket"],
+#         genome = lambda w: sample_data[w.sample]["genome"],
+#         read_length = lambda w: sample_data[w.sample]["read_length"]
+#     conda:
+#         "envs/portal.yaml"
+#     script:
+#         "scripts/build_bulk_caper_config.py" 
