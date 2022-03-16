@@ -376,6 +376,30 @@ rule move_archr_files:
     input:
         get_archr_files_all
 
+rule resubmit_files:
+    """
+    Resubmit files that failed to upload
+    """
+    input:
+        ENCFF611IWH = "results/ENCSR481YWC-1/fastqs/R2_trim.fastq.gz",
+        ENCFF863MSU = "results/ENCSR639HAJ-1/mapping/raw.bam",
+        ENCFF401TTS = "results/ENCSR290IUT-1/mapping/raw.bam",
+        ENCFF871AGQ = "results/ENCSR568XID-1/fragments/fragments.tar.gz",
+        ENCFF288DCD = "results/ENCSR726QTF-1/mapping/raw.bam",
+        ENCFF863UAO = "results/ENCSR534KYJ-1/mapping/raw.bam",
+        ENCFF371RGF = "results/ENCSR341TTX-1/fastqs/R2_trim.fastq.gz"
+    output:
+        "reupload_touch.txt"
+    params:
+        dcc_api_key = os.environ["DCC_API_KEY"], 
+        dcc_secret_key = os.environ["DCC_SECRET_KEY"]
+    log:
+        directory("logs/{sample}/query")
+    conda:
+        "envs/portal.yaml"
+    script:
+        "scripts/encode_resubmit.py"
+
 # rule build_bulk_caper_config:
 #     """
 #     Build input json for bulk pipeline integration
