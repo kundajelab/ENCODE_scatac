@@ -394,7 +394,7 @@ rule resubmit_files:
         dcc_api_key = os.environ["DCC_API_KEY"], 
         dcc_secret_key = os.environ["DCC_SECRET_KEY"]
     log:
-        directory("logs/{sample}/query")
+        directory("logs/reupload")
     conda:
         "envs/portal.yaml"
     script:
