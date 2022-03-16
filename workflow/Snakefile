@@ -382,12 +382,12 @@ rule resubmit_files:
     """
     input:
         ENCFF611IWH = "results/ENCSR481YWC-1/fastqs/R2_trim.fastq.gz",
-        ENCFF863MSU = "results/ENCSR639HAJ-1/mapping/raw.bam",
-        ENCFF401TTS = "results/ENCSR290IUT-1/mapping/raw.bam",
-        ENCFF871AGQ = "results/ENCSR568XID-1/fragments/fragments.tar.gz",
-        ENCFF288DCD = "results/ENCSR726QTF-1/mapping/raw.bam",
-        ENCFF863UAO = "results/ENCSR534KYJ-1/mapping/raw.bam",
-        ENCFF371RGF = "results/ENCSR341TTX-1/fastqs/R2_trim.fastq.gz"
+        # ENCFF863MSU = "results/ENCSR639HAJ-1/mapping/raw.bam",
+        # ENCFF401TTS = "results/ENCSR290IUT-1/mapping/raw.bam",
+        # ENCFF871AGQ = "results/ENCSR568XID-1/fragments/fragments.tar.gz",
+        # ENCFF288DCD = "results/ENCSR726QTF-1/mapping/raw.bam",
+        # ENCFF863UAO = "results/ENCSR534KYJ-1/mapping/raw.bam",
+        # ENCFF371RGF = "results/ENCSR341TTX-1/fastqs/R2_trim.fastq.gz"
     output:
         "reupload_touch.txt"
     params:
