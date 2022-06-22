@@ -2,3 +2,4 @@ keep-going: True
 kubernetes: True
 use-conda: True
 default-remote-provider: GS
+--restart-times: 2
