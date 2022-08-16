@@ -186,6 +186,22 @@ rule submit:
     input: 
         expand("submit/{sample}/submit.done", sample=samples)
 
+rule submit_to_frags:
+    """
+    Submit up to fragments
+    """
+    input: 
+        expand("submit/{sample}/R1_trim_submit.done", sample=samples),
+        expand("submit/{sample}/R2_trim_submit.done", sample=samples),
+        expand("submit/{sample}/reads_qc_metadata_submit.done", sample=samples),
+        expand("submit/{sample}/raw_bam_submit.done", sample=samples),
+        expand("submit/{sample}/alignments_raw_qc_metadata_submit.done", sample=samples),
+        expand("submit/{sample}/filtered_bam_submit.done", sample=samples),
+        expand("submit/{sample}/alignments_filtered_qc_metadata_submit.done", sample=samples),
+        expand("submit/{sample}/alignments_lib_comp_qc_metadata_submit.done", sample=samples),
+        expand("submit/{sample}/fragments_submit.done", sample=samples),
+        expand("submit/{sample}/fragments_qc_metadata_submit.done", sample=samples)
+
 checkpoint query_portal:
     """
     Query ENCODE portal by experiment accession and replicate
