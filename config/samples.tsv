@@ -1,4 +1,13 @@
 Experiment	Replicate	Modality	Genome
+ENCSR594BJF	1	multiome	GRCh38
+ENCSR659ANG	1	multiome	GRCh38
+ENCSR074DOR	1	multiome	GRCh38
+ENCSR497ZST	1	multiome	GRCh38
+ENCSR825WYQ	1	multiome	GRCh38
+ENCSR118PUH	1	multiome	GRCh38
+ENCSR650BBI	1	multiome	GRCh38
+ENCSR552QVU	1	multiome	GRCh38
+@	-	-
 ENCSR273DAC	1	multiome	GRCh38
 ENCSR321AHR	1	multiome	GRCh38
 ENCSR769WLL	1	multiome	GRCh38
@@ -7,7 +16,6 @@ ENCSR701JAT	1	multiome	GRCh38
 ENCSR101LQQ	1	multiome	GRCh38
 ENCSR270CUT	1	multiome	GRCh38
 ENCSR409QLZ	1	multiome	GRCh38
-@	-	-
 ENCSR185NXG	1	multiome	GRCh38
 ENCSR088ZOL	1	multiome	GRCh38
 ENCSR862IWS	1	multiome	GRCh38
